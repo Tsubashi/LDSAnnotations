@@ -1,0 +1,25 @@
+PODS:
+  - LDSAnnotations (1.0.0):
+    - PSOperations
+    - SQLite.swift (~> 0.9.2)
+    - Swiftification
+  - PSOperations (2.1.0)
+  - SQLite.swift (0.9.2)
+  - Swiftification (4.1.0)
+
+DEPENDENCIES:
+  - LDSAnnotations (from `.`)
+
+EXTERNAL SOURCES:
+  LDSAnnotations:
+    :path: "."
+
+SPEC CHECKSUMS:
+  LDSAnnotations: cc569fb5bed2d0ea68762b33027c08d547f62b9e
+  PSOperations: ced5d50e2ce4ec28dcdb2ff121c04f56b479fa7b
+  SQLite.swift: 5dca22dbf6634fdb9c3270fae9491830804e9b2d
+  Swiftification: 0b54f77ff26bf5d7d6f9b19ac8f1d8e4a4110b75
+
+PODFILE CHECKSUM: 80fc4047deb447f0ebf487f06720690b380256a2
+
+COCOAPODS: 1.0.0.beta.2
