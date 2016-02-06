@@ -83,12 +83,25 @@ class SyncNotebooksTests: XCTestCase {
     }
     
     func createSession() -> Session {
-        let username = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountUsername")!
-        let password = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountPassword")!
+        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountUsername") else {
+            XCTFail("Missing LDSAccountUsername")
+            fatalError()
+        }
+        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountPassword") else {
+            XCTFail("Missing LDSAccountPassword")
+            fatalError()
+        }
+        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
+            XCTFail("Missing ClientUsername")
+            fatalError()
+        }
+        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
+            XCTFail("Missing ClientPassword")
+            fatalError()
+        }
+        
         let userAgent = "LDSAnnotations unit tests"
         let clientVersion = "1"
-        let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername")!
-        let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword")!
         
         return Session(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
     }

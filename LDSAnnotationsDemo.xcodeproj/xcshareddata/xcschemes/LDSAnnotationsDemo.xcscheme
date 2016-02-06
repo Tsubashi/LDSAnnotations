@@ -71,6 +71,24 @@
             ReferencedContainer = "container:LDSAnnotationsDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-ClientUsername $(CLIENT_USERNAME)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-ClientPassword $(CLIENT_PASSWORD)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-LDSAccountUsername $(LDSACCOUNT_USERNAME)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-LDSAccountPassword $(LDSACCOUNT_PASSWORD)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
