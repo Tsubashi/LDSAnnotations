@@ -81,11 +81,11 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-LDSAccountUsername $(LDSACCOUNT_USERNAME)"
+            argument = "-TestAccountUsername $(TEST_ACCOUNT_USERNAME)"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-LDSAccountPassword $(LDSACCOUNT_PASSWORD)"
+            argument = "-TestAccountPassword $(TEST_ACCOUNT_PASSWORD)"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

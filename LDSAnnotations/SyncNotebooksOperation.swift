@@ -63,6 +63,7 @@ class SyncNotebooksOperation: Operation {
             "changes": localChanges,
         ]
         if token?.serverSyncDate == nil {
+            // TODO: have another syncStatus option defined that includes active and trashed folders
             syncFolders["syncStatus"] = "normal"
         }
         let payload = [
@@ -73,7 +74,7 @@ class SyncNotebooksOperation: Operation {
             switch response {
             case .Success(let payload):
                 do {
-                    try self.annotationStore.inTransaction {
+                    try self.annotationStore.inSyncTransaction {
                         self.annotationStore.deletedNotebooks(lastModifiedOnOrBefore: localSyncDate)
                         try self.applyServerChanges(payload)
                     }
@@ -81,8 +82,8 @@ class SyncNotebooksOperation: Operation {
                 } catch let error as NSError {
                     self.finishWithError(error)
                 }
-            case .Failure(_):
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Failure response"))
+            case .Failure(let payload):
+                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
             case .Error(let error):
                 self.finishWithError(error)
             }
@@ -121,6 +122,8 @@ class SyncNotebooksOperation: Operation {
         self.serverSyncDate = serverSyncDate
         
         if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
+            var downloadCount = 0
+            
             for change in remoteChanges {
                 guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
                     throw Error.errorWithCode(.Unknown, failureReason: "Missing changeType")
@@ -138,6 +141,8 @@ class SyncNotebooksOperation: Operation {
                 
                 switch changeType {
                 case .New, .Trash:
+                    downloadCount += 1
+                    
                     if let existingNotebook = annotationStore.notebookWithUniqueID(uniqueID) {
                         var mergedNotebook = downloadedNotebook
                         mergedNotebook.id = existingNotebook.id
@@ -154,7 +159,7 @@ class SyncNotebooksOperation: Operation {
                 }
             }
             
-            downloadCount = remoteChanges.count
+            self.downloadCount = downloadCount
         } else {
             downloadCount = 0
         }

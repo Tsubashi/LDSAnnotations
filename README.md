@@ -23,11 +23,13 @@ Then run:
 pod install
 ```
 
-### Tests
+### Demo and Tests
 
-The tests can be run from the `LDSAnnotationsDemo` scheme. The tests require a client
-username and password, as well as a test LDS Account username and password. You will
-need to supply these credentials through the “Arguments Passed On Launch” in the scheme.
+The demo app and tests can be run from the `LDSAnnotationsDemo` scheme. The demo app
+requires a client username and password (to authorize use of the API for the app).
+To run the tests you will also need a test LDS Account username and password (don’t use
+an account that has annotations you care about). You will need to supply these credentials
+through the “Arguments Passed On Launch” in the scheme.
 
 The easiest way to do this is to duplicate the `LDSAnnotationsDemo` scheme (naming it 
 something like `LDSAnnotationsDemo with Secrets`) and replace the environment variables
@@ -38,14 +40,14 @@ isn’t accidentally committed.
 
 The test credentials are encrypted in the `.travis.yml` for use when building on
 Travis CI. To update the credentials, use the following command (substituting the
-appropriate values):
+appropriate values; be sure to escape `bash` symbols):
 
 ```bash
 travis encrypt --add --override \
     "CLIENT_USERNAME=<value>" \
     "CLIENT_PASSWORD=<value>" \
-    "LDSACCOUNT_USERNAME=<value>" \
-    "LDSACCOUNT_PASSWORD=<value>"
+    "TEST_ACCOUNT_USERNAME=<value>" \
+    "TEST_ACCOUNT_PASSWORD=<value>"
 ```
 
 ### License

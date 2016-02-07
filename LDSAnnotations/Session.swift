@@ -28,8 +28,12 @@ import PSOperations
 /// Instances are lightweight; construct a new instance whenever the user's credentials change.
 public class Session: NSObject {
     
-    let username: String
-    let password: String
+    /// The username used to authenticate this session.
+    public let username: String
+    
+    /// The password used to authenticate this session.
+    public let password: String
+    
     let userAgent: String
     let clientVersion: String
     let clientUsername: String

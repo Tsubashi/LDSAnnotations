@@ -20,31 +20,12 @@
 // THE SOFTWARE.
 //
 
-import UIKit
+import Foundation
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(NSFileManager.privateDocumentsURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {}
-        do {
-            try NSFileManager.privateDocumentsURL.setResourceValue(true, forKey: NSURLIsExcludedFromBackupKey)
-        } catch {}
-        
-        let viewController = AccountsViewController()
-        
-        let navigationController = UINavigationController(rootViewController: viewController)
-        
-        window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
-        
-        return true
+extension NSFileManager {
+    
+    static var privateDocumentsURL: NSURL {
+        return NSFileManager.defaultManager().URLsForDirectory(.LibraryDirectory, inDomains: .UserDomainMask).last!.URLByAppendingPathComponent("Private Documents")
     }
-
+    
 }
-

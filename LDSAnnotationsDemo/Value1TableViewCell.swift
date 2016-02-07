@@ -22,29 +22,14 @@
 
 import UIKit
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(NSFileManager.privateDocumentsURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {}
-        do {
-            try NSFileManager.privateDocumentsURL.setResourceValue(true, forKey: NSURLIsExcludedFromBackupKey)
-        } catch {}
-        
-        let viewController = AccountsViewController()
-        
-        let navigationController = UINavigationController(rootViewController: viewController)
-        
-        window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
-        
-        return true
+class Value1TableViewCell: UITableViewCell {
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: .Value1, reuseIdentifier: reuseIdentifier)
     }
 
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
 }
-

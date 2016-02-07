@@ -20,9 +20,14 @@
 // THE SOFTWARE.
 //
 
-import UIKit
+import Foundation
 
-class ViewController: UIViewController {
-
+public enum NotificationSource {
+    
+    /// The notification was caused by a sync.
+    case Sync
+    
+    /// The notification was caused by a local modification.
+    case Local
+    
 }
-

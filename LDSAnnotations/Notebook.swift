@@ -65,7 +65,7 @@ public struct Notebook {
             self.description = nil
         }
         
-        if let rawStatus = jsonObject["status"] as? String, status = AnnotationStatus(rawValue: rawStatus) {
+        if let rawStatus = jsonObject["@status"] as? String, status = AnnotationStatus(rawValue: rawStatus) {
             self.status = status
         } else {
             self.status = .Active
@@ -77,11 +77,13 @@ public struct Notebook {
             "@guid": uniqueID,
             "label": name,
             "timestamp": lastModified.formattedISO8601,
-            "status": status.rawValue,
         ]
         
         if let description = description {
             result["desc"] = description
+        }
+        if status != .Active {
+            result["@status"] = status.rawValue
         }
         
         return result

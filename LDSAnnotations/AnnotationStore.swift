@@ -24,6 +24,12 @@ import Foundation
 import SQLite
 import Swiftification
 
+class SetBox<T where T: Hashable>: NSObject {
+    
+    var set = Set<T>()
+    
+}
+
 /// A local annotation store backed by a SQLite database.
 public class AnnotationStore {
     
@@ -75,17 +81,93 @@ public class AnnotationStore {
         }
     }
     
+    /// Registration point for notifications when notebooks are added, updated, trashed, and deleted.
+    public let notebookObservers = ObserverSet<(source: NotificationSource, notebooks: [Notebook])>()
+    
     /// Makes multiple queries or modifications in a single transaction.
     ///
     /// This method is reentrant.
     public func inTransaction(closure: () throws -> Void) throws {
-        let key = "txn:\(unsafeAddressOf(self))"
-        if NSThread.currentThread().threadDictionary[key] != nil {
+        let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
+        guard NSThread.currentThread().threadDictionary[inSyncTransactionKey] == nil else {
+            fatalError("A local transaction cannot be started in a sync transaction")
+        }
+        
+        let inTransactionKey = "txn:\(unsafeAddressOf(self))"
+        if NSThread.currentThread().threadDictionary[inTransactionKey] != nil {
             try closure()
         } else {
-            NSThread.currentThread().threadDictionary[key] = true
-            defer { NSThread.currentThread().threadDictionary[key] = false }
-            try db.transaction(block: closure)
+            NSThread.currentThread().threadDictionary[inTransactionKey] = true
+            defer { NSThread.currentThread().threadDictionary.removeObjectForKey(inTransactionKey) }
+            try db.transaction {
+                try closure()
+                
+                // Batch notify about any notebooks modified in this transaction
+                let notebookIDsKey = "ids:\(unsafeAddressOf(self))"
+                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> {
+                    self.notebookObservers.notify((source: .Local, notebooks: self.allNotebooks(ids: Array(notebookIDs.set))))
+                }
+            }
+        }
+    }
+    
+    func inSyncTransaction(closure: () throws -> Void) throws {
+        let inTransactionKey = "txn:\(unsafeAddressOf(self))"
+        guard NSThread.currentThread().threadDictionary[inTransactionKey] == nil else {
+            fatalError("A sync transaction cannot be started in a local transaction")
+        }
+        
+        let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
+        if NSThread.currentThread().threadDictionary[inSyncTransactionKey] != nil {
+            try closure()
+        } else {
+            NSThread.currentThread().threadDictionary[inSyncTransactionKey] = true
+            defer { NSThread.currentThread().threadDictionary[inSyncTransactionKey] = false }
+            try db.transaction {
+                try closure()
+                
+                // Batch notify about any notebooks modified in this transaction
+                let notebookIDsKey = "ids:\(unsafeAddressOf(self))"
+                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> {
+                    self.notebookObservers.notify((source: .Sync, notebooks: self.allNotebooks(ids: Array(notebookIDs.set))))
+                }
+            }
+        }
+    }
+    
+    func notifyModifiedNotebooksWithIDs(ids: [Int64]) {
+        let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
+        guard NSThread.currentThread().threadDictionary[inSyncTransactionKey] == nil else {
+            fatalError("A local transaction cannot be started in a sync transaction")
+        }
+        
+        let inTransactionKey = "txn:\(unsafeAddressOf(self))"
+        if NSThread.currentThread().threadDictionary[inTransactionKey] != nil {
+            let notebookIDsKey = "ids:\(unsafeAddressOf(self))"
+            let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> ?? SetBox()
+            notebookIDs.set.unionInPlace(ids)
+            NSThread.currentThread().threadDictionary[notebookIDsKey] = notebookIDs
+        } else {
+            // Immediately notify about these modified notebooks when outside of a transaction
+            notebookObservers.notify((source: .Local, notebooks: allNotebooks(ids: ids)))
+        }
+    }
+    
+    func notifySyncModifiedNotebooksWithIDs(ids: [Int64]) {
+        let inTransactionKey = "txn:\(unsafeAddressOf(self))"
+        guard NSThread.currentThread().threadDictionary[inTransactionKey] == nil else {
+            fatalError("A sync transaction cannot be started in a local transaction")
+        }
+        
+        let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
+        if NSThread.currentThread().threadDictionary[inSyncTransactionKey] != nil {
+            let notebookIDsKey = "ids:\(unsafeAddressOf(self))"
+            let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> ?? SetBox()
+            notebookIDs.set.unionInPlace(ids)
+            NSThread.currentThread().threadDictionary[notebookIDsKey] = notebookIDs
+        } else {
+            // Immediately notify about these modified notebooks when outside of a transaction
+            notebookObservers.notify((source: .Sync, notebooks: allNotebooks(ids: ids)))
         }
     }
     
@@ -109,6 +191,11 @@ private class NotebookTable {
 
 extension AnnotationStore {
     
+    /// Returns the number of active notebooks.
+    public func notebookCount() -> Int {
+        return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).count)
+    }
+    
     /// Returns an unordered list of active notebooks.
     public func notebooks() -> [Notebook] {
         do {
@@ -120,23 +207,56 @@ extension AnnotationStore {
     
     /// Adds a new notebook with `name`.
     public func addNotebook(name name: String) throws -> Notebook {
-        guard let notebook = addOrUpdateNotebook(Notebook(id: nil, uniqueID: NSUUID().UUIDString, name: name, description: nil, status: .Active, lastModified: NSDate())) else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Failed to add notebook")
+        guard name.length > 0 else {
+            throw Error.errorWithCode(.Unknown, failureReason: "Cannotst add a notebook without a name.")
         }
         
-        return notebook
+        let notebook = Notebook(id: nil, uniqueID: NSUUID().UUIDString, name: name, description: nil, status: .Active, lastModified: NSDate())
+        
+        let id = try db.run(NotebookTable.table.insert(
+            NotebookTable.uniqueID <- notebook.uniqueID,
+            NotebookTable.name <- notebook.name,
+            NotebookTable.description <- notebook.description,
+            NotebookTable.status <- notebook.status,
+            NotebookTable.lastModified <- notebook.lastModified
+        ))
+        
+        notifyModifiedNotebooksWithIDs([id])
+        
+        var modifiedNotebook = notebook
+        modifiedNotebook.id = id
+        return modifiedNotebook
     }
     
     /// Saves any changes to `notebook` and updates the `lastModified`.
     public func updateNotebook(notebook: Notebook) throws -> Notebook {
+        guard notebook.name.length > 0 else {
+            throw Error.errorWithCode(.Unknown, failureReason: "Cannot update a notebook without a name.")
+        }
+        
         var modifiedNotebook = notebook
         modifiedNotebook.lastModified = NSDate()
         
-        if addOrUpdateNotebook(modifiedNotebook) == nil {
-            throw Error.errorWithCode(.Unknown, failureReason: "Failed to update notebook")
+        guard let id = notebook.id else {
+            throw Error.errorWithCode(.Unknown, failureReason: "Cannot update a notebook without an ID.")
         }
+            
+        try db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
+            NotebookTable.uniqueID <- modifiedNotebook.uniqueID,
+            NotebookTable.name <- modifiedNotebook.name,
+            NotebookTable.description <- modifiedNotebook.description,
+            NotebookTable.status <- modifiedNotebook.status,
+            NotebookTable.lastModified <- modifiedNotebook.lastModified
+        ))
+        
+        notifyModifiedNotebooksWithIDs([id])
         
         return modifiedNotebook
+    }
+    
+    /// Returns the number of trashed notebooks.
+    public func trashedNotebookCount() -> Int {
+        return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Trashed).count)
     }
     
     /// Returns an unordered list of trashed notebooks.
@@ -153,6 +273,8 @@ extension AnnotationStore {
         try inTransaction {
             let lastModified = NSDate()
             
+            var ids = [Int64]()
+            
             // Fetch the current status of the notebooks
             for notebook in self.allNotebooks(ids: notebooks.mapFilter { $0.id }) {
                 if notebook.status != .Active && notebook.status != .Trashed {
@@ -164,8 +286,12 @@ extension AnnotationStore {
                         NotebookTable.status <- .Trashed,
                         NotebookTable.lastModified <- lastModified
                     ))
+                    
+                    ids.append(id)
                 }
             }
+            
+            self.notifyModifiedNotebooksWithIDs(ids)
         }
     }
     
@@ -173,6 +299,8 @@ extension AnnotationStore {
     public func deleteNotebooks(notebooks: [Notebook]) throws {
         try inTransaction {
             let lastModified = NSDate()
+            
+            var ids = [Int64]()
             
             // Fetch the current status of the notebooks
             for notebook in self.allNotebooks(ids: notebooks.mapFilter { $0.id }) {
@@ -185,8 +313,35 @@ extension AnnotationStore {
                         NotebookTable.status <- .Deleted,
                         NotebookTable.lastModified <- lastModified
                     ))
+                    
+                    ids.append(id)
                 }
             }
+            
+            self.notifyModifiedNotebooksWithIDs(ids)
+        }
+    }
+    
+    /// Restores the `notebooks` to active.
+    public func restoreNotebooks(notebooks: [Notebook]) throws {
+        try inTransaction {
+            let lastModified = NSDate()
+            
+            var ids = [Int64]()
+            
+            // Fetch the current status of the notebooks
+            for notebook in self.allNotebooks(ids: notebooks.mapFilter { $0.id }) {
+                if let id = notebook.id {
+                    try self.db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
+                        NotebookTable.status <- .Active,
+                        NotebookTable.lastModified <- lastModified
+                    ))
+                    
+                    ids.append(id)
+                }
+            }
+            
+            self.notifyModifiedNotebooksWithIDs(ids)
         }
     }
     
@@ -234,6 +389,9 @@ extension AnnotationStore {
                     NotebookTable.status <- notebook.status,
                     NotebookTable.lastModified <- notebook.lastModified
                 ))
+                
+                notifySyncModifiedNotebooksWithIDs([id])
+                
                 return notebook
             } else {
                 let id = try db.run(NotebookTable.table.insert(
@@ -243,6 +401,9 @@ extension AnnotationStore {
                     NotebookTable.status <- notebook.status,
                     NotebookTable.lastModified <- notebook.lastModified
                 ))
+                
+                notifySyncModifiedNotebooksWithIDs([id])
+                
                 return Notebook(id: id, uniqueID: notebook.uniqueID, name: notebook.name, description: notebook.description, status: notebook.status, lastModified: notebook.lastModified)
             }
         } catch {
@@ -254,6 +415,8 @@ extension AnnotationStore {
         do {
             try db.run(NotebookTable.table.filter(NotebookTable.id == id).delete())
         } catch {}
+        
+        notifySyncModifiedNotebooksWithIDs([id])
     }
     
 }

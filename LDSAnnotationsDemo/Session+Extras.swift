@@ -20,31 +20,26 @@
 // THE SOFTWARE.
 //
 
-import UIKit
+import Foundation
+import LDSAnnotations
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
-    var window: UIWindow?
-
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(NSFileManager.privateDocumentsURL, withIntermediateDirectories: true, attributes: nil)
-        } catch {}
-        do {
-            try NSFileManager.privateDocumentsURL.setResourceValue(true, forKey: NSURLIsExcludedFromBackupKey)
-        } catch {}
+extension Session {
+    
+    convenience init(username: String, password: String) {
+        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
+            fatalError("Missing bundle name")
+        }
+        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
+            fatalError("Missing bundle version")
+        }
+        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
+            fatalError("Missing ClientUsername")
+        }
+        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
+            fatalError("Missing ClientPassword")
+        }
         
-        let viewController = AccountsViewController()
-        
-        let navigationController = UINavigationController(rootViewController: viewController)
-        
-        window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
-        
-        return true
+        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
     }
-
+    
 }
-

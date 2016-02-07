@@ -13,6 +13,7 @@
 		D99234831C628B7C00177FD2 /* ChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234821C628B7C00177FD2 /* ChangeType.swift */; };
 		D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */; };
 		D99234871C6567A200177FD2 /* SyncToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234861C6567A200177FD2 /* SyncToken.swift */; };
+		D992349E1C66CC7100177FD2 /* NotificationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992349D1C66CC7100177FD2 /* NotificationSource.swift */; };
 		D9C4708A1C60144800EDCD69 /* SyncNotebooksOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470891C60144800EDCD69 /* SyncNotebooksOperation.swift */; };
 		D9C470951C60273400EDCD69 /* AuthenticateOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470941C60273400EDCD69 /* AuthenticateOperation.swift */; };
 		D9C470971C602B4A00EDCD69 /* AuthenticateCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470961C602B4A00EDCD69 /* AuthenticateCondition.swift */; };
@@ -34,6 +35,7 @@
 		D99234821C628B7C00177FD2 /* ChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeType.swift; sourceTree = "<group>"; };
 		D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksResult.swift; sourceTree = "<group>"; };
 		D99234861C6567A200177FD2 /* SyncToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncToken.swift; sourceTree = "<group>"; };
+		D992349D1C66CC7100177FD2 /* NotificationSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NotificationSource.swift; sourceTree = "<group>"; };
 		D9C470891C60144800EDCD69 /* SyncNotebooksOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksOperation.swift; sourceTree = "<group>"; };
 		D9C470911C60221400EDCD69 /* PSOperations.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PSOperations.framework; path = "Pods/../build/Debug-iphoneos/PSOperations.framework"; sourceTree = "<group>"; };
 		D9C470941C60273400EDCD69 /* AuthenticateOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticateOperation.swift; sourceTree = "<group>"; };
@@ -90,7 +92,6 @@
 			isa = PBXGroup;
 			children = (
 				D9C470891C60144800EDCD69 /* SyncNotebooksOperation.swift */,
-				D99234861C6567A200177FD2 /* SyncToken.swift */,
 				D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */,
 				D99234821C628B7C00177FD2 /* ChangeType.swift */,
 			);
@@ -108,6 +109,7 @@
 				D9C470D71C615C1300EDCD69 /* NSMutableURLRequest+Sync.swift */,
 				D9C4709A1C60319400EDCD69 /* String+Query.swift */,
 				D9C470D51C614FAE00EDCD69 /* NSDate+ISO8601.swift */,
+				D99234861C6567A200177FD2 /* SyncToken.swift */,
 				D99234811C628B7200177FD2 /* Notebooks */,
 			);
 			name = "Web Service";
@@ -118,6 +120,7 @@
 			children = (
 				D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */,
 				D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */,
+				D992349D1C66CC7100177FD2 /* NotificationSource.swift */,
 				D992347D1C627E6F00177FD2 /* Notebook.swift */,
 			);
 			name = "Local Data";
@@ -221,6 +224,7 @@
 				D99234831C628B7C00177FD2 /* ChangeType.swift in Sources */,
 				D9C470E21C617A0400EDCD69 /* AnnotationStatus.swift in Sources */,
 				D9C4709B1C60319400EDCD69 /* String+Query.swift in Sources */,
+				D992349E1C66CC7100177FD2 /* NotificationSource.swift in Sources */,
 				D9C470991C60317E00EDCD69 /* Error.swift in Sources */,
 				D94305791C5C237B00FA14B6 /* Session.swift in Sources */,
 				D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */,

@@ -83,12 +83,12 @@ class SyncNotebooksTests: XCTestCase {
     }
     
     func createSession() -> Session {
-        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountUsername") else {
-            XCTFail("Missing LDSAccountUsername")
+        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountUsername") else {
+            XCTFail("Missing TestAccountUsername")
             fatalError()
         }
-        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountPassword") else {
-            XCTFail("Missing LDSAccountPassword")
+        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountPassword") else {
+            XCTFail("Missing TestAccountPassword")
             fatalError()
         }
         guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
@@ -110,11 +110,11 @@ class SyncNotebooksTests: XCTestCase {
         sync(annotationStore, session: session, token: &token, description: "Initial sync") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 0, "There were existing local notebooks")
             
-            let notebookCount = annotationStore.notebooks().count + annotationStore.trashedNotebooks().count
+            let notebookCount = annotationStore.notebookCount() + annotationStore.trashedNotebookCount()
             XCTAssertEqual(downloadCount, notebookCount, "Not all downloaded notebooks were saved locally")
         }
         
-        let deleteCount = annotationStore.notebooks().count + annotationStore.trashedNotebooks().count
+        let deleteCount = annotationStore.notebookCount() + annotationStore.trashedNotebookCount()
         if deleteCount > 0 {
             try! annotationStore.inTransaction {
                 // Trash all active notebooks
@@ -131,7 +131,7 @@ class SyncNotebooksTests: XCTestCase {
                 XCTAssertEqual(downloadCount, 0)
             }
             
-            XCTAssertEqual(annotationStore.notebooks().count, 0)
+            XCTAssertEqual(annotationStore.notebookCount() + annotationStore.trashedNotebookCount(), 0)
         }
     }
     

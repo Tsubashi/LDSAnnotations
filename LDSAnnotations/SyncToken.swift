@@ -28,4 +28,39 @@ public struct SyncToken {
     let localSyncDate: NSDate
     let serverSyncDate: NSDate
     
+    /// Constructs a token from an encoded string.
+    public init?(rawValue: String) {
+        let scanner = NSScanner(string: rawValue)
+        
+        if !scanner.scanString("1:", intoString: nil) {
+            return nil
+        }
+        
+        var localSyncTimeInterval: Double = 0
+        if !scanner.scanDouble(&localSyncTimeInterval) {
+            return nil
+        }
+        localSyncDate = NSDate(timeIntervalSince1970: localSyncTimeInterval)
+        
+        if !scanner.scanString(":", intoString: nil) {
+            return nil
+        }
+        
+        var serverSyncTimeInterval: Double = 0
+        if !scanner.scanDouble(&serverSyncTimeInterval) {
+            return nil
+        }
+        serverSyncDate = NSDate(timeIntervalSince1970: serverSyncTimeInterval)
+    }
+    
+    init(localSyncDate: NSDate, serverSyncDate: NSDate) {
+        self.localSyncDate = localSyncDate
+        self.serverSyncDate = serverSyncDate
+    }
+    
+    /// An encoded value which can be persisted.
+    public var rawValue: String {
+        return "1:\(localSyncDate.timeIntervalSince1970):\(serverSyncDate.timeIntervalSince1970)"
+    }
+    
 }

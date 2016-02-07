@@ -52,12 +52,12 @@ class AuthenticationTests: XCTestCase {
     }
     
     func createSession(useIncorrectPassword useIncorrectPassword: Bool = false) -> Session {
-        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountUsername") else {
-            XCTFail("Missing LDSAccountUsername")
+        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountUsername") else {
+            XCTFail("Missing TestAccountUsername")
             fatalError()
         }
-        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("LDSAccountPassword") else {
-            XCTFail("Missing LDSAccountPassword")
+        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountPassword") else {
+            XCTFail("Missing TestAccountPassword")
             fatalError()
         }
         guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
