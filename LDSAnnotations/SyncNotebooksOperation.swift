@@ -63,8 +63,7 @@ class SyncNotebooksOperation: Operation {
             "changes": localChanges,
         ]
         if token?.serverSyncDate == nil {
-            // TODO: have another syncStatus option defined that includes active and trashed folders
-            syncFolders["syncStatus"] = "normal"
+            syncFolders["syncStatus"] = "notdeleted"
         }
         let payload = [
             "syncFolders": syncFolders
