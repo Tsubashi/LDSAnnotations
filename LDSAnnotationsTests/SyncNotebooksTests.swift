@@ -23,6 +23,8 @@
 import XCTest
 import LDSAnnotations
 
+// TODO: test observer sets
+
 class SyncNotebooksTests: XCTestCase {
     
     func testAddAndUpdateNotebook() {
