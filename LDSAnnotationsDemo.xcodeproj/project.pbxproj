@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7D869A4A60332B79EF48EAFA /* Pods_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BE4FFF93929CA3366A7D7B3 /* Pods_LDSAnnotationsTests.framework */; };
+		D90A3CD01C95C5B40060094B /* LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D90A3CCF1C95C5B40060094B /* LDSAnnotations.framework */; };
 		D992348B1C663FF500177FD2 /* Session+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992348A1C663FF500177FD2 /* Session+Extras.swift */; };
 		D992348F1C66450600177FD2 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992348E1C66450600177FD2 /* AccountController.swift */; };
 		D99234931C668D3200177FD2 /* AccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234921C668D3200177FD2 /* AccountViewController.swift */; };
@@ -18,20 +18,8 @@
 		D9C470AD1C612E0A00EDCD69 /* AccountsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470AC1C612E0A00EDCD69 /* AccountsViewController.swift */; };
 		D9C470B21C612E0A00EDCD69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9C470B11C612E0A00EDCD69 /* Assets.xcassets */; };
 		D9C470B51C612E0A00EDCD69 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9C470B31C612E0A00EDCD69 /* LaunchScreen.storyboard */; };
-		D9C470D31C612F1300EDCD69 /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470D11C612F1300EDCD69 /* AuthenticationTests.swift */; };
-		D9C470D41C612F1300EDCD69 /* SyncNotebooksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470D21C612F1300EDCD69 /* SyncNotebooksTests.swift */; };
 		FF02870D4805E3D83090DEF1 /* Pods_LDSAnnotationsDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA329BED4CD8C704A42BB9B1 /* Pods_LDSAnnotationsDemo.framework */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		D9C470CC1C612F0600EDCD69 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D9C4709F1C612E0A00EDCD69 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D9C470A61C612E0A00EDCD69;
-			remoteInfo = LDSAnnotationsDemo;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		007D477BB37C7E2158D5A82B /* Pods-LDSAnnotationsDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsDemo/Pods-LDSAnnotationsDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -40,6 +28,7 @@
 		8BE4FFF93929CA3366A7D7B3 /* Pods_LDSAnnotationsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotationsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6F9664386A6FDD2A5FD86E1 /* Pods-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		C0D08D4477F8D21FD1594603 /* Pods-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
+		D90A3CCF1C95C5B40060094B /* LDSAnnotations.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDSAnnotations.framework; path = "build/Debug-iphoneos/LDSAnnotations.framework"; sourceTree = "<group>"; };
 		D992348A1C663FF500177FD2 /* Session+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Session+Extras.swift"; sourceTree = "<group>"; };
 		D992348E1C66450600177FD2 /* AccountController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
 		D99234921C668D3200177FD2 /* AccountViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountViewController.swift; sourceTree = "<group>"; };
@@ -53,10 +42,6 @@
 		D9C470B41C612E0A00EDCD69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D9C470B61C612E0A00EDCD69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D9C470C01C612E8D00EDCD69 /* LDSAnnotations.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDSAnnotations.framework; path = "../build/Debug-iphoneos/LDSAnnotations.framework"; sourceTree = "<group>"; };
-		D9C470C71C612F0600EDCD69 /* LDSAnnotationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LDSAnnotationsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D9C470CB1C612F0600EDCD69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D9C470D11C612F1300EDCD69 /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
-		D9C470D21C612F1300EDCD69 /* SyncNotebooksTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksTests.swift; sourceTree = "<group>"; };
 		EA329BED4CD8C704A42BB9B1 /* Pods_LDSAnnotationsDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotationsDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -65,15 +50,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D90A3CD01C95C5B40060094B /* LDSAnnotations.framework in Frameworks */,
 				FF02870D4805E3D83090DEF1 /* Pods_LDSAnnotationsDemo.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D9C470C41C612F0600EDCD69 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				7D869A4A60332B79EF48EAFA /* Pods_LDSAnnotationsTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,7 +119,6 @@
 			isa = PBXGroup;
 			children = (
 				D9C470A91C612E0A00EDCD69 /* LDSAnnotationsDemo */,
-				D9C470C81C612F0600EDCD69 /* LDSAnnotationsTests */,
 				D9C470A81C612E0A00EDCD69 /* Products */,
 				D9C470C21C612E9000EDCD69 /* Frameworks */,
 				BE830F744053C64FEE20590F /* Pods */,
@@ -152,7 +129,6 @@
 			isa = PBXGroup;
 			children = (
 				D9C470A71C612E0A00EDCD69 /* LDSAnnotationsDemo.app */,
-				D9C470C71C612F0600EDCD69 /* LDSAnnotationsTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,22 +148,13 @@
 		D9C470C21C612E9000EDCD69 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D90A3CCF1C95C5B40060094B /* LDSAnnotations.framework */,
 				D9C470C01C612E8D00EDCD69 /* LDSAnnotations.framework */,
 				30963D6DD85B60A79388F06E /* Pods.framework */,
 				EA329BED4CD8C704A42BB9B1 /* Pods_LDSAnnotationsDemo.framework */,
 				8BE4FFF93929CA3366A7D7B3 /* Pods_LDSAnnotationsTests.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		D9C470C81C612F0600EDCD69 /* LDSAnnotationsTests */ = {
-			isa = PBXGroup;
-			children = (
-				D9C470D11C612F1300EDCD69 /* AuthenticationTests.swift */,
-				D9C470D21C612F1300EDCD69 /* SyncNotebooksTests.swift */,
-				D9C470CB1C612F0600EDCD69 /* Info.plist */,
-			);
-			path = LDSAnnotationsTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -213,27 +180,6 @@
 			productReference = D9C470A71C612E0A00EDCD69 /* LDSAnnotationsDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
-		D9C470C61C612F0600EDCD69 /* LDSAnnotationsTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D9C470CE1C612F0600EDCD69 /* Build configuration list for PBXNativeTarget "LDSAnnotationsTests" */;
-			buildPhases = (
-				92BA734634A4AB0869CD73A2 /* Check Pods Manifest.lock */,
-				D9C470C31C612F0600EDCD69 /* Sources */,
-				D9C470C41C612F0600EDCD69 /* Frameworks */,
-				D9C470C51C612F0600EDCD69 /* Resources */,
-				4FA6724E986637725E8FF483 /* Embed Pods Frameworks */,
-				588BFE22276C906ACF268BBD /* Copy Pods Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				D9C470CD1C612F0600EDCD69 /* PBXTargetDependency */,
-			);
-			name = LDSAnnotationsTests;
-			productName = LDSAnnotationsTests;
-			productReference = D9C470C71C612F0600EDCD69 /* LDSAnnotationsTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -246,10 +192,6 @@
 				TargetAttributes = {
 					D9C470A61C612E0A00EDCD69 = {
 						CreatedOnToolsVersion = 7.2;
-					};
-					D9C470C61C612F0600EDCD69 = {
-						CreatedOnToolsVersion = 7.2;
-						TestTargetID = D9C470A61C612E0A00EDCD69;
 					};
 				};
 			};
@@ -267,7 +209,6 @@
 			projectRoot = "";
 			targets = (
 				D9C470A61C612E0A00EDCD69 /* LDSAnnotationsDemo */,
-				D9C470C61C612F0600EDCD69 /* LDSAnnotationsTests */,
 			);
 		};
 /* End PBXProject section */
@@ -282,46 +223,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D9C470C51C612F0600EDCD69 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4FA6724E986637725E8FF483 /* Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		588BFE22276C906ACF268BBD /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		60457ED19C64E9F76EF1943E /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -338,21 +242,6 @@
 			showEnvVarsInLog = 0;
 		};
 		796AC1BC9AD2E33CC4BAB382 /* Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		92BA734634A4AB0869CD73A2 /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -400,24 +289,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		D9C470C31C612F0600EDCD69 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D9C470D31C612F1300EDCD69 /* AuthenticationTests.swift in Sources */,
-				D9C470D41C612F1300EDCD69 /* SyncNotebooksTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D9C470CD1C612F0600EDCD69 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D9C470A61C612E0A00EDCD69 /* LDSAnnotationsDemo */;
-			targetProxy = D9C470CC1C612F0600EDCD69 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		D9C470B31C612E0A00EDCD69 /* LaunchScreen.storyboard */ = {
@@ -538,32 +410,6 @@
 			};
 			name = Release;
 		};
-		D9C470CF1C612F0600EDCD69 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = A6F9664386A6FDD2A5FD86E1 /* Pods-LDSAnnotationsTests.debug.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				INFOPLIST_FILE = LDSAnnotationsTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.crosswaterbridge.LDSAnnotationsTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LDSAnnotationsDemo.app/LDSAnnotationsDemo";
-			};
-			name = Debug;
-		};
-		D9C470D01C612F0600EDCD69 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = C0D08D4477F8D21FD1594603 /* Pods-LDSAnnotationsTests.release.xcconfig */;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				INFOPLIST_FILE = LDSAnnotationsTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.crosswaterbridge.LDSAnnotationsTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LDSAnnotationsDemo.app/LDSAnnotationsDemo";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -581,15 +427,6 @@
 			buildConfigurations = (
 				D9C470BA1C612E0A00EDCD69 /* Debug */,
 				D9C470BB1C612E0A00EDCD69 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D9C470CE1C612F0600EDCD69 /* Build configuration list for PBXNativeTarget "LDSAnnotationsTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D9C470CF1C612F0600EDCD69 /* Debug */,
-				D9C470D01C612F0600EDCD69 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
