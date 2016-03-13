@@ -276,7 +276,7 @@ extension AnnotationStore {
             var ids = [Int64]()
             
             // Fetch the current status of the notebooks
-            for notebook in self.allNotebooks(ids: notebooks.mapFilter { $0.id }) {
+            for notebook in self.allNotebooks(ids: notebooks.flatMap { $0.id }) {
                 if notebook.status != .Active && notebook.status != .Trashed {
                     throw Error.errorWithCode(.Unknown, failureReason: "Attempted to trash a notebook that is not active or trashed.")
                 }
@@ -303,7 +303,7 @@ extension AnnotationStore {
             var ids = [Int64]()
             
             // Fetch the current status of the notebooks
-            for notebook in self.allNotebooks(ids: notebooks.mapFilter { $0.id }) {
+            for notebook in self.allNotebooks(ids: notebooks.flatMap { $0.id }) {
                 if notebook.status != .Trashed && notebook.status != .Deleted {
                     throw Error.errorWithCode(.Unknown, failureReason: "Attempted to delete a notebook that is not trashed or deleted.")
                 }
@@ -330,7 +330,7 @@ extension AnnotationStore {
             var ids = [Int64]()
             
             // Fetch the current status of the notebooks
-            for notebook in self.allNotebooks(ids: notebooks.mapFilter { $0.id }) {
+            for notebook in self.allNotebooks(ids: notebooks.flatMap { $0.id }) {
                 if let id = notebook.id {
                     try self.db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
                         NotebookTable.status <- .Active,
