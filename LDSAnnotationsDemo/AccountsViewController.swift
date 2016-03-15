@@ -143,7 +143,7 @@ extension AccountsViewController {
     }
     
     func addAccountWithUsername(username: String, password: String) {
-        let session = Session(username: username, password: password)
+        let session = Session(username: username, password: password, source: "LDSAnnotations Demo")
         session.authenticate { error in
             if let error = error {
                 NSLog("Failed to authenticate account: %@", error)
@@ -215,7 +215,7 @@ extension AccountsViewController: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let username = usernames[indexPath.row]
         if let password = AccountController.sharedController.passwordForUsername(username), path = NSFileManager.privateDocumentsURL.URLByAppendingPathComponent("\(username).sqlite").path, annotationStore = AnnotationStore(path: path) {
-            let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
+            let viewController = AccountViewController(session: Session(username: username, password: password, source: "LDSAnnotations Demo"), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)
         } else {

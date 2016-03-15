@@ -21,25 +21,12 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+/// An annotation.
+public struct AnnotationIndex {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword, source: source)
-    }
-    
+    /// Local ID.
+    public internal(set) var id: Int64?
+
+
 }

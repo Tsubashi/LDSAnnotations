@@ -40,9 +40,12 @@ public class Session: NSObject {
     let clientPassword: String
     let authenticationURL: NSURL?
     let domain: String
+    let source: String
+    
+    var docVersionsForDocIDs: ((docIDs: [String]) -> ([String: Int]))?
     
     /// Constructs a session.
-    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org") {
+    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", source: String) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
@@ -51,6 +54,7 @@ public class Session: NSObject {
         self.clientPassword = clientPassword
         self.authenticationURL = authenticationURL
         self.domain = domain
+        self.source = source
     }
     
     lazy var urlSession: NSURLSession = {
@@ -79,14 +83,24 @@ public class Session: NSObject {
         operationQueue.addOperation(operation)
     }
     
-    /// Uploads all local notebook modifications made since the last sync, then downloads and stores all notebook modifications made after the last sync.
+    /// Uploads all local annotations modifications made since the last sync, then downloads and stores all annotation modifications made after the last sync.
     ///
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
-    public func syncNotebooks(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult) -> Void) {
-        let operation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, token: token, completion: completion)
-        operationQueue.addOperation(operation)
+    public func syncAnnotations(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult, SyncAnnotationsResult) -> Void) {
+        let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, token: token) { syncNotebooksResult in
+            switch syncNotebooksResult {
+            case let .Success(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate, notebookAnnotationIDs: notebookAnnotationIDs, uploadCount: _, downloadCount: _):
+                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, token: token, localSyncDate: localSyncDate, serverSyncDate: serverSyncDate, notebookAnnotationIDs: notebookAnnotationIDs) { syncAnnotationsResult in
+                    completion(syncNotebooksResult, syncAnnotationsResult)
+                }
+                self.operationQueue.addOperation(syncAnnotationsOperation)
+            case .Error(errors: _):
+                completion(syncNotebooksResult, SyncAnnotationsResult.Error(errors: []))
+            }
+        }
+        operationQueue.addOperation(syncNotebooksOperation)
     }
-    
+
 }
 
 // MARK: - Networking primitives

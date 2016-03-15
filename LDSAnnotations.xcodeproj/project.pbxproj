@@ -9,6 +9,28 @@
 /* Begin PBXBuildFile section */
 		17C647A9F408968E6B7EDC69 /* Pods_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C2FFF5E37CC2AA0648EC7AD /* Pods_LDSAnnotationsTests.framework */; };
 		5CCA4B49970BAA5FDAD1C8C5 /* Pods_LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A104C3E25584A2A80020A6D6 /* Pods_LDSAnnotations.framework */; };
+		D40F0A221C975368002D61EA /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A211C975368002D61EA /* Annotation.swift */; };
+		D40F0A241C975988002D61EA /* AnnotationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A231C975988002D61EA /* AnnotationType.swift */; };
+		D40F0A261C976507002D61EA /* Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A251C976507002D61EA /* Highlight.swift */; };
+		D40F0A281C976634002D61EA /* HighlightStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A271C976634002D61EA /* HighlightStyle.swift */; };
+		D40F0A2A1C97693C002D61EA /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A291C97693C002D61EA /* Note.swift */; };
+		D40F0A2C1C976A58002D61EA /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2B1C976A58002D61EA /* Tag.swift */; };
+		D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2D1C976B7E002D61EA /* Link.swift */; };
+		D40F0A301C977129002D61EA /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2F1C977129002D61EA /* Bookmark.swift */; };
+		D48FD6A31C9B0C640089EA68 /* AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */; };
+		D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */; };
+		D4A90CDE1C986D180010F8F2 /* AnnotationIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDD1C986D180010F8F2 /* AnnotationIndex.swift */; };
+		D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */; };
+		D4A90CE21C986FB40010F8F2 /* SyncAnnotationsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */; };
+		D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */; };
+		D4A90CE61C9877B10010F8F2 /* AnnotationStore+Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE51C9877B10010F8F2 /* AnnotationStore+Annotation.swift */; };
+		D4A90CE81C988FBD0010F8F2 /* AnnotationStore+Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE71C988FBD0010F8F2 /* AnnotationStore+Note.swift */; };
+		D4ACFD361C99DD57008CEF22 /* AnnotationStore+Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD351C99DD57008CEF22 /* AnnotationStore+Bookmark.swift */; };
+		D4ACFD381C99E1DC008CEF22 /* AnnotationStore+Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD371C99E1DC008CEF22 /* AnnotationStore+Highlight.swift */; };
+		D4ACFD3A1C99EB37008CEF22 /* AnnotationStore+Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD391C99EB37008CEF22 /* AnnotationStore+Tag.swift */; };
+		D4ACFD3C1C99ECF1008CEF22 /* AnnotationTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD3B1C99ECF1008CEF22 /* AnnotationTag.swift */; };
+		D4ACFD3E1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */; };
+		D4ACFD401C99F6A5008CEF22 /* AnnotationStore+Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD3F1C99F6A5008CEF22 /* AnnotationStore+Link.swift */; };
 		D90A3CE11C95C6FE0060094B /* LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943055E1C5C184B00FA14B6 /* LDSAnnotations.framework */; };
 		D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3CE71C95C7280060094B /* AuthenticationTests.swift */; };
 		D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */; };
@@ -48,6 +70,28 @@
 		97DC6EE3078F03199869E3DB /* Pods-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A104C3E25584A2A80020A6D6 /* Pods_LDSAnnotations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8EB6ABEC73A54B5DBF98A17 /* Pods-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
+		D40F0A211C975368002D61EA /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
+		D40F0A231C975988002D61EA /* AnnotationType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationType.swift; sourceTree = "<group>"; };
+		D40F0A251C976507002D61EA /* Highlight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Highlight.swift; sourceTree = "<group>"; };
+		D40F0A271C976634002D61EA /* HighlightStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HighlightStyle.swift; sourceTree = "<group>"; };
+		D40F0A291C97693C002D61EA /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		D40F0A2B1C976A58002D61EA /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		D40F0A2D1C976B7E002D61EA /* Link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
+		D40F0A2F1C977129002D61EA /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
+		D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationNotebook.swift; sourceTree = "<group>"; };
+		D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationNotebook.swift"; sourceTree = "<group>"; };
+		D4A90CDD1C986D180010F8F2 /* AnnotationIndex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationIndex.swift; sourceTree = "<group>"; };
+		D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsOperation.swift; sourceTree = "<group>"; };
+		D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsResult.swift; sourceTree = "<group>"; };
+		D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Notebook.swift"; sourceTree = "<group>"; };
+		D4A90CE51C9877B10010F8F2 /* AnnotationStore+Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Annotation.swift"; sourceTree = "<group>"; };
+		D4A90CE71C988FBD0010F8F2 /* AnnotationStore+Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Note.swift"; sourceTree = "<group>"; };
+		D4ACFD351C99DD57008CEF22 /* AnnotationStore+Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Bookmark.swift"; sourceTree = "<group>"; };
+		D4ACFD371C99E1DC008CEF22 /* AnnotationStore+Highlight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Highlight.swift"; sourceTree = "<group>"; };
+		D4ACFD391C99EB37008CEF22 /* AnnotationStore+Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Tag.swift"; sourceTree = "<group>"; };
+		D4ACFD3B1C99ECF1008CEF22 /* AnnotationTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationTag.swift; sourceTree = "<group>"; };
+		D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationTag.swift"; sourceTree = "<group>"; };
+		D4ACFD3F1C99F6A5008CEF22 /* AnnotationStore+Link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Link.swift"; sourceTree = "<group>"; };
 		D90A3CDC1C95C6FE0060094B /* LDSAnnotationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LDSAnnotationsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D90A3CE01C95C6FE0060094B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D90A3CE71C95C7280060094B /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
@@ -106,6 +150,15 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		D40F0A201C97531D002D61EA /* Annotations */ = {
+			isa = PBXGroup;
+			children = (
+				D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */,
+				D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */,
+			);
+			name = Annotations;
+			sourceTree = "<group>";
+		};
 		D90A3CDD1C95C6FE0060094B /* LDSAnnotationsTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -160,6 +213,7 @@
 		D9C470DD1C61761E00EDCD69 /* Web Service */ = {
 			isa = PBXGroup;
 			children = (
+				D40F0A201C97531D002D61EA /* Annotations */,
 				D94305781C5C237B00FA14B6 /* Session.swift */,
 				D9C470DB1C61655100EDCD69 /* Response.swift */,
 				D9C470981C60317E00EDCD69 /* Error.swift */,
@@ -177,10 +231,30 @@
 		D9C470DE1C6176FF00EDCD69 /* Local Data */ = {
 			isa = PBXGroup;
 			children = (
-				D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */,
+				D40F0A211C975368002D61EA /* Annotation.swift */,
+				D4A90CDD1C986D180010F8F2 /* AnnotationIndex.swift */,
+				D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */,
 				D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */,
-				D992349D1C66CC7100177FD2 /* NotificationSource.swift */,
+				D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */,
+				D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */,
+				D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */,
+				D4A90CE51C9877B10010F8F2 /* AnnotationStore+Annotation.swift */,
+				D4ACFD351C99DD57008CEF22 /* AnnotationStore+Bookmark.swift */,
+				D4ACFD371C99E1DC008CEF22 /* AnnotationStore+Highlight.swift */,
+				D4ACFD3F1C99F6A5008CEF22 /* AnnotationStore+Link.swift */,
+				D4A90CE71C988FBD0010F8F2 /* AnnotationStore+Note.swift */,
+				D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */,
+				D4ACFD391C99EB37008CEF22 /* AnnotationStore+Tag.swift */,
+				D4ACFD3B1C99ECF1008CEF22 /* AnnotationTag.swift */,
+				D40F0A231C975988002D61EA /* AnnotationType.swift */,
+				D40F0A2F1C977129002D61EA /* Bookmark.swift */,
+				D40F0A251C976507002D61EA /* Highlight.swift */,
+				D40F0A271C976634002D61EA /* HighlightStyle.swift */,
+				D40F0A2D1C976B7E002D61EA /* Link.swift */,
+				D40F0A291C97693C002D61EA /* Note.swift */,
 				D992347D1C627E6F00177FD2 /* Notebook.swift */,
+				D992349D1C66CC7100177FD2 /* NotificationSource.swift */,
+				D40F0A2B1C976A58002D61EA /* Tag.swift */,
 			);
 			name = "Local Data";
 			sourceTree = "<group>";
@@ -396,21 +470,43 @@
 			buildActionMask = 2147483647;
 			files = (
 				D9C470971C602B4A00EDCD69 /* AuthenticateCondition.swift in Sources */,
+				D4ACFD3E1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift in Sources */,
+				D40F0A221C975368002D61EA /* Annotation.swift in Sources */,
+				D40F0A2A1C97693C002D61EA /* Note.swift in Sources */,
 				D9C470D61C614FAE00EDCD69 /* NSDate+ISO8601.swift in Sources */,
 				D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */,
+				D4ACFD381C99E1DC008CEF22 /* AnnotationStore+Highlight.swift in Sources */,
 				D99234871C6567A200177FD2 /* SyncToken.swift in Sources */,
+				D40F0A2C1C976A58002D61EA /* Tag.swift in Sources */,
 				D9C470951C60273400EDCD69 /* AuthenticateOperation.swift in Sources */,
+				D4ACFD401C99F6A5008CEF22 /* AnnotationStore+Link.swift in Sources */,
 				D9C4708A1C60144800EDCD69 /* SyncNotebooksOperation.swift in Sources */,
 				D9C470DC1C61655100EDCD69 /* Response.swift in Sources */,
+				D40F0A241C975988002D61EA /* AnnotationType.swift in Sources */,
 				D9C470D81C615C1300EDCD69 /* NSMutableURLRequest+Sync.swift in Sources */,
+				D40F0A261C976507002D61EA /* Highlight.swift in Sources */,
 				D99234831C628B7C00177FD2 /* ChangeType.swift in Sources */,
+				D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */,
+				D4A90CE61C9877B10010F8F2 /* AnnotationStore+Annotation.swift in Sources */,
+				D40F0A281C976634002D61EA /* HighlightStyle.swift in Sources */,
+				D4A90CE81C988FBD0010F8F2 /* AnnotationStore+Note.swift in Sources */,
+				D4ACFD361C99DD57008CEF22 /* AnnotationStore+Bookmark.swift in Sources */,
+				D4A90CE21C986FB40010F8F2 /* SyncAnnotationsResult.swift in Sources */,
 				D9C470E21C617A0400EDCD69 /* AnnotationStatus.swift in Sources */,
 				D9C4709B1C60319400EDCD69 /* String+Query.swift in Sources */,
 				D992349E1C66CC7100177FD2 /* NotificationSource.swift in Sources */,
+				D4ACFD3C1C99ECF1008CEF22 /* AnnotationTag.swift in Sources */,
+				D48FD6A31C9B0C640089EA68 /* AnnotationNotebook.swift in Sources */,
+				D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */,
 				D9C470991C60317E00EDCD69 /* Error.swift in Sources */,
 				D94305791C5C237B00FA14B6 /* Session.swift in Sources */,
+				D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */,
+				D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */,
+				D4ACFD3A1C99EB37008CEF22 /* AnnotationStore+Tag.swift in Sources */,
+				D4A90CDE1C986D180010F8F2 /* AnnotationIndex.swift in Sources */,
 				D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */,
 				D9C470E01C61773D00EDCD69 /* AnnotationStore.swift in Sources */,
+				D40F0A301C977129002D61EA /* Bookmark.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

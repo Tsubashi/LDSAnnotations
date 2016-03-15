@@ -72,8 +72,8 @@ public struct Notebook {
         }
     }
     
-    func jsonObject() -> [String: AnyObject] {
-        var result = [
+    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
+        var result: [String: AnyObject] = [
             "@guid": uniqueID,
             "label": name,
             "timestamp": lastModified.formattedISO8601,
@@ -86,7 +86,19 @@ public struct Notebook {
             result["@status"] = status.rawValue
         }
         
+        if let id = id {
+            let annotations = annotationStore.annotationsWithNotebookID(id)
+            if !annotations.isEmpty {
+                result["order"] = ["id": annotations.map { $0.uniqueID }]
+            }
+        }
+        
         return result
+    }
+    
+    func annotationNotebookJsonObject() -> [String: AnyObject] {
+        // The Annotation Service requires we send a URI with the @guid in it in the format below. The 'x' used to be the person-id value, but the service automatically populates that  now, so we just put a placeholder there instead.
+        return ["@uri": String(format: "/study-tools/folders/x/%@", uniqueID)]
     }
 
 }

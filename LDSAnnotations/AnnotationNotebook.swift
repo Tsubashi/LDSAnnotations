@@ -21,25 +21,21 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+/// A table that allows us to have a many-to-many relationship between annotations and folders.
+public struct AnnotationNotebook {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword, source: source)
+    /// Annotation ID
+    public var annotationID: Int64
+    
+    /// Notebook ID
+    public var notebookID: Int64
+    
+    public var displayOrder: Int
+    
+    init(annotationID: Int64, notebookID: Int64, displayOrder: Int) {
+        self.annotationID = annotationID
+        self.notebookID = notebookID
+        self.displayOrder = displayOrder
     }
-    
 }

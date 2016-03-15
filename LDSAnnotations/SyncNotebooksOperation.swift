@@ -33,6 +33,7 @@ class SyncNotebooksOperation: Operation {
     var serverSyncDate: NSDate?
     var uploadCount: Int?
     var downloadCount: Int?
+    var notebookAnnotationIDs: [String: [String]]?
     
     init(session: Session, annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult) -> Void) {
         self.session = session
@@ -44,7 +45,7 @@ class SyncNotebooksOperation: Operation {
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty, let localSyncDate = self.localSyncDate, serverSyncDate = self.serverSyncDate, uploadCount = self.uploadCount, downloadCount = self.downloadCount {
-                completion(.Success(token: SyncToken(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate), uploadCount: uploadCount, downloadCount: downloadCount))
+                completion(.Success(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadCount: uploadCount, downloadCount: downloadCount))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -60,11 +61,16 @@ class SyncNotebooksOperation: Operation {
         var syncFolders: [String: AnyObject] = [
             "since": (token?.serverSyncDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
-            "changes": localChanges,
         ]
+        
+        if !localChanges.isEmpty {
+            syncFolders["changes"] = localChanges
+        }
+        
         if token?.serverSyncDate == nil {
             syncFolders["syncStatus"] = "notdeleted"
         }
+        
         let payload = [
             "syncFolders": syncFolders
         ]
@@ -74,7 +80,6 @@ class SyncNotebooksOperation: Operation {
             case .Success(let payload):
                 do {
                     try self.annotationStore.inSyncTransaction {
-                        self.annotationStore.deletedNotebooks(lastModifiedOnOrBefore: localSyncDate)
                         try self.applyServerChanges(payload)
                     }
                     self.finish()
@@ -102,7 +107,7 @@ class SyncNotebooksOperation: Operation {
             ]
             
             if notebook.status != .Deleted {
-                result["folder"] = notebook.jsonObject()
+                result["folder"] = notebook.jsonObject(annotationStore)
             }
             
             return result
@@ -120,6 +125,8 @@ class SyncNotebooksOperation: Operation {
         
         self.serverSyncDate = serverSyncDate
         
+        var notebookAnnotationIDs = [String: [String]]()
+        
         if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
             var downloadCount = 0
             
@@ -136,7 +143,9 @@ class SyncNotebooksOperation: Operation {
                     throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize folder")
                 }
                 
-                // TODO: handle "order"
+                if let order = folder["order"] as? [String: [String]] {
+                    notebookAnnotationIDs[downloadedNotebook.uniqueID] = order["id"]
+                }
                 
                 switch changeType {
                 case .New, .Trash:
@@ -158,6 +167,7 @@ class SyncNotebooksOperation: Operation {
                 }
             }
             
+            self.notebookAnnotationIDs = notebookAnnotationIDs
             self.downloadCount = downloadCount
         } else {
             downloadCount = 0

@@ -46,16 +46,20 @@ class AccountViewController: UIViewController {
     
     enum Row {
         case Notebooks
+        case Annotations
         case TrashedNotebooks
+        case TrashedAnnotations
     }
     
     let sections: [(title: String, rows: [Row])] = [
         (title: "Active", rows: [
-            .Notebooks
-        ]),
+            .Notebooks,
+            .Annotations
+            ]),
         (title: "Trashed", rows: [
-            .TrashedNotebooks
-        ]),
+            .TrashedNotebooks,
+            .TrashedAnnotations
+            ]),
     ]
     
     lazy var tableView: UITableView = {
@@ -107,11 +111,15 @@ class AccountViewController: UIViewController {
     }
     
     var notebookCount = 0
+    var annotationCount = 0
     var trashedNotebookCount = 0
+    var trashedAnnotationCount = 0
     
     func reloadData() {
         notebookCount = annotationStore.notebookCount()
+        annotationCount = annotationStore.annotationCount()
         trashedNotebookCount = annotationStore.trashedNotebookCount()
+        trashedAnnotationCount = annotationStore.trashedAnnotationCount()
     }
     
     func notebooksDidChange(source: NotificationSource, notebooks: [Notebook]) {
@@ -124,16 +132,38 @@ class AccountViewController: UIViewController {
     }
     
     func syncFolders() {
-        let token = AccountController.sharedController.syncFoldersTokenForUsername(session.username)
-        session.syncNotebooks(annotationStore: annotationStore, token: token) { result in
+        let token = AccountController.sharedController.syncTokenForUsername(session.username)
+        session.syncAnnotations(annotationStore: annotationStore, token: token) { syncFoldersResult, syncAnnotationsResult in
             dispatch_sync(dispatch_get_main_queue()) {
-                switch result {
-                case let .Success(token: token, uploadCount: uploadCount, downloadCount: downloadCount):
-                    NSLog("Sync folders completed (\(uploadCount) uploaded, \(downloadCount) downloaded)")
+                switch (syncFoldersResult, syncAnnotationsResult) {
+                case let (.Success(localSyncDate: _, serverSyncDate: _, notebookAnnotationIDs: _, uploadCount: notebookUploadCount, downloadCount: notebookDownloadCount), .Success(token: token, localSyncDate: _, serverSyncDate: _, uploadCount: annotationUploadCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadCount: annotationDownloadCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount)):
                     
-                    AccountController.sharedController.setSyncFoldersToken(token, forUsername: self.session.username)
-                case let .Error(errors: errors):
-                    NSLog("Sync folders failed: %@", errors)
+                    NSLog("Sync notebooks completed (\(notebookUploadCount) uploaded, \(notebookDownloadCount) downloaded)")
+                    
+                    let uploaded = [
+                        "\(uploadHighlightCount) highlights uploaded",
+                        "\(uploadNoteCount) notes uploaded",
+                        "\(uploadTagCount) tags uploaded",
+                        "\(uploadBookmarkCount) bookmarks uploaded",
+                        "\(uploadLinkCount) links uploaded",
+                    ]
+                    let downloaded = [
+                        "\(downloadHighlightCount) highlights downloaded",
+                        "\(downloadNoteCount) notes downloaded",
+                        "\(downloadTagCount) tags downloaded",
+                        "\(downloadBookmarkCount) bookmarks downloaded",
+                        "\(downloadLinkCount) links downloaded",
+                    ]
+                    
+                    NSLog("Sync annotations completed (\(annotationUploadCount) uploaded, \(annotationDownloadCount) downloaded)\n%@\n%@", uploaded.joinWithSeparator(","), downloaded.joinWithSeparator(","))
+                    
+                    AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
+                case let (.Error(errors: errors), _):
+                    NSLog("Sync notebooks failed: %@", errors)
+                case let (_, .Error(errors: errors)):
+                    NSLog("Sync annotations failed: %@", errors)
+                default:
+                    break
                 }
             }
         }
@@ -165,9 +195,17 @@ extension AccountViewController: UITableViewDataSource {
             cell.textLabel?.text = "Notebooks"
             cell.detailTextLabel?.text = "\(notebookCount)"
             cell.accessoryType = .DisclosureIndicator
+        case .Annotations:
+            cell.textLabel?.text = "Annotations"
+            cell.detailTextLabel?.text = "\(annotationCount)"
+            cell.accessoryType = .DisclosureIndicator
         case .TrashedNotebooks:
             cell.textLabel?.text = "Notebooks"
             cell.detailTextLabel?.text = "\(trashedNotebookCount)"
+            cell.accessoryType = .DisclosureIndicator
+        case .TrashedAnnotations:
+            cell.textLabel?.text = "Annotations"
+            cell.detailTextLabel?.text = "\(trashedAnnotationCount)"
             cell.accessoryType = .DisclosureIndicator
         }
         
@@ -186,11 +224,18 @@ extension AccountViewController: UITableViewDelegate {
             let viewController = NotebooksViewController(annotationStore: annotationStore, status: .Active)
             
             navigationController?.pushViewController(viewController, animated: true)
+        case .Annotations:
+            let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .Active)
+            
+            navigationController?.pushViewController(viewController, animated: true)
         case .TrashedNotebooks:
             let viewController = NotebooksViewController(annotationStore: annotationStore, status: .Trashed)
             
             navigationController?.pushViewController(viewController, animated: true)
+        case .TrashedAnnotations:
+            let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .Trashed)
+            
+            navigationController?.pushViewController(viewController, animated: true)
         }
     }
-    
 }

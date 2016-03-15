@@ -79,7 +79,7 @@ class AccountController {
     
     private static let tokensKey = "tokens"
     
-    func syncFoldersTokenForUsername(username: String) -> SyncToken? {
+    func syncTokenForUsername(username: String) -> SyncToken? {
         assert(NSThread.isMainThread())
         
         guard let tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String], rawToken = tokens[username] else { return nil }
@@ -87,7 +87,7 @@ class AccountController {
         return SyncToken(rawValue: rawToken)
     }
     
-    func setSyncFoldersToken(token: SyncToken?, forUsername username: String) {
+    func setSyncToken(token: SyncToken?, forUsername username: String) {
         assert(NSThread.isMainThread())
         
         var tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String] ?? [:]

@@ -21,25 +21,30 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+/// Result of syncing notebooks.
+public enum SyncAnnotationsResult {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword, source: source)
-    }
+    /// Result when sync is successful.
+    ///
+    /// The `token` should be used for the next sync.
+    case Success(token: SyncToken?,
+        localSyncDate: NSDate,
+        serverSyncDate: NSDate,
+        uploadCount: Int,
+        uploadNoteCount: Int,
+        uploadBookmarkCount: Int,
+        uploadHighlightCount: Int,
+        uploadTagCount: Int,
+        uploadLinkCount: Int,
+        downloadCount: Int,
+        downloadNoteCount: Int,
+        downloadBookmarkCount: Int,
+        downloadHighlightCount: Int,
+        downloadTagCount: Int,
+        downloadLinkCount: Int)
+    
+    /// Result when a sync fails.
+    case Error(errors: [NSError])
     
 }

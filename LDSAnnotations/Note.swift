@@ -21,25 +21,51 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+/// A note.
+public struct Note {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
+    /// Local ID.
+    public internal(set) var id: Int64?
+    
+    /// Note title
+    public var title: String?
+    
+    /// Note content
+    public var content: String
+    
+    /// ID of annotation
+    public var annotationID: Int64
+    
+    init(id: Int64?, title: String?, content: String, annotationID: Int64) {
+        self.id = id
+        self.title = title
+        self.content = content
+        self.annotationID = annotationID
+    }
+    
+    init?(jsonObject: [String: AnyObject], annotationID: Int64) {
+        guard let content = jsonObject["content"] as? String else { return nil }
+        
+        self.id = nil
+        self.content = content
+        self.annotationID = annotationID
+        
+        if let title = jsonObject["title"] as? String {
+            self.title = title
+        } else {
+            self.title = nil
         }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
+    }
+    
+    func jsonObject() -> [String: AnyObject] {
+        var result = ["content": content]
+        
+        if let title = title {
+            result["title"] = title
         }
         
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword, source: source)
+        return result
     }
     
 }
