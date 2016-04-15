@@ -50,7 +50,7 @@ extension AnnotationStore {
         })
     }
     
-    /// Adds a new tag with `name`.
+    /// Adds a new annotation tag with 'annotationID' and 'tagID'.
     public func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64) throws -> AnnotationTag? {
         guard annotationID > 0 && tagID > 0 else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add an annotationID or tagID that is == 0")

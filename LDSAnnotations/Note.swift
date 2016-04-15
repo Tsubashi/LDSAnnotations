@@ -50,12 +50,7 @@ public struct Note {
         self.id = nil
         self.content = content
         self.annotationID = annotationID
-        
-        if let title = jsonObject["title"] as? String {
-            self.title = title
-        } else {
-            self.title = nil
-        }
+        self.title = jsonObject["title"] as? String
     }
     
     func jsonObject() -> [String: AnyObject] {

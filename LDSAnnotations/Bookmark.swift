@@ -57,18 +57,8 @@ public struct Bookmark {
         self.id = nil
         self.name = name
         self.annotationID = annotationID
-        
-        if let offset = jsonObject["@offset"] as? Int {
-            self.offset = offset
-        } else {
-            self.offset = nil
-        }
-        
-        if let displayOrder = jsonObject["sort"] as? Int {
-            self.displayOrder = displayOrder
-        } else {
-            self.displayOrder = nil
-        }
+        self.offset = jsonObject["@offset"] as? Int
+        self.displayOrder = jsonObject["sort"] as? Int
     }
     
     func jsonObject() -> [String: AnyObject] {

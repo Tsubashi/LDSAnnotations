@@ -28,7 +28,7 @@ public enum SyncNotebooksResult {
     /// Result when sync is successful.
     ///
     /// The `token` should be used for the next sync.
-    case Success(localSyncDate: NSDate?, serverSyncDate: NSDate?, notebookAnnotationIDs: [String: [String]]?, uploadCount: Int, downloadCount: Int)
+    case Success(localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, notebookAnnotationIDs: [String: [String]]?, uploadCount: Int, downloadCount: Int)
     
     /// Result when a sync fails.
     case Error(errors: [NSError])

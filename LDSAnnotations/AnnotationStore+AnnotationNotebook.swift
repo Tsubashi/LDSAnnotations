@@ -52,7 +52,7 @@ extension AnnotationStore {
         })
     }
     
-    /// Adds a new folder with `name`.
+    /// Adds a new annotation notebook with 'annotationID', 'notebookID' and 'displayOrder'
     public func addOrUpdateAnnotationNotebook(annotationID annotationID: Int64, notebookID: Int64, displayOrder: Int) throws -> AnnotationNotebook? {
         guard annotationID > 0 && notebookID > 0 else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add an annotationID or notebookID that is == 0")
@@ -71,7 +71,7 @@ extension AnnotationStore {
         }
     }
     
-    func deleteAnnotationNotebookWithID(annotationID: Int64, notebookID: Int64) {
+    func deleteAnnotationNotebook(annotationID: Int64, notebookID: Int64) {
         do {
             try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID && AnnotationNotebookTable.notebookID == notebookID).delete())
         } catch {}

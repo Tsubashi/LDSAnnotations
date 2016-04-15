@@ -45,7 +45,7 @@ class SyncNotebooksOperation: Operation {
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty, let localSyncDate = self.localSyncDate, serverSyncDate = self.serverSyncDate, uploadCount = self.uploadCount, downloadCount = self.downloadCount {
-                completion(.Success(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadCount: uploadCount, downloadCount: downloadCount))
+                completion(.Success(localSyncNotebooksDate: localSyncDate, serverSyncNotebooksDate: serverSyncDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadCount: uploadCount, downloadCount: downloadCount))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -54,12 +54,12 @@ class SyncNotebooksOperation: Operation {
     
     override func execute() {
         let localSyncDate = NSDate()
-        let localChanges = localChangesAfter(token?.localSyncDate, onOrBefore: localSyncDate)
+        let localChanges = localChangesAfter(token?.localSyncNotebooksDate, onOrBefore: localSyncDate)
         
         self.localSyncDate = localSyncDate
         
         var syncFolders: [String: AnyObject] = [
-            "since": (token?.serverSyncDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
+            "since": (token?.serverSyncNotebooksDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
         ]
         
@@ -67,13 +67,11 @@ class SyncNotebooksOperation: Operation {
             syncFolders["changes"] = localChanges
         }
         
-        if token?.serverSyncDate == nil {
+        if token?.serverSyncNotebooksDate == nil {
             syncFolders["syncStatus"] = "notdeleted"
         }
         
-        let payload = [
-            "syncFolders": syncFolders
-        ]
+        let payload = ["syncFolders": syncFolders]
         
         session.put("/ws/annotation/v1.4/Services/rest/sync/folders?xver=2", payload: payload) { response in
             switch response {

@@ -89,13 +89,13 @@ public class Session: NSObject {
     public func syncAnnotations(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult, SyncAnnotationsResult) -> Void) {
         let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, token: token) { syncNotebooksResult in
             switch syncNotebooksResult {
-            case let .Success(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate, notebookAnnotationIDs: notebookAnnotationIDs, uploadCount: _, downloadCount: _):
-                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, token: token, localSyncDate: localSyncDate, serverSyncDate: serverSyncDate, notebookAnnotationIDs: notebookAnnotationIDs) { syncAnnotationsResult in
+            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: notebookAnnotationIDs, uploadCount: _, downloadCount: _):
+                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, token: token, localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: notebookAnnotationIDs) { syncAnnotationsResult in
                     completion(syncNotebooksResult, syncAnnotationsResult)
                 }
                 self.operationQueue.addOperation(syncAnnotationsOperation)
-            case .Error(errors: _):
-                completion(syncNotebooksResult, SyncAnnotationsResult.Error(errors: []))
+            case let .Error(errors: errors):
+                completion(syncNotebooksResult, SyncAnnotationsResult.Error(errors: errors))
             }
         }
         operationQueue.addOperation(syncNotebooksOperation)

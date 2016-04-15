@@ -46,7 +46,7 @@ public struct Annotation {
     /// Whether the annotation is active, trashed, or deleted.
     public internal(set) var status: AnnotationStatus
     
-    /// When the annotation was last modified in local time.
+    /// When the annotation was created in local time.
     public internal(set) var created: NSDate?
 
     /// When the annotation was last modified in local time.
@@ -80,10 +80,13 @@ public struct Annotation {
     
     init?(jsonObject: [String: AnyObject]) {
         guard let uniqueID = jsonObject["@id"] as? String,
-            type = jsonObject["@type"] as? String, annotationType = AnnotationType(rawValue: type),
-            rawLastModified = jsonObject["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified),
+            type = jsonObject["@type"] as? String,
+            annotationType = AnnotationType(rawValue: type),
+            rawLastModified = jsonObject["timestamp"] as? String,
+            lastModified = NSDate.parseFormattedISO8601(rawLastModified),
             docID = jsonObject["@docId"] as? String where !docID.isEmpty || (docID.isEmpty && annotationType == .Journal),
-            let docVersionString = jsonObject["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
+            let docVersionString = jsonObject["@contentVersion"] as? String,
+            docVersion = Int(docVersionString) else {
                 return nil
         }
         
@@ -93,36 +96,11 @@ public struct Annotation {
         self.lastModified = lastModified
         self.docID = docID
         self.docVersion = docVersion
-        
-        if let rawCreated = jsonObject["created"] as? String, created = NSDate.parseFormattedISO8601(rawCreated) {
-            self.created = created
-        } else {
-            self.created = nil
-        }
-        
-        if let iso639_3Code = jsonObject["@locale"] as? String {
-            self.iso639_3Code = iso639_3Code
-        } else {
-            self.iso639_3Code = "eng"
-        }
-
-        if let rawStatus = jsonObject["@status"] as? String, status = AnnotationStatus(rawValue: rawStatus) {
-            self.status = status
-        } else {
-            self.status = .Active
-        }
-        
-        if let source = jsonObject["source"] as? String {
-            self.source = source
-        } else {
-            self.source = nil
-        }
-        
-        if let device = jsonObject["device"] as? String {
-            self.device = device
-        } else {
-            self.device = nil
-        }
+        self.iso639_3Code = jsonObject["@locale"] as? String ?? "eng"
+        self.source = jsonObject["source"] as? String
+        self.device = jsonObject["device"] as? String
+        self.created = (jsonObject["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
+        self.status = (jsonObject["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
     }
     
     func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {

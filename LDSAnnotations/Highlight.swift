@@ -67,12 +67,7 @@ public struct Highlight {
         self.offsetEnd = offsetEnd
         self.colorName = colorName
         self.annotationID = annotationID
-        
-        if let rawStyle = jsonObject["@style"] as? String, style = HighlightStyle(rawValue: rawStyle) {
-            self.style = style
-        } else {
-            self.style = .Highlight
-        }
+        self.style = (jsonObject["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
     }
     
     func jsonObject() -> [String: AnyObject] {

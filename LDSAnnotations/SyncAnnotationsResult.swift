@@ -29,8 +29,6 @@ public enum SyncAnnotationsResult {
     ///
     /// The `token` should be used for the next sync.
     case Success(token: SyncToken?,
-        localSyncDate: NSDate,
-        serverSyncDate: NSDate,
         uploadCount: Int,
         uploadNoteCount: Int,
         uploadBookmarkCount: Int,

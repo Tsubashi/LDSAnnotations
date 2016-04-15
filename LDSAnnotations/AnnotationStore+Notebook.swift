@@ -276,9 +276,8 @@ extension AnnotationStore {
     func deleteNotebookWithID(id: Int64) {
         do {
             try db.run(NotebookTable.table.filter(NotebookTable.id == id).delete())
+            notifySyncModifiedNotebooksWithIDs([id])
         } catch {}
-        
-        notifySyncModifiedNotebooksWithIDs([id])
     }
     
     public func notebooksWithAnnotationID(annotationID: Int64) -> [Notebook] {

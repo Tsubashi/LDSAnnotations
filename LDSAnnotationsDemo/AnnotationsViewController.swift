@@ -40,10 +40,9 @@ class AnnotationsViewController: UIViewController {
         switch status {
         case .Active:
             title = "Annotations"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
         case .Trashed:
             title = "Trashed Annotations"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .Plain, target: self, action: "deleteAll")
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .Plain, target: self, action: #selector(deleteAll))
         case .Deleted:
             fatalError("Deleted annotations are not supported")
         }

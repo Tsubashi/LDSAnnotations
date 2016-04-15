@@ -136,8 +136,10 @@ class AccountViewController: UIViewController {
         session.syncAnnotations(annotationStore: annotationStore, token: token) { syncFoldersResult, syncAnnotationsResult in
             dispatch_sync(dispatch_get_main_queue()) {
                 switch (syncFoldersResult, syncAnnotationsResult) {
-                case let (.Success(localSyncDate: _, serverSyncDate: _, notebookAnnotationIDs: _, uploadCount: notebookUploadCount, downloadCount: notebookDownloadCount), .Success(token: token, localSyncDate: _, serverSyncDate: _, uploadCount: annotationUploadCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadCount: annotationDownloadCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount)):
-                    
+                case let (
+                    .Success(localSyncNotebooksDate: _, serverSyncNotebooksDate: _, notebookAnnotationIDs: _, uploadCount: notebookUploadCount, downloadCount: notebookDownloadCount),
+                    .Success(token: token, uploadCount: annotationUploadCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadCount: annotationDownloadCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount)
+                    ):
                     NSLog("Sync notebooks completed (\(notebookUploadCount) uploaded, \(notebookDownloadCount) downloaded)")
                     
                     let uploaded = [

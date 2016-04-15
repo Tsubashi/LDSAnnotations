@@ -68,7 +68,8 @@ extension AnnotationStore {
                 try db.run(BookmarkTable.table.filter(BookmarkTable.id == id).update(
                     BookmarkTable.name <- bookmark.name,
                     BookmarkTable.paragraphAID <- bookmark.paragraphAID,
-                    BookmarkTable.displayOrder <- bookmark.displayOrder
+                    BookmarkTable.displayOrder <- bookmark.displayOrder,
+                    BookmarkTable.annotationID <- bookmark.annotationID
                 ))
                 return bookmark
             } else {

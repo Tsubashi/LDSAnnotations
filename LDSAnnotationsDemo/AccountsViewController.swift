@@ -32,7 +32,7 @@ class AccountsViewController: UIViewController {
         automaticallyAdjustsScrollViewInsets = false
         
         title = "Accounts"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(add))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -112,11 +112,11 @@ extension AccountsViewController {
         let alertController = UIAlertController(title: "Add Account", message: "Enter the username and password for your LDS Account.", preferredStyle: .Alert)
         alertController.addTextFieldWithConfigurationHandler { textField in
             textField.placeholder = "Username"
-            textField.addTarget(self, action: "textFieldDidChange:", forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
         }
         alertController.addTextFieldWithConfigurationHandler { textField in
             textField.placeholder = "Password"
-            textField.addTarget(self, action: "textFieldDidChange:", forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
             textField.secureTextEntry = true
         }
         

@@ -40,10 +40,10 @@ class NotebooksViewController: UIViewController {
         switch status {
         case .Active:
             title = "Notebooks"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(add))
         case .Trashed:
             title = "Trashed Notebooks"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .Plain, target: self, action: "deleteAll")
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .Plain, target: self, action: #selector(deleteAll))
         case .Deleted:
             fatalError("Deleted notebooks are not supported")
         }
@@ -129,7 +129,7 @@ extension NotebooksViewController {
         let alertController = UIAlertController(title: "Add Notebook", message: "Enter the name for your notebook.", preferredStyle: .Alert)
         alertController.addTextFieldWithConfigurationHandler { textField in
             textField.placeholder = "Name"
-            textField.addTarget(self, action: "textFieldDidChange:", forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(NotebooksViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
         }
         
         let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
@@ -261,7 +261,7 @@ extension NotebooksViewController: UITableViewDelegate {
             alertController.addTextFieldWithConfigurationHandler { textField in
                 textField.text = notebook.name
                 textField.placeholder = "Name"
-                textField.addTarget(self, action: "textFieldDidChange:", forControlEvents: .EditingChanged)
+                textField.addTarget(self, action: #selector(NotebooksViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
             }
             
             let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in

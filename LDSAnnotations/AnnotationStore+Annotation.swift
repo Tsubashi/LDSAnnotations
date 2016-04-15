@@ -178,7 +178,7 @@ extension AnnotationStore {
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
                 if annotation.status != .Active && annotation.status != .Trashed {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Attempted to trash a annotation that is not active or trashed.")
+                    throw Error.errorWithCode(.Unknown, failureReason: "Attempted to trash a annotation that is not active and not trashed (i.e. deleted).")
                 }
                 
                 if let id = annotation.id {
@@ -204,8 +204,8 @@ extension AnnotationStore {
             
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
-                if annotation.status != .Trashed && annotation.status != .Deleted {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Attempted to delete a annotation that is not trashed or deleted.")
+                if annotation.status == .Active {
+                    throw Error.errorWithCode(.Unknown, failureReason: "Attempted to delete a annotation that is not trashed and not deleted.")
                 }
                 
                 if let id = annotation.id {
@@ -265,7 +265,7 @@ extension AnnotationStore {
     
     func deletedAnnotations(lastModifiedOnOrBefore lastModifiedOnOrBefore: NSDate) -> [Annotation] {
         do {
-            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.lastModified <= lastModifiedOnOrBefore && AnnotationTable.status == .Deleted)).map { AnnotationTable.fromRow($0) }
+            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .Deleted && AnnotationTable.lastModified <= lastModifiedOnOrBefore)).map { AnnotationTable.fromRow($0) }
         } catch {
             return []
         }
@@ -329,9 +329,8 @@ extension AnnotationStore {
     func deleteAnnotationWithID(id: Int64) {
         do {
             try db.run(AnnotationTable.table.filter(AnnotationTable.id == id).delete())
+            notifySyncModifiedAnnotationsWithIDs([id])
         } catch {}
-        
-        notifySyncModifiedAnnotationsWithIDs([id])
     }
     
 }

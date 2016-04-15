@@ -19,7 +19,6 @@
 		D40F0A301C977129002D61EA /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2F1C977129002D61EA /* Bookmark.swift */; };
 		D48FD6A31C9B0C640089EA68 /* AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */; };
 		D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */; };
-		D4A90CDE1C986D180010F8F2 /* AnnotationIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDD1C986D180010F8F2 /* AnnotationIndex.swift */; };
 		D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */; };
 		D4A90CE21C986FB40010F8F2 /* SyncAnnotationsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */; };
 		D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */; };
@@ -80,7 +79,6 @@
 		D40F0A2F1C977129002D61EA /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
 		D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationNotebook.swift; sourceTree = "<group>"; };
 		D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationNotebook.swift"; sourceTree = "<group>"; };
-		D4A90CDD1C986D180010F8F2 /* AnnotationIndex.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationIndex.swift; sourceTree = "<group>"; };
 		D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsOperation.swift; sourceTree = "<group>"; };
 		D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsResult.swift; sourceTree = "<group>"; };
 		D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Notebook.swift"; sourceTree = "<group>"; };
@@ -232,7 +230,6 @@
 			isa = PBXGroup;
 			children = (
 				D40F0A211C975368002D61EA /* Annotation.swift */,
-				D4A90CDD1C986D180010F8F2 /* AnnotationIndex.swift */,
 				D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */,
 				D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */,
 				D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */,
@@ -503,7 +500,6 @@
 				D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */,
 				D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */,
 				D4ACFD3A1C99EB37008CEF22 /* AnnotationStore+Tag.swift in Sources */,
-				D4A90CDE1C986D180010F8F2 /* AnnotationIndex.swift in Sources */,
 				D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */,
 				D9C470E01C61773D00EDCD69 /* AnnotationStore.swift in Sources */,
 				D40F0A301C977129002D61EA /* Bookmark.swift in Sources */,

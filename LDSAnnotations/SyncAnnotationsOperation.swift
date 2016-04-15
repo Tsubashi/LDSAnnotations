@@ -28,8 +28,11 @@ class SyncAnnotationsOperation: Operation {
     let session: Session
     let annotationStore: AnnotationStore
     let token: SyncToken?
-    let localSyncDate: NSDate?
-    let serverSyncDate: NSDate?
+    let localSyncNotebooksDate: NSDate?
+    let serverSyncNotebooksDate: NSDate?
+    var localSyncAnnotationsDate: NSDate?
+    var serverSyncAnnotationsDate: NSDate?
+    
     let notebookAnnotationIDs: [String: [String]]
 
     var uploadCount = 0
@@ -46,22 +49,20 @@ class SyncAnnotationsOperation: Operation {
     var downloadLinkCount = 0
     var downloadTagCount = 0
     
-    init(session: Session, annotationStore: AnnotationStore, token: SyncToken?, localSyncDate: NSDate?, serverSyncDate: NSDate?, notebookAnnotationIDs: [String: [String]]?, completion: (SyncAnnotationsResult) -> Void) {
+    init(session: Session, annotationStore: AnnotationStore, token: SyncToken?, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, notebookAnnotationIDs: [String: [String]]?, completion: (SyncAnnotationsResult) -> Void) {
         self.session = session
         self.annotationStore = annotationStore
         self.token = token
         self.notebookAnnotationIDs = notebookAnnotationIDs ?? [:]
-        self.localSyncDate = localSyncDate
-        self.serverSyncDate = serverSyncDate
+        self.localSyncNotebooksDate = localSyncNotebooksDate
+        self.serverSyncNotebooksDate = serverSyncNotebooksDate
         
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
-            if errors.isEmpty, let localSyncDate = self.localSyncDate, serverSyncDate = self.serverSyncDate {
-                completion(.Success(token: SyncToken(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate),
-                    localSyncDate: localSyncDate,
-                    serverSyncDate: serverSyncDate,
+            if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate, localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate {
+                completion(.Success(token: SyncToken(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate),
                     uploadCount: self.uploadCount,
                     uploadNoteCount: self.uploadNoteCount,
                     uploadBookmarkCount: self.uploadBookmarkCount,
@@ -82,10 +83,10 @@ class SyncAnnotationsOperation: Operation {
     
     override func execute() {
         let localSyncDate = NSDate()
-        let localChanges = localChangesAfter(token?.localSyncDate, onOrBefore: localSyncDate)
+        let localChanges = localChangesAfter(token?.localSyncAnnotationsDate, onOrBefore: localSyncDate)
         
         var syncAnnotations: [String: AnyObject] = [
-            "since": (token?.serverSyncDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
+            "since": (token?.serverSyncAnnotationsDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
         ]
         
@@ -93,13 +94,11 @@ class SyncAnnotationsOperation: Operation {
             syncAnnotations["changes"] = localChanges
         }
         
-        if token?.serverSyncDate == nil {
+        if token?.serverSyncAnnotationsDate == nil {
             syncAnnotations["syncStatus"] = "notdeleted"
         }
         
-        let payload = [
-            "syncAnnotations": syncAnnotations
-        ]
+        let payload = ["syncAnnotations": syncAnnotations]
         
         session.put("/ws/annotation/v1.4/Services/rest/sync/annotations-ids?xver=2", payload: payload) { response in
             switch response {
@@ -193,8 +192,9 @@ class SyncAnnotationsOperation: Operation {
             case .Success(let payload):
                 do {
                     try self.annotationStore.inSyncTransaction {
-                        if let localSyncDate = self.localSyncDate {
+                        if let localSyncDate = self.token?.localSyncAnnotationsDate {
                             let deletedAnnotations = self.annotationStore.deletedAnnotations(lastModifiedOnOrBefore: localSyncDate)
+                            // TODO: Do we need to actually delete these?
                             print(deletedAnnotations)
                         }
                         try self.applyServerChanges(payload)
@@ -241,7 +241,7 @@ class SyncAnnotationsOperation: Operation {
                     } else {
                         databaseAnnotation = annotationStore.addOrUpdateAnnotation(downloadedAnnotation)
                     }
-                    downloadCount++
+                    downloadCount += 1
                     
                     if let annotationID = databaseAnnotation?.id, annotationUniqueID = databaseAnnotation?.uniqueID {
                         
@@ -249,7 +249,7 @@ class SyncAnnotationsOperation: Operation {
                         if let note = annotation["note"] as? [String: AnyObject] {
                             if let downloadedNote = Note(jsonObject: note, annotationID: annotationID) {
                                 try annotationStore.addOrUpdateNote(downloadedNote)
-                                downloadNoteCount++
+                                downloadNoteCount += 1
                             } else {
                                 NSLog("Failed to deserialize note: %@", note)
                             }
@@ -259,7 +259,7 @@ class SyncAnnotationsOperation: Operation {
                         if let bookmark = annotation["bookmark"] as? [String: AnyObject] {
                             if let downloadedBookmark = Bookmark(jsonObject: bookmark, annotationID: annotationID) {
                                 try annotationStore.addOrUpdateBookmark(downloadedBookmark)
-                                downloadBookmarkCount++
+                                downloadBookmarkCount += 1
                             } else {
                                 NSLog("Failed to deserialize bookmark: %@", bookmark)
                             }
@@ -293,7 +293,7 @@ class SyncAnnotationsOperation: Operation {
                                 }
                                 
                                 try annotationStore.addOrUpdateHighlight(downloadedHighlight)
-                                downloadHighlightCount++
+                                downloadHighlightCount += 1
                             }
                         }
                         
@@ -305,7 +305,7 @@ class SyncAnnotationsOperation: Operation {
                                 }
                                 
                                 try annotationStore.addOrUpdateLink(downloadedLink)
-                                downloadLinkCount++
+                                downloadLinkCount += 1
                             }
                         }
                         
@@ -317,7 +317,7 @@ class SyncAnnotationsOperation: Operation {
                                 }
                                 
                                 let tag = try annotationStore.addOrUpdateTag(downloadedTag)
-                                downloadTagCount++
+                                downloadTagCount += 1
                                 
                                 if let tagID = tag?.id {
                                     try annotationStore.addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID)

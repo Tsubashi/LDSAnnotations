@@ -63,7 +63,8 @@ extension AnnotationStore {
             if let id = note.id {
                 try db.run(NoteTable.table.filter(NoteTable.id == id).update(
                     NoteTable.title <- note.title,
-                    NoteTable.content <- note.content
+                    NoteTable.content <- note.content,
+                    NoteTable.annotationID <- note.annotationID
                 ))
                 return note
             } else {
@@ -71,7 +72,7 @@ extension AnnotationStore {
                     NoteTable.title <- note.title,
                     NoteTable.content <- note.content,
                     NoteTable.annotationID <- note.annotationID
-                    ))
+                ))
                 return Note(id: id, title: note.title, content: note.content, annotationID: note.annotationID)
             }
         } catch {
@@ -83,7 +84,7 @@ extension AnnotationStore {
         return db.pluck(NoteTable.table.filter(NoteTable.id == id)).map { NoteTable.fromRow($0) }
     }
     
-    public func deleteNoteWithID(id: Int64) {
+    internal func deleteNoteWithID(id: Int64) {
         do {
             try db.run(NoteTable.table.filter(NoteTable.id == id).delete())
         } catch {}

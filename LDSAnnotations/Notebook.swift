@@ -58,18 +58,8 @@ public struct Notebook {
         self.uniqueID = uniqueID
         self.name = name
         self.lastModified = lastModified
-        
-        if let description = jsonObject["desc"] as? String {
-            self.description = description
-        } else {
-            self.description = nil
-        }
-        
-        if let rawStatus = jsonObject["@status"] as? String, status = AnnotationStatus(rawValue: rawStatus) {
-            self.status = status
-        } else {
-            self.status = .Active
-        }
+        self.description = jsonObject["desc"] as? String
+        self.status = (jsonObject["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
     }
     
     func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
