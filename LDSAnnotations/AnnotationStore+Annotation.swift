@@ -177,7 +177,7 @@ extension AnnotationStore {
             
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
-                if annotation.status != .Active && annotation.status != .Trashed {
+                if annotation.status == .Deleted {
                     throw Error.errorWithCode(.Unknown, failureReason: "Attempted to trash a annotation that is not active and not trashed (i.e. deleted).")
                 }
                 
