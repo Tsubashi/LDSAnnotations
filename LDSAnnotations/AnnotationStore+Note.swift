@@ -55,7 +55,7 @@ extension AnnotationStore {
     
     /// Adds a new note with `content`.
     public func addOrUpdateNote(note: Note) throws -> Note? {
-        guard !note.content.isEmpty && note.annotationID != 0 else {
+        guard note.annotationID != 0 else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a note without content and an annotation ID.")
         }
         

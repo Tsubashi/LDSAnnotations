@@ -40,12 +40,11 @@ public class Session: NSObject {
     let clientPassword: String
     let authenticationURL: NSURL?
     let domain: String
-    let source: String
     
     var docVersionsForDocIDs: ((docIDs: [String]) -> ([String: Int]))?
     
     /// Constructs a session.
-    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", source: String) {
+    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org") {
         self.username = username
         self.password = password
         self.userAgent = userAgent
@@ -54,7 +53,6 @@ public class Session: NSObject {
         self.clientPassword = clientPassword
         self.authenticationURL = authenticationURL
         self.domain = domain
-        self.source = source
     }
     
     lazy var urlSession: NSURLSession = {

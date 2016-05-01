@@ -20,26 +20,20 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import LDSAnnotations
+import XCTest
+@testable import LDSAnnotations
 
-extension Session {
-    
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+class BookmarkTests: XCTestCase {
+
+    func testDeserializeBookmark() {
+        let jsonObject = [
+            "@offset": -1,
+            "@pid": "20527924",
+            "@uri": "/friend/2015/01/friends-by-mail/flying-with-the-friend.p1",
+        ]
+        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: nil)
+        let actual = Bookmark(jsonObject: jsonObject, annotationID: 1)
+        XCTAssertEqual(actual, expected)
     }
     
 }

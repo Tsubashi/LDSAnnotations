@@ -23,7 +23,7 @@
 import Foundation
 
 /// A note.
-public struct Note {
+public struct Note: Equatable {
     
     /// Local ID.
     public internal(set) var id: Int64?
@@ -63,4 +63,11 @@ public struct Note {
         return result
     }
     
+}
+
+public func == (lhs: Note, rhs: Note) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.title == rhs.title
+        && lhs.content == rhs.content
+        && lhs.annotationID == rhs.annotationID
 }

@@ -35,6 +35,8 @@
 		D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */; };
 		D94305621C5C184B00FA14B6 /* LDSAnnotations.h in Headers */ = {isa = PBXBuildFile; fileRef = D94305611C5C184B00FA14B6 /* LDSAnnotations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D94305791C5C237B00FA14B6 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94305781C5C237B00FA14B6 /* Session.swift */; };
+		D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B21CD664B2008618AA /* BookmarkTests.swift */; };
+		D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */; };
 		D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992347D1C627E6F00177FD2 /* Notebook.swift */; };
 		D99234831C628B7C00177FD2 /* ChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234821C628B7C00177FD2 /* ChangeType.swift */; };
 		D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */; };
@@ -98,6 +100,8 @@
 		D94305611C5C184B00FA14B6 /* LDSAnnotations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDSAnnotations.h; sourceTree = "<group>"; };
 		D94305631C5C184B00FA14B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D94305781C5C237B00FA14B6 /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		D95F19B21CD664B2008618AA /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
+		D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStoreTests.swift; sourceTree = "<group>"; };
 		D992347D1C627E6F00177FD2 /* Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notebook.swift; sourceTree = "<group>"; };
 		D99234821C628B7C00177FD2 /* ChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeType.swift; sourceTree = "<group>"; };
 		D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksResult.swift; sourceTree = "<group>"; };
@@ -162,6 +166,8 @@
 			children = (
 				D90A3CE71C95C7280060094B /* AuthenticationTests.swift */,
 				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
+				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
+				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
 			);
 			path = LDSAnnotationsTests;
@@ -457,7 +463,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */,
 				D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */,
+				D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */,
 				D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

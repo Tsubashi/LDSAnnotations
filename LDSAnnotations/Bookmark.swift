@@ -23,7 +23,7 @@
 import Foundation
 
 /// A Bookmark.
-public struct Bookmark {
+public struct Bookmark: Equatable {
     
     /// Local ID.
     public internal(set) var id: Int64?
@@ -40,25 +40,27 @@ public struct Bookmark {
     /// ID of annotation
     public var annotationID: Int64
     
-    /// The word offset that marks the word for this bookmark. It is one based, so zero is not allowed. A value of -1 means the beginning of the paragraph.
+    /// The word offset that marks the word for this bookmark. It is one based, so zero is not allowed. `nil` means the beginning of the paragraph.
     public internal(set) var offset: Int?
     
-    init(id: Int64?, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64) {
+    init(id: Int64?, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int?) {
         self.id = id
         self.name = name
         self.paragraphAID = paragraphAID
         self.displayOrder = displayOrder
         self.annotationID = annotationID
+        self.offset = offset
     }
     
     init?(jsonObject: [String: AnyObject], annotationID: Int64) {
-        guard let name = jsonObject["name"] as? String else { return nil }
-        
         self.id = nil
-        self.name = name
-        self.annotationID = annotationID
-        self.offset = jsonObject["@offset"] as? Int
+        self.name = jsonObject["name"] as? String
+        self.paragraphAID = jsonObject["@pid"] as? String
         self.displayOrder = jsonObject["sort"] as? Int
+        self.annotationID = annotationID
+        
+        let offset = jsonObject["@offset"] as? Int
+        self.offset = (offset < 1 ? nil : offset)
     }
     
     func jsonObject() -> [String: AnyObject] {
@@ -77,4 +79,13 @@ public struct Bookmark {
         return result
     }
     
+}
+
+public func == (lhs: Bookmark, rhs: Bookmark) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.name == rhs.name
+        && lhs.paragraphAID == rhs.paragraphAID
+        && lhs.displayOrder == rhs.displayOrder
+        && lhs.annotationID == rhs.annotationID
+        && lhs.offset == rhs.offset
 }

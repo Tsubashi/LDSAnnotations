@@ -34,13 +34,15 @@ class BookmarkTable {
     static let paragraphAID = Expression<String?>("paragraph_aid")
     static let displayOrder = Expression<Int?>("display_order")
     static let annotationID = Expression<Int64>("annotation_id")
+    static let offset = Expression<Int?>("offset")
     
     static func fromRow(row: Row) -> Bookmark {
         return Bookmark(id: row[id],
             name: row[name],
             paragraphAID: row[paragraphAID],
             displayOrder: row[displayOrder],
-            annotationID: row[annotationID])
+            annotationID: row[annotationID],
+            offset: row[offset])
     }
     
 }
@@ -55,6 +57,7 @@ extension AnnotationStore {
             builder.column(BookmarkTable.name)
             builder.column(BookmarkTable.paragraphAID)
             builder.column(BookmarkTable.annotationID, references: AnnotationTable.table, AnnotationTable.id)
+            builder.column(BookmarkTable.offset)
         })
     }
     
@@ -69,7 +72,8 @@ extension AnnotationStore {
                     BookmarkTable.name <- bookmark.name,
                     BookmarkTable.paragraphAID <- bookmark.paragraphAID,
                     BookmarkTable.displayOrder <- bookmark.displayOrder,
-                    BookmarkTable.annotationID <- bookmark.annotationID
+                    BookmarkTable.annotationID <- bookmark.annotationID,
+                    BookmarkTable.offset <- bookmark.offset
                 ))
                 return bookmark
             } else {
@@ -77,9 +81,10 @@ extension AnnotationStore {
                     BookmarkTable.name <- bookmark.name,
                     BookmarkTable.paragraphAID <- bookmark.paragraphAID,
                     BookmarkTable.displayOrder <- bookmark.displayOrder,
-                    BookmarkTable.annotationID <- bookmark.annotationID
+                    BookmarkTable.annotationID <- bookmark.annotationID,
+                    BookmarkTable.offset <- bookmark.offset
                 ))
-                return Bookmark(id: id, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: bookmark.annotationID)
+                return Bookmark(id: id, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: bookmark.annotationID, offset: bookmark.offset)
             }
         } catch {
             return nil

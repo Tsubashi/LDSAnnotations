@@ -20,26 +20,18 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import LDSAnnotations
+import XCTest
+@testable import LDSAnnotations
 
-extension Session {
+class AnnotationStoreTests: XCTestCase {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+    func testAddNote() {
+        let annotationStore = AnnotationStore()!
+        let noteToAdd = Note(id: nil, title: nil, content: "", annotationID: 1)
+        try! annotationStore.addOrUpdateNote(noteToAdd)
+        let expected = Note(id: 1, title: nil, content: "", annotationID: 1)
+        let actual = annotationStore.noteWithID(1)
+        XCTAssertEqual(actual, expected)
     }
     
 }

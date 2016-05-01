@@ -85,6 +85,8 @@ class SyncAnnotationsOperation: Operation {
         let localSyncDate = NSDate()
         let localChanges = localChangesAfter(token?.localSyncAnnotationsDate, onOrBefore: localSyncDate)
         
+        self.localSyncAnnotationsDate = localSyncDate
+        
         var syncAnnotations: [String: AnyObject] = [
             "since": (token?.serverSyncAnnotationsDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
@@ -158,6 +160,12 @@ class SyncAnnotationsOperation: Operation {
         guard let syncAnnotations = payload["syncAnnotationsIds"] as? [String: AnyObject] else {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing syncAnnotationsIds")
         }
+        
+        guard let rawServerSyncDate = syncAnnotations["before"] as? String, serverSyncDate = NSDate.parseFormattedISO8601(rawServerSyncDate) else {
+            throw Error.errorWithCode(.Unknown, failureReason: "Missing before")
+        }
+        
+        self.serverSyncAnnotationsDate = serverSyncDate
         
         guard let syncIDs = syncAnnotations["syncIds"] as? [[String: AnyObject]] else {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing syncIds")
