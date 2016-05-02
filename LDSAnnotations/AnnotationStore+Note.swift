@@ -84,7 +84,7 @@ extension AnnotationStore {
         return db.pluck(NoteTable.table.filter(NoteTable.id == id)).map { NoteTable.fromRow($0) }
     }
     
-    internal func deleteNoteWithID(id: Int64) {
+    func deleteNoteWithID(id: Int64) {
         do {
             try db.run(NoteTable.table.filter(NoteTable.id == id).delete())
         } catch {}
