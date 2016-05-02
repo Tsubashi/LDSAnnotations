@@ -25,6 +25,35 @@ import XCTest
 
 class AnnotationStoreTests: XCTestCase {
     
+    func testAddAndUpdateNotebook() {
+        let annotationStore = AnnotationStore()!
+        
+        let addExpectation = expectationWithDescription("Notebook added")
+        let addObserver = annotationStore.notebookObservers.add { source, notebooks in
+            if source == .Local && notebooks.count == 1 {
+                addExpectation.fulfill()
+            } else {
+                XCTFail()
+            }
+        }
+        var notebook = try! annotationStore.addNotebook(name: "Test Notebook")
+        annotationStore.notebookObservers.remove(addObserver)
+        
+        let updateExpectation = expectationWithDescription("Notebook updated")
+        let updateObserver = annotationStore.notebookObservers.add { source, notebooks in
+            if source == .Local && notebooks.count == 1 {
+                updateExpectation.fulfill()
+            } else {
+                XCTFail()
+            }
+        }
+        notebook.name = "Renamed Notebook"
+        try! annotationStore.updateNotebook(notebook)
+        annotationStore.notebookObservers.remove(updateObserver)
+        
+        waitForExpectationsWithTimeout(2, handler: nil)
+    }
+    
     func testAddNote() {
         let annotationStore = AnnotationStore()!
         let noteToAdd = Note(id: nil, title: nil, content: "", annotationID: 1)
