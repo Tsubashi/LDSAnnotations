@@ -37,6 +37,7 @@
 		D94305791C5C237B00FA14B6 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94305781C5C237B00FA14B6 /* Session.swift */; };
 		D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B21CD664B2008618AA /* BookmarkTests.swift */; };
 		D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */; };
+		D95F19B71CD6CE67008618AA /* SyncResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B61CD6CE67008618AA /* SyncResult.swift */; };
 		D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992347D1C627E6F00177FD2 /* Notebook.swift */; };
 		D99234831C628B7C00177FD2 /* ChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234821C628B7C00177FD2 /* ChangeType.swift */; };
 		D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */; };
@@ -102,6 +103,7 @@
 		D94305781C5C237B00FA14B6 /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		D95F19B21CD664B2008618AA /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStoreTests.swift; sourceTree = "<group>"; };
+		D95F19B61CD6CE67008618AA /* SyncResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResult.swift; sourceTree = "<group>"; };
 		D992347D1C627E6F00177FD2 /* Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notebook.swift; sourceTree = "<group>"; };
 		D99234821C628B7C00177FD2 /* ChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeType.swift; sourceTree = "<group>"; };
 		D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksResult.swift; sourceTree = "<group>"; };
@@ -217,8 +219,9 @@
 		D9C470DD1C61761E00EDCD69 /* Web Service */ = {
 			isa = PBXGroup;
 			children = (
-				D40F0A201C97531D002D61EA /* Annotations */,
 				D94305781C5C237B00FA14B6 /* Session.swift */,
+				D95F19B61CD6CE67008618AA /* SyncResult.swift */,
+				D99234861C6567A200177FD2 /* SyncToken.swift */,
 				D9C470DB1C61655100EDCD69 /* Response.swift */,
 				D9C470981C60317E00EDCD69 /* Error.swift */,
 				D9C470961C602B4A00EDCD69 /* AuthenticateCondition.swift */,
@@ -226,8 +229,8 @@
 				D9C470D71C615C1300EDCD69 /* NSMutableURLRequest+Sync.swift */,
 				D9C4709A1C60319400EDCD69 /* String+Query.swift */,
 				D9C470D51C614FAE00EDCD69 /* NSDate+ISO8601.swift */,
-				D99234861C6567A200177FD2 /* SyncToken.swift */,
 				D99234811C628B7200177FD2 /* Notebooks */,
+				D40F0A201C97531D002D61EA /* Annotations */,
 			);
 			name = "Web Service";
 			sourceTree = "<group>";
@@ -481,6 +484,7 @@
 				D9C470D61C614FAE00EDCD69 /* NSDate+ISO8601.swift in Sources */,
 				D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */,
 				D4ACFD381C99E1DC008CEF22 /* AnnotationStore+Highlight.swift in Sources */,
+				D95F19B71CD6CE67008618AA /* SyncResult.swift in Sources */,
 				D99234871C6567A200177FD2 /* SyncToken.swift in Sources */,
 				D40F0A2C1C976A58002D61EA /* Tag.swift in Sources */,
 				D9C470951C60273400EDCD69 /* AuthenticateOperation.swift in Sources */,

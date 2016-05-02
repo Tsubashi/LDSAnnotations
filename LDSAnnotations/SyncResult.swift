@@ -22,22 +22,29 @@
 
 import Foundation
 
-enum SyncAnnotationsResult {
+/// Result of syncing notebooks and annotations.
+public enum SyncResult {
     
-    case Success(localSyncAnnotationsDate: NSDate,
-        serverSyncAnnotationsDate: NSDate,
+    /// Result when sync is successful.
+    ///
+    /// The `token` should be used for the next sync.
+    case Success(token: SyncToken?,
+        uploadNotebookCount: Int,
         uploadAnnotationCount: Int,
         uploadNoteCount: Int,
         uploadBookmarkCount: Int,
         uploadHighlightCount: Int,
         uploadTagCount: Int,
         uploadLinkCount: Int,
+        downloadNotebookCount: Int,
         downloadAnnotationCount: Int,
         downloadNoteCount: Int,
         downloadBookmarkCount: Int,
         downloadHighlightCount: Int,
         downloadTagCount: Int,
         downloadLinkCount: Int)
+    
+    /// Result when a sync fails.
     case Error(errors: [NSError])
     
 }

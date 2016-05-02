@@ -139,21 +139,14 @@ class SyncNotebooksTests: XCTestCase {
     
     func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, completion: (uploadCount: Int, downloadCount: Int) -> Void) {
         let expectation = expectationWithDescription(description)
-        session.syncAnnotations(annotationStore: annotationStore, token: token) { syncNotebooksResult, syncAnnotationsResult in
-            switch (syncNotebooksResult, syncAnnotationsResult) {
-            case let (
-                .Success(localSyncNotebooksDate: _, serverSyncNotebooksDate: _, notebookAnnotationIDs: _, uploadCount: notebookUploadCount, downloadCount: notebookDownloadCount),
-                .Success(token: newToken, uploadCount: _, uploadNoteCount: _, uploadBookmarkCount: _, uploadHighlightCount: _, uploadTagCount: _, uploadLinkCount: _, downloadCount: _, downloadNoteCount: _, downloadBookmarkCount: _, downloadHighlightCount: _, downloadTagCount: _, downloadLinkCount: _)
-            ):
+        session.sync(annotationStore: annotationStore, token: token) { syncResult in
+            switch syncResult {
+            case let .Success(token: newToken, uploadNotebookCount: uploadNotebookCount, uploadAnnotationCount: _, uploadNoteCount: _, uploadBookmarkCount: _, uploadHighlightCount: _, uploadTagCount: _, uploadLinkCount: _, downloadNotebookCount: downloadNotebookCount, downloadAnnotationCount: _, downloadNoteCount: _, downloadBookmarkCount: _, downloadHighlightCount: _, downloadTagCount: _, downloadLinkCount: _):
                 token = newToken
                 
-                completion(uploadCount: notebookUploadCount, downloadCount: notebookDownloadCount)
-            case let (.Error(errors: errors), _):
+                completion(uploadCount: uploadNotebookCount, downloadCount: downloadNotebookCount)
+            case let .Error(errors: errors):
                 XCTFail("Failed with errors \(errors)")
-            case let (_, .Error(errors: errors)):
-                XCTFail("Failed with errors \(errors)")
-            default:
-                XCTFail("Failed")
             }
             expectation.fulfill()
         }

@@ -54,11 +54,7 @@ public struct SyncToken {
         }
         serverSyncNotebooksDate = NSDate(timeIntervalSince1970: serverSyncNotebooksTimeInterval)
         
-        if !scanner.scanString("|", intoString: nil) {
-            return nil
-        }
-        
-        if !scanner.scanString("2:", intoString: nil) {
+        if !scanner.scanString(":", intoString: nil) {
             return nil
         }
         
@@ -88,7 +84,7 @@ public struct SyncToken {
     
     /// An encoded value which can be persisted.
     public var rawValue: String {
-        return "1:\(localSyncNotebooksDate.timeIntervalSince1970):\(serverSyncNotebooksDate.timeIntervalSince1970)|2:\(localSyncAnnotationsDate.timeIntervalSince1970):\(serverSyncAnnotationsDate.timeIntervalSince1970)"
+        return "1:\(localSyncNotebooksDate.timeIntervalSince1970):\(serverSyncNotebooksDate.timeIntervalSince1970):\(localSyncAnnotationsDate.timeIntervalSince1970):\(serverSyncAnnotationsDate.timeIntervalSince1970)"
     }
     
 }

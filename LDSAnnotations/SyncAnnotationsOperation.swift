@@ -27,49 +27,48 @@ class SyncAnnotationsOperation: Operation {
     
     let session: Session
     let annotationStore: AnnotationStore
-    let token: SyncToken?
-    let localSyncNotebooksDate: NSDate?
-    let serverSyncNotebooksDate: NSDate?
+    let notebookAnnotationIDs: [String: [String]]
+    let previousLocalSyncAnnotationsDate: NSDate?
+    let previousServerSyncAnnotationsDate: NSDate?
+    
     var localSyncAnnotationsDate: NSDate?
     var serverSyncAnnotationsDate: NSDate?
-    
-    let notebookAnnotationIDs: [String: [String]]
 
-    var uploadCount = 0
+    var uploadAnnotationCount = 0
     var uploadHighlightCount = 0
     var uploadBookmarkCount = 0
     var uploadNoteCount = 0
     var uploadLinkCount = 0
     var uploadTagCount = 0
     
-    var downloadCount = 0
+    var downloadAnnotationCount = 0
     var downloadHighlightCount = 0
     var downloadBookmarkCount = 0
     var downloadNoteCount = 0
     var downloadLinkCount = 0
     var downloadTagCount = 0
     
-    init(session: Session, annotationStore: AnnotationStore, token: SyncToken?, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, notebookAnnotationIDs: [String: [String]]?, completion: (SyncAnnotationsResult) -> Void) {
+    init(session: Session, annotationStore: AnnotationStore, notebookAnnotationIDs: [String: [String]], localSyncAnnotationsDate: NSDate?, serverSyncAnnotationsDate: NSDate?, completion: (SyncAnnotationsResult) -> Void) {
         self.session = session
         self.annotationStore = annotationStore
-        self.token = token
-        self.notebookAnnotationIDs = notebookAnnotationIDs ?? [:]
-        self.localSyncNotebooksDate = localSyncNotebooksDate
-        self.serverSyncNotebooksDate = serverSyncNotebooksDate
+        self.notebookAnnotationIDs = notebookAnnotationIDs
+        self.previousLocalSyncAnnotationsDate = localSyncAnnotationsDate
+        self.previousServerSyncAnnotationsDate = serverSyncAnnotationsDate
         
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
-            if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate, localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate {
-                completion(.Success(token: SyncToken(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate),
-                    uploadCount: self.uploadCount,
+            if errors.isEmpty, let localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate {
+                completion(.Success(localSyncAnnotationsDate: localSyncAnnotationsDate,
+                    serverSyncAnnotationsDate: serverSyncAnnotationsDate,
+                    uploadAnnotationCount: self.uploadAnnotationCount,
                     uploadNoteCount: self.uploadNoteCount,
                     uploadBookmarkCount: self.uploadBookmarkCount,
                     uploadHighlightCount: self.uploadHighlightCount,
                     uploadTagCount: self.uploadTagCount,
                     uploadLinkCount: self.uploadLinkCount,
-                    downloadCount: self.downloadCount,
+                    downloadAnnotationCount: self.downloadAnnotationCount,
                     downloadNoteCount: self.downloadNoteCount,
                     downloadBookmarkCount: self.downloadBookmarkCount,
                     downloadHighlightCount: self.downloadHighlightCount,
@@ -83,12 +82,12 @@ class SyncAnnotationsOperation: Operation {
     
     override func execute() {
         let localSyncDate = NSDate()
-        let localChanges = localChangesAfter(token?.localSyncAnnotationsDate, onOrBefore: localSyncDate)
+        let localChanges = localChangesAfter(previousLocalSyncAnnotationsDate, onOrBefore: localSyncDate)
         
         self.localSyncAnnotationsDate = localSyncDate
         
         var syncAnnotations: [String: AnyObject] = [
-            "since": (token?.serverSyncAnnotationsDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
+            "since": (previousServerSyncAnnotationsDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
         ]
         
@@ -96,7 +95,7 @@ class SyncAnnotationsOperation: Operation {
             syncAnnotations["changes"] = localChanges
         }
         
-        if token?.serverSyncAnnotationsDate == nil {
+        if previousServerSyncAnnotationsDate == nil {
             syncAnnotations["syncStatus"] = "notdeleted"
         }
         
@@ -121,7 +120,7 @@ class SyncAnnotationsOperation: Operation {
     func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> [[String: AnyObject]] {
         let modifiedAnnotations = annotationStore.allAnnotations(lastModifiedAfter: after, lastModifiedOnOrBefore: onOrBefore)
         
-        uploadCount = modifiedAnnotations.count
+        uploadAnnotationCount = modifiedAnnotations.count
         
         let localChanges = modifiedAnnotations.map { annotation -> [String: AnyObject] in
             var result: [String: AnyObject] = [
@@ -200,7 +199,7 @@ class SyncAnnotationsOperation: Operation {
             case .Success(let payload):
                 do {
                     try self.annotationStore.inSyncTransaction {
-                        if let localSyncDate = self.token?.localSyncAnnotationsDate {
+                        if let localSyncDate = self.localSyncAnnotationsDate {
                             let deletedAnnotations = self.annotationStore.deletedAnnotations(lastModifiedOnOrBefore: localSyncDate)
                             // TODO: Do we need to actually delete these?
                             print(deletedAnnotations)
@@ -249,7 +248,7 @@ class SyncAnnotationsOperation: Operation {
                     } else {
                         databaseAnnotation = annotationStore.addOrUpdateAnnotation(downloadedAnnotation)
                     }
-                    downloadCount += 1
+                    downloadAnnotationCount += 1
                     
                     if let annotationID = databaseAnnotation?.id, annotationUniqueID = databaseAnnotation?.uniqueID {
                         

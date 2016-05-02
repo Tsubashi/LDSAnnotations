@@ -27,25 +27,29 @@ class SyncNotebooksOperation: Operation {
     
     let session: Session
     let annotationStore: AnnotationStore
-    let token: SyncToken?
+    let previousLocalSyncNotebooksDate: NSDate?
+    let previousServerSyncNotebooksDate: NSDate?
     
-    var localSyncDate: NSDate?
-    var serverSyncDate: NSDate?
-    var uploadCount: Int?
-    var downloadCount: Int?
+    var localSyncNotebooksDate: NSDate?
+    var serverSyncNotebooksDate: NSDate?
+    
+    var uploadNotebookCount = 0
+    var downloadNotebookCount = 0
+    
     var notebookAnnotationIDs: [String: [String]]?
     
-    init(session: Session, annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult) -> Void) {
+    init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, completion: (SyncNotebooksResult) -> Void) {
         self.session = session
         self.annotationStore = annotationStore
-        self.token = token
+        self.previousLocalSyncNotebooksDate = localSyncNotebooksDate
+        self.previousServerSyncNotebooksDate = serverSyncNotebooksDate
         
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
-            if errors.isEmpty, let localSyncDate = self.localSyncDate, serverSyncDate = self.serverSyncDate, uploadCount = self.uploadCount, downloadCount = self.downloadCount {
-                completion(.Success(localSyncNotebooksDate: localSyncDate, serverSyncNotebooksDate: serverSyncDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadCount: uploadCount, downloadCount: downloadCount))
+            if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
+                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadCount: self.uploadNotebookCount, downloadCount: self.downloadNotebookCount))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -54,12 +58,12 @@ class SyncNotebooksOperation: Operation {
     
     override func execute() {
         let localSyncDate = NSDate()
-        let localChanges = localChangesAfter(token?.localSyncNotebooksDate, onOrBefore: localSyncDate)
+        let localChanges = localChangesAfter(previousLocalSyncNotebooksDate, onOrBefore: localSyncDate)
         
-        self.localSyncDate = localSyncDate
+        self.localSyncNotebooksDate = localSyncDate
         
         var syncFolders: [String: AnyObject] = [
-            "since": (token?.serverSyncNotebooksDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
+            "since": (previousServerSyncNotebooksDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
         ]
         
@@ -67,7 +71,7 @@ class SyncNotebooksOperation: Operation {
             syncFolders["changes"] = localChanges
         }
         
-        if token?.serverSyncNotebooksDate == nil {
+        if previousServerSyncNotebooksDate == nil {
             syncFolders["syncStatus"] = "notdeleted"
         }
         
@@ -95,7 +99,7 @@ class SyncNotebooksOperation: Operation {
     func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> [[String: AnyObject]] {
         let modifiedNotebooks = annotationStore.allNotebooks(lastModifiedAfter: after, lastModifiedOnOrBefore: onOrBefore)
         
-        uploadCount = modifiedNotebooks.count
+        uploadNotebookCount = modifiedNotebooks.count
         
         return modifiedNotebooks.map { (notebook: Notebook) -> [String: AnyObject] in
             var result: [String: AnyObject] = [
@@ -121,7 +125,7 @@ class SyncNotebooksOperation: Operation {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing before")
         }
         
-        self.serverSyncDate = serverSyncDate
+        self.serverSyncNotebooksDate = serverSyncDate
         
         var notebookAnnotationIDs = [String: [String]]()
         
@@ -165,10 +169,8 @@ class SyncNotebooksOperation: Operation {
                 }
             }
             
+            self.downloadNotebookCount = downloadCount
             self.notebookAnnotationIDs = notebookAnnotationIDs
-            self.downloadCount = downloadCount
-        } else {
-            downloadCount = 0
         }
     }
     

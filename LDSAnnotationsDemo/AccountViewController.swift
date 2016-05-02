@@ -133,39 +133,34 @@ class AccountViewController: UIViewController {
     
     func syncFolders() {
         let token = AccountController.sharedController.syncTokenForUsername(session.username)
-        session.syncAnnotations(annotationStore: annotationStore, token: token) { syncFoldersResult, syncAnnotationsResult in
+        session.sync(annotationStore: annotationStore, token: token) { syncResult in
             dispatch_sync(dispatch_get_main_queue()) {
-                switch (syncFoldersResult, syncAnnotationsResult) {
-                case let (
-                    .Success(localSyncNotebooksDate: _, serverSyncNotebooksDate: _, notebookAnnotationIDs: _, uploadCount: notebookUploadCount, downloadCount: notebookDownloadCount),
-                    .Success(token: token, uploadCount: annotationUploadCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadCount: annotationDownloadCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount)
-                    ):
-                    NSLog("Sync notebooks completed (\(notebookUploadCount) uploaded, \(notebookDownloadCount) downloaded)")
-                    
+                switch syncResult {
+                case let .Success(token: token, uploadNotebookCount: uploadNotebookCount, uploadAnnotationCount: uploadAnnotationCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadNotebookCount: downloadNotebookCount, downloadAnnotationCount: downloadAnnotationCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount):
                     let uploaded = [
-                        "\(uploadHighlightCount) highlights uploaded",
-                        "\(uploadNoteCount) notes uploaded",
-                        "\(uploadTagCount) tags uploaded",
-                        "\(uploadBookmarkCount) bookmarks uploaded",
-                        "\(uploadLinkCount) links uploaded",
+                        "\(uploadNotebookCount) notebooks",
+                        "\(uploadAnnotationCount) annotations",
+                        "\(uploadHighlightCount) highlights",
+                        "\(uploadNoteCount) notes",
+                        "\(uploadTagCount) tags",
+                        "\(uploadBookmarkCount) bookmarks",
+                        "\(uploadLinkCount) links",
                     ]
                     let downloaded = [
-                        "\(downloadHighlightCount) highlights downloaded",
-                        "\(downloadNoteCount) notes downloaded",
-                        "\(downloadTagCount) tags downloaded",
-                        "\(downloadBookmarkCount) bookmarks downloaded",
-                        "\(downloadLinkCount) links downloaded",
+                        "\(downloadNotebookCount) notebooks",
+                        "\(downloadAnnotationCount) annotations",
+                        "\(downloadHighlightCount) highlights",
+                        "\(downloadNoteCount) notes",
+                        "\(downloadTagCount) tags",
+                        "\(downloadBookmarkCount) bookmarks",
+                        "\(downloadLinkCount) links",
                     ]
                     
-                    NSLog("Sync annotations completed (\(annotationUploadCount) uploaded, \(annotationDownloadCount) downloaded)\n%@\n%@", uploaded.joinWithSeparator(","), downloaded.joinWithSeparator(","))
+                    NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joinWithSeparator(", "), downloaded.joinWithSeparator(", "))
                     
                     AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
-                case let (.Error(errors: errors), _):
-                    NSLog("Sync notebooks failed: %@", errors)
-                case let (_, .Error(errors: errors)):
-                    NSLog("Sync annotations failed: %@", errors)
-                default:
-                    break
+                case let .Error(errors: errors):
+                    NSLog("Sync failed: %@", errors)
                 }
             }
         }
