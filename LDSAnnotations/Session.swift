@@ -40,6 +40,7 @@ public class Session: NSObject {
     let clientPassword: String
     let authenticationURL: NSURL?
     let domain: String
+    let trustPolicy: TrustPolicy
     
     /// Callback to get the local doc version of the given doc IDs.
     ///
@@ -47,7 +48,7 @@ public class Session: NSObject {
     public var docVersionsForDocIDs: ((docIDs: [String]) -> ([String: Int]))?
     
     /// Constructs a session.
-    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org") {
+    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", trustPolicy: TrustPolicy = .Trust) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
@@ -56,6 +57,7 @@ public class Session: NSObject {
         self.clientPassword = clientPassword
         self.authenticationURL = authenticationURL
         self.domain = domain
+        self.trustPolicy = trustPolicy
     }
     
     lazy var urlSession: NSURLSession = {
@@ -167,6 +169,21 @@ extension Session {
             }
         }
         task.resume()
+    }
+    
+}
+
+// MARK: - NSURLSessionDelegate
+
+extension Session: NSURLSessionDelegate {
+    
+    public func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+        switch trustPolicy {
+        case .Validate:
+            completionHandler(.PerformDefaultHandling, nil)
+        case .Trust:
+            completionHandler(.UseCredential, challenge.protectionSpace.serverTrust.flatMap { NSURLCredential(forTrust: $0) })
+        }
     }
     
 }

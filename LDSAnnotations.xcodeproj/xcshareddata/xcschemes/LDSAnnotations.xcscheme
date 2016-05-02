@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "D90A3CDB1C95C6FE0060094B"
+               BuildableName = "LDSAnnotationsTests.xctest"
+               BlueprintName = "LDSAnnotationsTests"
+               ReferencedContainer = "container:LDSAnnotations.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
@@ -60,6 +70,24 @@
             ReferencedContainer = "container:LDSAnnotations.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "-ClientUsername $(CLIENT_USERNAME)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-ClientPassword $(CLIENT_PASSWORD)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-TestAccountUsername $(TEST_ACCOUNT_USERNAME)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-TestAccountPassword $(TEST_ACCOUNT_PASSWORD)"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
