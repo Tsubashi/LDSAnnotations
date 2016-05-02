@@ -233,9 +233,12 @@ class SyncAnnotationsOperation: Operation {
                     throw Error.errorWithCode(.Unknown, failureReason: "Missing annotationId")
                 }
                 
-                guard let annotation = change["annotation"] as? [String: AnyObject], downloadedAnnotation = Annotation(jsonObject: annotation) else {
-                    NSLog("Unable to deserialize annotation: %@", change)
-                    continue
+                guard let rawAnnotation = change["annotation"] as? [String: AnyObject] else {
+                    throw Error.errorWithCode(.Unknown, failureReason: "Missing annotation")
+                }
+                
+                guard let downloadedAnnotation = Annotation(jsonObject: rawAnnotation) else {
+                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize annotation: \(rawAnnotation)")
                 }
                 
                 switch changeType {
@@ -253,36 +256,34 @@ class SyncAnnotationsOperation: Operation {
                     if let annotationID = databaseAnnotation?.id, annotationUniqueID = databaseAnnotation?.uniqueID {
                         
                         // Note
-                        if let note = annotation["note"] as? [String: AnyObject] {
+                        if let note = rawAnnotation["note"] as? [String: AnyObject] {
                             if let downloadedNote = Note(jsonObject: note, annotationID: annotationID) {
                                 try annotationStore.addOrUpdateNote(downloadedNote)
                                 downloadNoteCount += 1
                             } else {
-                                NSLog("Failed to deserialize note: %@", note)
+                                throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize note: \(note)")
                             }
                         }
                         
                         // Bookmark
-                        if let bookmark = annotation["bookmark"] as? [String: AnyObject] {
+                        if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
                             if let downloadedBookmark = Bookmark(jsonObject: bookmark, annotationID: annotationID) {
                                 try annotationStore.addOrUpdateBookmark(downloadedBookmark)
                                 downloadBookmarkCount += 1
                             } else {
-                                NSLog("Failed to deserialize bookmark: %@", bookmark)
+                                throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize bookmark: \(bookmark)")
                             }
                         }
                         
                         // Annotation order within notebook
-                        if let folders = annotation["folders"] as? [String: [[String: AnyObject]]] {
+                        if let folders = rawAnnotation["folders"] as? [String: [[String: AnyObject]]] {
                             for folder in folders["folder"] ?? [] {
                                 guard let notebookUniqueID = folder["@uri"]?.lastPathComponent else {
-                                    NSLog("Failed to deserialize folder: %@", folder)
-                                    continue
+                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize notebook: \(folder)")
                                 }
 
                                 guard let notebookID = annotationStore.notebookWithUniqueID(notebookUniqueID)?.id else {
-                                    NSLog("No notebook with uniqueID found in database: %@", notebookUniqueID)
-                                    continue
+                                    throw Error.errorWithCode(.Unknown, failureReason: "Cannot find notebook with uniqueID \(notebookUniqueID)")
                                 }
                                 
                                 // Don't fail if we don't get a display order from the syncFolders, just put it at the end
@@ -292,11 +293,10 @@ class SyncAnnotationsOperation: Operation {
                             }
                         }
                         
-                        if let highlights = annotation["highlights"] as? [String: [[String: AnyObject]]] {
+                        if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                             for highlight in highlights["highlight"] ?? [] {
                                 guard let downloadedHighlight = Highlight(jsonObject: highlight, annotationID: annotationID) else {
-                                    NSLog("Failed to deserialize highlight: %@", highlight)
-                                    continue
+                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize highlight: \(highlight)")
                                 }
                                 
                                 try annotationStore.addOrUpdateHighlight(downloadedHighlight)
@@ -304,11 +304,10 @@ class SyncAnnotationsOperation: Operation {
                             }
                         }
                         
-                        if let links = annotation["refs"] as? [String: [[String: AnyObject]]] {
+                        if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                             for link in links["ref"] ?? [] {
                                 guard let downloadedLink = Link(jsonObject: link, annotationID: annotationID) else {
-                                    NSLog("Failed to deserialize link: %@", link)
-                                    continue
+                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize link: \(link)")
                                 }
                                 
                                 try annotationStore.addOrUpdateLink(downloadedLink)
@@ -316,11 +315,10 @@ class SyncAnnotationsOperation: Operation {
                             }
                         }
                         
-                        if let tags = annotation["tags"] as? [String: [String]] {
+                        if let tags = rawAnnotation["tags"] as? [String: [String]] {
                             for tagName in tags["tag"] ?? [] {
                                 guard let downloadedTag = Tag(name: tagName) else {
-                                    NSLog("Failed to deserialize tag: %@", tagName)
-                                    continue
+                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize tag: \(tagName)")
                                 }
                                 
                                 let tag = try annotationStore.addOrUpdateTag(downloadedTag)

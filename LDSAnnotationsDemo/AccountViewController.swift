@@ -136,9 +136,9 @@ class AccountViewController: UIViewController {
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             dispatch_sync(dispatch_get_main_queue()) {
                 switch syncResult {
-                case let .Success(token: token, uploadNotebookCount: uploadNotebookCount, uploadAnnotationCount: uploadAnnotationCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadNotebookCount: downloadNotebookCount, downloadAnnotationCount: downloadAnnotationCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount):
+                case let .Success(token: token, uploadedNotebooks: uploadedNotebooks, uploadAnnotationCount: uploadAnnotationCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadedNotebooks: downloadedNotebooks, downloadAnnotationCount: downloadAnnotationCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount):
                     let uploaded = [
-                        "\(uploadNotebookCount) notebooks",
+                        "\(uploadedNotebooks.count) notebooks",
                         "\(uploadAnnotationCount) annotations",
                         "\(uploadHighlightCount) highlights",
                         "\(uploadNoteCount) notes",
@@ -147,7 +147,7 @@ class AccountViewController: UIViewController {
                         "\(uploadLinkCount) links",
                     ]
                     let downloaded = [
-                        "\(downloadNotebookCount) notebooks",
+                        "\(downloadedNotebooks.count) notebooks",
                         "\(downloadAnnotationCount) annotations",
                         "\(downloadHighlightCount) highlights",
                         "\(downloadNoteCount) notes",

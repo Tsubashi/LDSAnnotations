@@ -141,10 +141,10 @@ class SyncNotebooksTests: XCTestCase {
         let expectation = expectationWithDescription(description)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             switch syncResult {
-            case let .Success(token: newToken, uploadNotebookCount: uploadNotebookCount, uploadAnnotationCount: _, uploadNoteCount: _, uploadBookmarkCount: _, uploadHighlightCount: _, uploadTagCount: _, uploadLinkCount: _, downloadNotebookCount: downloadNotebookCount, downloadAnnotationCount: _, downloadNoteCount: _, downloadBookmarkCount: _, downloadHighlightCount: _, downloadTagCount: _, downloadLinkCount: _):
+            case let .Success(token: newToken, uploadedNotebooks: uploadedNotebooks, uploadAnnotationCount: _, uploadNoteCount: _, uploadBookmarkCount: _, uploadHighlightCount: _, uploadTagCount: _, uploadLinkCount: _, downloadedNotebooks: downloadedNotebooks, downloadAnnotationCount: _, downloadNoteCount: _, downloadBookmarkCount: _, downloadHighlightCount: _, downloadTagCount: _, downloadLinkCount: _):
                 token = newToken
                 
-                completion(uploadCount: uploadNotebookCount, downloadCount: downloadNotebookCount)
+                completion(uploadCount: uploadedNotebooks.count, downloadCount: downloadedNotebooks.count)
             case let .Error(errors: errors):
                 XCTFail("Failed with errors \(errors)")
             }

@@ -33,8 +33,8 @@ class SyncNotebooksOperation: Operation {
     var localSyncNotebooksDate: NSDate?
     var serverSyncNotebooksDate: NSDate?
     
-    var uploadNotebookCount = 0
-    var downloadNotebookCount = 0
+    var uploadedNotebooks = [Notebook]()
+    var downloadedNotebooks = [Notebook]()
     
     var notebookAnnotationIDs: [String: [String]]?
     
@@ -49,7 +49,7 @@ class SyncNotebooksOperation: Operation {
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
-                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadCount: self.uploadNotebookCount, downloadCount: self.downloadNotebookCount))
+                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -99,7 +99,7 @@ class SyncNotebooksOperation: Operation {
     func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> [[String: AnyObject]] {
         let modifiedNotebooks = annotationStore.allNotebooks(lastModifiedAfter: after, lastModifiedOnOrBefore: onOrBefore)
         
-        uploadNotebookCount = modifiedNotebooks.count
+        uploadedNotebooks = modifiedNotebooks
         
         return modifiedNotebooks.map { (notebook: Notebook) -> [String: AnyObject] in
             var result: [String: AnyObject] = [
@@ -130,7 +130,7 @@ class SyncNotebooksOperation: Operation {
         var notebookAnnotationIDs = [String: [String]]()
         
         if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
-            var downloadCount = 0
+            var downloadedNotebooks = [Notebook]()
             
             for change in remoteChanges {
                 guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
@@ -149,10 +149,10 @@ class SyncNotebooksOperation: Operation {
                     notebookAnnotationIDs[downloadedNotebook.uniqueID] = order["id"]
                 }
                 
+                downloadedNotebooks.append(downloadedNotebook)
+                
                 switch changeType {
                 case .New, .Trash:
-                    downloadCount += 1
-                    
                     if let existingNotebook = annotationStore.notebookWithUniqueID(uniqueID) {
                         var mergedNotebook = downloadedNotebook
                         mergedNotebook.id = existingNotebook.id
@@ -169,7 +169,7 @@ class SyncNotebooksOperation: Operation {
                 }
             }
             
-            self.downloadNotebookCount = downloadCount
+            self.downloadedNotebooks = downloadedNotebooks
             self.notebookAnnotationIDs = notebookAnnotationIDs
         }
     }

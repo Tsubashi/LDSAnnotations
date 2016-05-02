@@ -29,14 +29,14 @@ public enum SyncResult {
     ///
     /// The `token` should be used for the next sync.
     case Success(token: SyncToken?,
-        uploadNotebookCount: Int,
+        uploadedNotebooks: [Notebook],
         uploadAnnotationCount: Int,
         uploadNoteCount: Int,
         uploadBookmarkCount: Int,
         uploadHighlightCount: Int,
         uploadTagCount: Int,
         uploadLinkCount: Int,
-        downloadNotebookCount: Int,
+        downloadedNotebooks: [Notebook],
         downloadAnnotationCount: Int,
         downloadNoteCount: Int,
         downloadBookmarkCount: Int,

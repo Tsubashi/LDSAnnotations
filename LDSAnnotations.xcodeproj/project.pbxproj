@@ -206,6 +206,15 @@
 			path = LDSAnnotations;
 			sourceTree = "<group>";
 		};
+		D95F19B81CD6D91D008618AA /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				D9C470961C602B4A00EDCD69 /* AuthenticateCondition.swift */,
+				D9C470941C60273400EDCD69 /* AuthenticateOperation.swift */,
+			);
+			name = Auth;
+			sourceTree = "<group>";
+		};
 		D99234811C628B7200177FD2 /* Notebooks */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,11 +233,10 @@
 				D99234861C6567A200177FD2 /* SyncToken.swift */,
 				D9C470DB1C61655100EDCD69 /* Response.swift */,
 				D9C470981C60317E00EDCD69 /* Error.swift */,
-				D9C470961C602B4A00EDCD69 /* AuthenticateCondition.swift */,
-				D9C470941C60273400EDCD69 /* AuthenticateOperation.swift */,
 				D9C470D71C615C1300EDCD69 /* NSMutableURLRequest+Sync.swift */,
 				D9C4709A1C60319400EDCD69 /* String+Query.swift */,
 				D9C470D51C614FAE00EDCD69 /* NSDate+ISO8601.swift */,
+				D95F19B81CD6D91D008618AA /* Auth */,
 				D99234811C628B7200177FD2 /* Notebooks */,
 				D40F0A201C97531D002D61EA /* Annotations */,
 			);
