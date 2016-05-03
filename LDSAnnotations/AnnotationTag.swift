@@ -21,25 +21,18 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+/// A table that allows us to have a many-to-many relationship between annotations and tags.
+public struct AnnotationTag {
+
+    /// Annotation ID
+    public var annotationID: Int64
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+    /// Tag ID
+    public var tagID: Int64
+
+    init(annotationID: Int64, tagID: Int64) {
+        self.annotationID = annotationID
+        self.tagID = tagID
     }
-    
 }

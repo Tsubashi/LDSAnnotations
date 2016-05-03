@@ -21,25 +21,30 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+/// A Tag.
+public struct Tag {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
+    /// Local ID.
+    public internal(set) var id: Int64?
+    
+    /// Tag name
+    public var name: String
+    
+    init(id: Int64?, name: String) {
+        self.id = id
+        self.name = name
+    }
+    
+    init?(name: String?) {
+        guard let name = name else { return nil }
         
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+        self.id = nil
+        self.name = name
+    }
+    
+    func jsonObject() -> String {
+        return name
     }
     
 }

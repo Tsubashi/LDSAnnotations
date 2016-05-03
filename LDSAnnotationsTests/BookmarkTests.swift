@@ -20,26 +20,33 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import LDSAnnotations
+import XCTest
+@testable import LDSAnnotations
 
-extension Session {
+class BookmarkTests: XCTestCase {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+    func testBookmarkWithOffset() {
+        let input = [
+            "@offset": 3,
+            "@pid": "20527924",
+        ]
+        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 2)
+        let actual = Bookmark(jsonObject: input, annotationID: 1)
+        XCTAssertEqual(actual, expected)
+        let output = actual!.jsonObject() as! [String: NSObject]
+        XCTAssertEqual(output, input)
+    }
+    
+    func testBookmarkWithSentinelOffset() {
+        let input = [
+            "@offset": -1,
+            "@pid": "20527924",
+        ]
+        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 0)
+        let actual = Bookmark(jsonObject: input, annotationID: 1)
+        XCTAssertEqual(actual, expected)
+        let output = actual!.jsonObject() as! [String: NSObject]
+        XCTAssertEqual(output, input)
     }
     
 }

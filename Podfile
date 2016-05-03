@@ -9,14 +9,14 @@ xcodeproj 'LDSAnnotations.xcodeproj'
 
 target 'LDSAnnotations' do
     pod 'PSOperations'
-    pod 'SQLite.swift', '~> 0.9.2'
+    pod 'SQLite.swift'
     pod 'Swiftification'
 end
 
 target 'LDSAnnotationsTests' do
     # Required by LDSAnnotations
     pod 'PSOperations'
-    pod 'SQLite.swift', '~> 0.9.2'
+    pod 'SQLite.swift'
     pod 'Swiftification'
 end
 
@@ -27,6 +27,6 @@ target 'LDSAnnotationsDemo' do
     
     # Required by LDSAnnotations
     pod 'PSOperations'
-    pod 'SQLite.swift', '~> 0.9.2'
+    pod 'SQLite.swift'
     pod 'Swiftification'
 end

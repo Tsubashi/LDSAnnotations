@@ -40,9 +40,15 @@ public class Session: NSObject {
     let clientPassword: String
     let authenticationURL: NSURL?
     let domain: String
+    let trustPolicy: TrustPolicy
+    
+    /// Callback to get the local doc version of the given doc IDs.
+    ///
+    /// Returns a dictionary of doc IDs to doc versions.
+    public var docVersionsForDocIDs: ((docIDs: [String]) -> ([String: Int]))?
     
     /// Constructs a session.
-    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org") {
+    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", trustPolicy: TrustPolicy = .Trust) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
@@ -51,6 +57,7 @@ public class Session: NSObject {
         self.clientPassword = clientPassword
         self.authenticationURL = authenticationURL
         self.domain = domain
+        self.trustPolicy = trustPolicy
     }
     
     lazy var urlSession: NSURLSession = {
@@ -79,14 +86,45 @@ public class Session: NSObject {
         operationQueue.addOperation(operation)
     }
     
-    /// Uploads all local notebook modifications made since the last sync, then downloads and stores all notebook modifications made after the last sync.
+    /// Uploads all local annotations modifications made since the last sync, then downloads and stores all annotation modifications made after the last sync.
     ///
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
-    public func syncNotebooks(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult) -> Void) {
-        let operation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, token: token, completion: completion)
-        operationQueue.addOperation(operation)
+    public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
+        let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, localSyncNotebooksDate: token?.localSyncNotebooksDate, serverSyncNotebooksDate: token?.serverSyncNotebooksDate) { syncNotebooksResult in
+            switch syncNotebooksResult {
+            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: syncNotebooksChanges):
+                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, notebookAnnotationIDs: syncNotebooksChanges.notebookAnnotationIDs, localSyncAnnotationsDate: token?.localSyncAnnotationsDate, serverSyncAnnotationsDate: token?.serverSyncAnnotationsDate) { syncAnnotationsResult in
+                    switch syncAnnotationsResult {
+                    case let .Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: syncAnnotationsChanges):
+                        let token = SyncToken(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate)
+                        let changes = SyncChanges(
+                            uploadedNotebooks: syncNotebooksChanges.uploadedNotebooks,
+                            uploadAnnotationCount: syncAnnotationsChanges.uploadAnnotationCount,
+                            uploadNoteCount: syncAnnotationsChanges.uploadNoteCount,
+                            uploadBookmarkCount: syncAnnotationsChanges.uploadBookmarkCount,
+                            uploadHighlightCount: syncAnnotationsChanges.uploadHighlightCount,
+                            uploadTagCount: syncAnnotationsChanges.uploadTagCount,
+                            uploadLinkCount: syncAnnotationsChanges.uploadLinkCount,
+                            downloadedNotebooks: syncNotebooksChanges.downloadedNotebooks,
+                            downloadAnnotationCount: syncAnnotationsChanges.downloadAnnotationCount,
+                            downloadNoteCount: syncAnnotationsChanges.downloadNoteCount,
+                            downloadBookmarkCount: syncAnnotationsChanges.downloadBookmarkCount,
+                            downloadHighlightCount: syncAnnotationsChanges.downloadHighlightCount,
+                            downloadTagCount: syncAnnotationsChanges.downloadTagCount,
+                            downloadLinkCount: syncAnnotationsChanges.downloadLinkCount)
+                        completion(SyncResult.Success(token: token, changes: changes))
+                    case let .Error(errors: errors):
+                        completion(SyncResult.Error(errors: errors))
+                    }
+                }
+                self.operationQueue.addOperation(syncAnnotationsOperation)
+            case let .Error(errors: errors):
+                completion(SyncResult.Error(errors: errors))
+            }
+        }
+        operationQueue.addOperation(syncNotebooksOperation)
     }
-    
+
 }
 
 // MARK: - Networking primitives
@@ -146,6 +184,21 @@ extension Session {
             }
         }
         task.resume()
+    }
+    
+}
+
+// MARK: - NSURLSessionDelegate
+
+extension Session: NSURLSessionDelegate {
+    
+    public func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+        switch trustPolicy {
+        case .Validate:
+            completionHandler(.PerformDefaultHandling, nil)
+        case .Trust:
+            completionHandler(.UseCredential, challenge.protectionSpace.serverTrust.flatMap { NSURLCredential(forTrust: $0) })
+        }
     }
     
 }

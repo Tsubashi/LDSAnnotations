@@ -21,25 +21,32 @@
 //
 
 import Foundation
-import LDSAnnotations
+import SQLite
 
-extension Session {
+/// The style of a highlight.
+public enum HighlightStyle: String {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+    /// Plain block highlight style
+    case Highlight = ""
+    
+    /// Underline style
+    case Underline = "red-underline"
+    
+}
+
+extension HighlightStyle: Value {
+    
+    public static var declaredDatatype: String {
+        return String.declaredDatatype
+    }
+    
+    public static func fromDatatypeValue(stringValue: String) -> HighlightStyle {
+        return HighlightStyle(rawValue: stringValue) ?? .Highlight
+    }
+    
+    public var datatypeValue: String {
+        return rawValue
     }
     
 }
+

@@ -21,25 +21,37 @@
 //
 
 import Foundation
-import LDSAnnotations
+import SQLite
 
-extension Session {
+/// The status of an annotation.
+public enum AnnotationType: String {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+    /// A bookmark type annotation cannot have notes, tags, or links.
+    case Bookmark = "bookmark"
+    
+    /// An annotation with a highlight, that is not a bookmark.
+    case Highlight = "highlight"
+    
+    /// An annotation that doesn't have a highlight. It can only be created/used in a notebook.
+    case Journal = "journal"
+    
+    /// If an annotation has at least one reference, then its type needs to be Link.
+    case Link = "reference"
+    
+}
+
+extension AnnotationType: Value {
+    
+    public static var declaredDatatype: String {
+        return String.declaredDatatype
+    }
+    
+    public static func fromDatatypeValue(stringValue: String) -> AnnotationType {
+        return AnnotationType(rawValue: stringValue) ?? .Highlight
+    }
+    
+    public var datatypeValue: String {
+        return rawValue
     }
     
 }

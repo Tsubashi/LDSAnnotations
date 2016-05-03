@@ -21,25 +21,21 @@
 //
 
 import Foundation
-import LDSAnnotations
 
-extension Session {
+struct SyncAnnotationsChanges {
     
-    convenience init(username: String, password: String, source: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
-            fatalError("Missing bundle name")
-        }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
-            fatalError("Missing bundle version")
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            fatalError("Missing ClientUsername")
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            fatalError("Missing ClientPassword")
-        }
-        
-        self.init(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
-    }
+    let uploadAnnotationCount: Int
+    let uploadNoteCount: Int
+    let uploadBookmarkCount: Int
+    let uploadHighlightCount: Int
+    let uploadTagCount: Int
+    let uploadLinkCount: Int
+    
+    let downloadAnnotationCount: Int
+    let downloadNoteCount: Int
+    let downloadBookmarkCount: Int
+    let downloadHighlightCount: Int
+    let downloadTagCount: Int
+    let downloadLinkCount: Int
     
 }

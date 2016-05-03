@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D4BCDA1C1CA5A40B001EE71F /* AnnotationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BCDA1B1CA5A40B001EE71F /* AnnotationsViewController.swift */; };
+		D4BCDA1E1CA5A5AD001EE71F /* AnnotationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BCDA1D1CA5A5AD001EE71F /* AnnotationViewController.swift */; };
 		D90A3CD01C95C5B40060094B /* LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D90A3CCF1C95C5B40060094B /* LDSAnnotations.framework */; };
 		D992348B1C663FF500177FD2 /* Session+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992348A1C663FF500177FD2 /* Session+Extras.swift */; };
 		D992348F1C66450600177FD2 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992348E1C66450600177FD2 /* AccountController.swift */; };
@@ -28,6 +30,8 @@
 		8BE4FFF93929CA3366A7D7B3 /* Pods_LDSAnnotationsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotationsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6F9664386A6FDD2A5FD86E1 /* Pods-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		C0D08D4477F8D21FD1594603 /* Pods-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
+		D4BCDA1B1CA5A40B001EE71F /* AnnotationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationsViewController.swift; sourceTree = "<group>"; };
+		D4BCDA1D1CA5A5AD001EE71F /* AnnotationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationViewController.swift; sourceTree = "<group>"; };
 		D90A3CCF1C95C5B40060094B /* LDSAnnotations.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDSAnnotations.framework; path = "build/Debug-iphoneos/LDSAnnotations.framework"; sourceTree = "<group>"; };
 		D992348A1C663FF500177FD2 /* Session+Extras.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Session+Extras.swift"; sourceTree = "<group>"; };
 		D992348E1C66450600177FD2 /* AccountController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
@@ -69,6 +73,15 @@
 			name = Pods;
 			sourceTree = "<group>";
 		};
+		D4BCDA1A1CA5A3EE001EE71F /* Annotations */ = {
+			isa = PBXGroup;
+			children = (
+				D4BCDA1B1CA5A40B001EE71F /* AnnotationsViewController.swift */,
+				D4BCDA1D1CA5A5AD001EE71F /* AnnotationViewController.swift */,
+			);
+			name = Annotations;
+			sourceTree = "<group>";
+		};
 		D99234881C66364600177FD2 /* Main */ = {
 			isa = PBXGroup;
 			children = (
@@ -101,6 +114,7 @@
 		D99234991C669D8100177FD2 /* Accounts */ = {
 			isa = PBXGroup;
 			children = (
+				D99234981C669D7800177FD2 /* Account */,
 				D9C470AC1C612E0A00EDCD69 /* AccountsViewController.swift */,
 				D992348E1C66450600177FD2 /* AccountController.swift */,
 			);
@@ -138,7 +152,7 @@
 			children = (
 				D99234881C66364600177FD2 /* Main */,
 				D99234991C669D8100177FD2 /* Accounts */,
-				D99234981C669D7800177FD2 /* Account */,
+				D4BCDA1A1CA5A3EE001EE71F /* Annotations */,
 				D992349A1C669D9400177FD2 /* Notebooks */,
 				D99234891C66365B00177FD2 /* Supporting Files */,
 			);
@@ -281,9 +295,11 @@
 				D9C470AD1C612E0A00EDCD69 /* AccountsViewController.swift in Sources */,
 				D99234931C668D3200177FD2 /* AccountViewController.swift in Sources */,
 				D9C470AB1C612E0A00EDCD69 /* AppDelegate.swift in Sources */,
+				D4BCDA1C1CA5A40B001EE71F /* AnnotationsViewController.swift in Sources */,
 				D992349C1C669DA600177FD2 /* NotebooksViewController.swift in Sources */,
 				D99234951C668FE300177FD2 /* Value1TableViewCell.swift in Sources */,
 				D992348B1C663FF500177FD2 /* Session+Extras.swift in Sources */,
+				D4BCDA1E1CA5A5AD001EE71F /* AnnotationViewController.swift in Sources */,
 				D99234971C66909300177FD2 /* NSFileManager+URLs.swift in Sources */,
 				D992348F1C66450600177FD2 /* AccountController.swift in Sources */,
 			);

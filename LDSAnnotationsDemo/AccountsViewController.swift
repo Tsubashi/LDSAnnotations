@@ -32,7 +32,7 @@ class AccountsViewController: UIViewController {
         automaticallyAdjustsScrollViewInsets = false
         
         title = "Accounts"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "add")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(add))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -112,11 +112,11 @@ extension AccountsViewController {
         let alertController = UIAlertController(title: "Add Account", message: "Enter the username and password for your LDS Account.", preferredStyle: .Alert)
         alertController.addTextFieldWithConfigurationHandler { textField in
             textField.placeholder = "Username"
-            textField.addTarget(self, action: "textFieldDidChange:", forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
         }
         alertController.addTextFieldWithConfigurationHandler { textField in
             textField.placeholder = "Password"
-            textField.addTarget(self, action: "textFieldDidChange:", forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
             textField.secureTextEntry = true
         }
         
@@ -143,7 +143,7 @@ extension AccountsViewController {
     }
     
     func addAccountWithUsername(username: String, password: String) {
-        let session = Session(username: username, password: password)
+        let session = Session(username: username, password: password, source: "LDSAnnotations Demo")
         session.authenticate { error in
             if let error = error {
                 NSLog("Failed to authenticate account: %@", error)
@@ -215,7 +215,7 @@ extension AccountsViewController: UITableViewDelegate {
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let username = usernames[indexPath.row]
         if let password = AccountController.sharedController.passwordForUsername(username), path = NSFileManager.privateDocumentsURL.URLByAppendingPathComponent("\(username).sqlite").path, annotationStore = AnnotationStore(path: path) {
-            let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
+            let viewController = AccountViewController(session: Session(username: username, password: password, source: "LDSAnnotations Demo"), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)
         } else {

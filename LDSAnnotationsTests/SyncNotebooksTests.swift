@@ -23,8 +23,6 @@
 import XCTest
 import LDSAnnotations
 
-// TODO: test observer sets
-
 class SyncNotebooksTests: XCTestCase {
     
     func testAddAndUpdateNotebook() {
@@ -139,18 +137,18 @@ class SyncNotebooksTests: XCTestCase {
     
     func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, completion: (uploadCount: Int, downloadCount: Int) -> Void) {
         let expectation = expectationWithDescription(description)
-        session.syncNotebooks(annotationStore: annotationStore, token: token) { result in
-            switch result {
-            case let .Success(newToken, uploadCount, downloadCount):
+        session.sync(annotationStore: annotationStore, token: token) { syncResult in
+            switch syncResult {
+            case let .Success(token: newToken, changes: changes):
                 token = newToken
                 
-                completion(uploadCount: uploadCount, downloadCount: downloadCount)
-            case let .Error(errors):
+                completion(uploadCount: changes.uploadedNotebooks.count, downloadCount: changes.downloadedNotebooks.count)
+            case let .Error(errors: errors):
                 XCTFail("Failed with errors \(errors)")
             }
             expectation.fulfill()
         }
-        waitForExpectationsWithTimeout(30, handler: nil)
+        waitForExpectationsWithTimeout(300, handler: nil)
     }
     
 }

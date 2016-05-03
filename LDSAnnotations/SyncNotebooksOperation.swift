@@ -27,24 +27,30 @@ class SyncNotebooksOperation: Operation {
     
     let session: Session
     let annotationStore: AnnotationStore
-    let token: SyncToken?
+    let previousLocalSyncNotebooksDate: NSDate?
+    let previousServerSyncNotebooksDate: NSDate?
     
-    var localSyncDate: NSDate?
-    var serverSyncDate: NSDate?
-    var uploadCount: Int?
-    var downloadCount: Int?
+    var localSyncNotebooksDate: NSDate?
+    var serverSyncNotebooksDate: NSDate?
     
-    init(session: Session, annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncNotebooksResult) -> Void) {
+    var uploadedNotebooks = [Notebook]()
+    var downloadedNotebooks = [Notebook]()
+    
+    var notebookAnnotationIDs = [String: [String]]()
+    
+    init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, completion: (SyncNotebooksResult) -> Void) {
         self.session = session
         self.annotationStore = annotationStore
-        self.token = token
+        self.previousLocalSyncNotebooksDate = localSyncNotebooksDate
+        self.previousServerSyncNotebooksDate = serverSyncNotebooksDate
         
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
-            if errors.isEmpty, let localSyncDate = self.localSyncDate, serverSyncDate = self.serverSyncDate, uploadCount = self.uploadCount, downloadCount = self.downloadCount {
-                completion(.Success(token: SyncToken(localSyncDate: localSyncDate, serverSyncDate: serverSyncDate), uploadCount: uploadCount, downloadCount: downloadCount))
+            if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
+                let changes = SyncNotebooksChanges(notebookAnnotationIDs: self.notebookAnnotationIDs, uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks)
+                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -53,28 +59,30 @@ class SyncNotebooksOperation: Operation {
     
     override func execute() {
         let localSyncDate = NSDate()
-        let localChanges = localChangesAfter(token?.localSyncDate, onOrBefore: localSyncDate)
+        let localChanges = localChangesAfter(previousLocalSyncNotebooksDate, onOrBefore: localSyncDate)
         
-        self.localSyncDate = localSyncDate
+        self.localSyncNotebooksDate = localSyncDate
         
         var syncFolders: [String: AnyObject] = [
-            "since": (token?.serverSyncDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
+            "since": (previousServerSyncNotebooksDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
             "clientTime": NSDate().formattedISO8601,
-            "changes": localChanges,
         ]
-        if token?.serverSyncDate == nil {
+        
+        if !localChanges.isEmpty {
+            syncFolders["changes"] = localChanges
+        }
+        
+        if previousServerSyncNotebooksDate == nil {
             syncFolders["syncStatus"] = "notdeleted"
         }
-        let payload = [
-            "syncFolders": syncFolders
-        ]
+        
+        let payload = ["syncFolders": syncFolders]
         
         session.put("/ws/annotation/v1.4/Services/rest/sync/folders?xver=2", payload: payload) { response in
             switch response {
             case .Success(let payload):
                 do {
                     try self.annotationStore.inSyncTransaction {
-                        self.annotationStore.deletedNotebooks(lastModifiedOnOrBefore: localSyncDate)
                         try self.applyServerChanges(payload)
                     }
                     self.finish()
@@ -92,7 +100,7 @@ class SyncNotebooksOperation: Operation {
     func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> [[String: AnyObject]] {
         let modifiedNotebooks = annotationStore.allNotebooks(lastModifiedAfter: after, lastModifiedOnOrBefore: onOrBefore)
         
-        uploadCount = modifiedNotebooks.count
+        uploadedNotebooks = modifiedNotebooks
         
         return modifiedNotebooks.map { (notebook: Notebook) -> [String: AnyObject] in
             var result: [String: AnyObject] = [
@@ -102,7 +110,7 @@ class SyncNotebooksOperation: Operation {
             ]
             
             if notebook.status != .Deleted {
-                result["folder"] = notebook.jsonObject()
+                result["folder"] = notebook.jsonObject(annotationStore)
             }
             
             return result
@@ -118,10 +126,12 @@ class SyncNotebooksOperation: Operation {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing before")
         }
         
-        self.serverSyncDate = serverSyncDate
+        self.serverSyncNotebooksDate = serverSyncDate
+        
+        var notebookAnnotationIDs = [String: [String]]()
         
         if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
-            var downloadCount = 0
+            var downloadedNotebooks = [Notebook]()
             
             for change in remoteChanges {
                 guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
@@ -136,12 +146,14 @@ class SyncNotebooksOperation: Operation {
                     throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize folder")
                 }
                 
-                // TODO: handle "order"
+                if let order = folder["order"] as? [String: [String]] {
+                    notebookAnnotationIDs[downloadedNotebook.uniqueID] = order["id"]
+                }
+                
+                downloadedNotebooks.append(downloadedNotebook)
                 
                 switch changeType {
                 case .New, .Trash:
-                    downloadCount += 1
-                    
                     if let existingNotebook = annotationStore.notebookWithUniqueID(uniqueID) {
                         var mergedNotebook = downloadedNotebook
                         mergedNotebook.id = existingNotebook.id
@@ -158,9 +170,8 @@ class SyncNotebooksOperation: Operation {
                 }
             }
             
-            self.downloadCount = downloadCount
-        } else {
-            downloadCount = 0
+            self.downloadedNotebooks = downloadedNotebooks
+            self.notebookAnnotationIDs = notebookAnnotationIDs
         }
     }
     
