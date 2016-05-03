@@ -24,20 +24,7 @@ import Foundation
 
 enum SyncAnnotationsResult {
     
-    case Success(localSyncAnnotationsDate: NSDate,
-        serverSyncAnnotationsDate: NSDate,
-        uploadAnnotationCount: Int,
-        uploadNoteCount: Int,
-        uploadBookmarkCount: Int,
-        uploadHighlightCount: Int,
-        uploadTagCount: Int,
-        uploadLinkCount: Int,
-        downloadAnnotationCount: Int,
-        downloadNoteCount: Int,
-        downloadBookmarkCount: Int,
-        downloadHighlightCount: Int,
-        downloadTagCount: Int,
-        downloadLinkCount: Int)
+    case Success(localSyncAnnotationsDate: NSDate, serverSyncAnnotationsDate: NSDate, changes: SyncAnnotationsChanges)
     case Error(errors: [NSError])
     
 }

@@ -60,9 +60,7 @@ class SyncAnnotationsOperation: Operation {
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty, let localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate {
-                completion(.Success(localSyncAnnotationsDate: localSyncAnnotationsDate,
-                    serverSyncAnnotationsDate: serverSyncAnnotationsDate,
-                    uploadAnnotationCount: self.uploadAnnotationCount,
+                let changes = SyncAnnotationsChanges(uploadAnnotationCount: self.uploadAnnotationCount,
                     uploadNoteCount: self.uploadNoteCount,
                     uploadBookmarkCount: self.uploadBookmarkCount,
                     uploadHighlightCount: self.uploadHighlightCount,
@@ -73,7 +71,8 @@ class SyncAnnotationsOperation: Operation {
                     downloadBookmarkCount: self.downloadBookmarkCount,
                     downloadHighlightCount: self.downloadHighlightCount,
                     downloadTagCount: self.downloadTagCount,
-                    downloadLinkCount: self.downloadLinkCount))
+                    downloadLinkCount: self.downloadLinkCount)
+                completion(.Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: changes))
             } else {
                 completion(.Error(errors: errors))
             }

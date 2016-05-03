@@ -136,24 +136,24 @@ class AccountViewController: UIViewController {
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             dispatch_sync(dispatch_get_main_queue()) {
                 switch syncResult {
-                case let .Success(token: token, uploadedNotebooks: uploadedNotebooks, uploadAnnotationCount: uploadAnnotationCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadedNotebooks: downloadedNotebooks, downloadAnnotationCount: downloadAnnotationCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount):
+                case let .Success(token: token, changes: changes):
                     let uploaded = [
-                        "\(uploadedNotebooks.count) notebooks",
-                        "\(uploadAnnotationCount) annotations",
-                        "\(uploadHighlightCount) highlights",
-                        "\(uploadNoteCount) notes",
-                        "\(uploadTagCount) tags",
-                        "\(uploadBookmarkCount) bookmarks",
-                        "\(uploadLinkCount) links",
+                        "\(changes.uploadedNotebooks.count) notebooks",
+                        "\(changes.uploadAnnotationCount) annotations",
+                        "\(changes.uploadHighlightCount) highlights",
+                        "\(changes.uploadNoteCount) notes",
+                        "\(changes.uploadTagCount) tags",
+                        "\(changes.uploadBookmarkCount) bookmarks",
+                        "\(changes.uploadLinkCount) links",
                     ]
                     let downloaded = [
-                        "\(downloadedNotebooks.count) notebooks",
-                        "\(downloadAnnotationCount) annotations",
-                        "\(downloadHighlightCount) highlights",
-                        "\(downloadNoteCount) notes",
-                        "\(downloadTagCount) tags",
-                        "\(downloadBookmarkCount) bookmarks",
-                        "\(downloadLinkCount) links",
+                        "\(changes.downloadedNotebooks.count) notebooks",
+                        "\(changes.downloadAnnotationCount) annotations",
+                        "\(changes.downloadHighlightCount) highlights",
+                        "\(changes.downloadNoteCount) notes",
+                        "\(changes.downloadTagCount) tags",
+                        "\(changes.downloadBookmarkCount) bookmarks",
+                        "\(changes.downloadLinkCount) links",
                     ]
                     
                     NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joinWithSeparator(", "), downloaded.joinWithSeparator(", "))

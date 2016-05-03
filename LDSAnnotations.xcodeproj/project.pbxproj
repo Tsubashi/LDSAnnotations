@@ -39,6 +39,10 @@
 		D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */; };
 		D95F19B71CD6CE67008618AA /* SyncResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B61CD6CE67008618AA /* SyncResult.swift */; };
 		D95F19CD1CD79BB6008618AA /* TrustPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19CC1CD79BB6008618AA /* TrustPolicy.swift */; };
+		D95F19CF1CD8DC42008618AA /* SyncChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19CE1CD8DC42008618AA /* SyncChanges.swift */; };
+		D95F19D11CD8DCED008618AA /* SyncNotebooksChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19D01CD8DCED008618AA /* SyncNotebooksChanges.swift */; };
+		D95F19D31CD8DD9C008618AA /* SyncAnnotationsChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19D21CD8DD9C008618AA /* SyncAnnotationsChanges.swift */; };
+		D95F19D51CD8E4C3008618AA /* HighlightTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19D41CD8E4C3008618AA /* HighlightTests.swift */; };
 		D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D992347D1C627E6F00177FD2 /* Notebook.swift */; };
 		D99234831C628B7C00177FD2 /* ChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234821C628B7C00177FD2 /* ChangeType.swift */; };
 		D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */; };
@@ -106,6 +110,10 @@
 		D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStoreTests.swift; sourceTree = "<group>"; };
 		D95F19B61CD6CE67008618AA /* SyncResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResult.swift; sourceTree = "<group>"; };
 		D95F19CC1CD79BB6008618AA /* TrustPolicy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrustPolicy.swift; sourceTree = "<group>"; };
+		D95F19CE1CD8DC42008618AA /* SyncChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncChanges.swift; sourceTree = "<group>"; };
+		D95F19D01CD8DCED008618AA /* SyncNotebooksChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksChanges.swift; sourceTree = "<group>"; };
+		D95F19D21CD8DD9C008618AA /* SyncAnnotationsChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsChanges.swift; sourceTree = "<group>"; };
+		D95F19D41CD8E4C3008618AA /* HighlightTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HighlightTests.swift; sourceTree = "<group>"; };
 		D992347D1C627E6F00177FD2 /* Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notebook.swift; sourceTree = "<group>"; };
 		D99234821C628B7C00177FD2 /* ChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeType.swift; sourceTree = "<group>"; };
 		D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncNotebooksResult.swift; sourceTree = "<group>"; };
@@ -161,6 +169,7 @@
 			children = (
 				D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */,
 				D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */,
+				D95F19D21CD8DD9C008618AA /* SyncAnnotationsChanges.swift */,
 			);
 			name = Annotations;
 			sourceTree = "<group>";
@@ -171,6 +180,7 @@
 				D90A3CE71C95C7280060094B /* AuthenticationTests.swift */,
 				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
 				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
+				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
 				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
 			);
@@ -222,6 +232,7 @@
 			children = (
 				D9C470891C60144800EDCD69 /* SyncNotebooksOperation.swift */,
 				D99234841C65505C00177FD2 /* SyncNotebooksResult.swift */,
+				D95F19D01CD8DCED008618AA /* SyncNotebooksChanges.swift */,
 				D99234821C628B7C00177FD2 /* ChangeType.swift */,
 			);
 			name = Notebooks;
@@ -234,6 +245,7 @@
 				D95F19CC1CD79BB6008618AA /* TrustPolicy.swift */,
 				D95F19B61CD6CE67008618AA /* SyncResult.swift */,
 				D99234861C6567A200177FD2 /* SyncToken.swift */,
+				D95F19CE1CD8DC42008618AA /* SyncChanges.swift */,
 				D9C470DB1C61655100EDCD69 /* Response.swift */,
 				D9C470981C60317E00EDCD69 /* Error.swift */,
 				D9C470D71C615C1300EDCD69 /* NSMutableURLRequest+Sync.swift */,
@@ -481,6 +493,7 @@
 				D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */,
 				D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */,
 				D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */,
+				D95F19D51CD8E4C3008618AA /* HighlightTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,11 +506,13 @@
 				D40F0A221C975368002D61EA /* Annotation.swift in Sources */,
 				D40F0A2A1C97693C002D61EA /* Note.swift in Sources */,
 				D9C470D61C614FAE00EDCD69 /* NSDate+ISO8601.swift in Sources */,
+				D95F19D11CD8DCED008618AA /* SyncNotebooksChanges.swift in Sources */,
 				D99234851C65505C00177FD2 /* SyncNotebooksResult.swift in Sources */,
 				D4ACFD381C99E1DC008CEF22 /* AnnotationStore+Highlight.swift in Sources */,
 				D95F19B71CD6CE67008618AA /* SyncResult.swift in Sources */,
 				D99234871C6567A200177FD2 /* SyncToken.swift in Sources */,
 				D40F0A2C1C976A58002D61EA /* Tag.swift in Sources */,
+				D95F19CF1CD8DC42008618AA /* SyncChanges.swift in Sources */,
 				D9C470951C60273400EDCD69 /* AuthenticateOperation.swift in Sources */,
 				D4ACFD401C99F6A5008CEF22 /* AnnotationStore+Link.swift in Sources */,
 				D9C4708A1C60144800EDCD69 /* SyncNotebooksOperation.swift in Sources */,
@@ -523,6 +538,7 @@
 				D94305791C5C237B00FA14B6 /* Session.swift in Sources */,
 				D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */,
 				D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */,
+				D95F19D31CD8DD9C008618AA /* SyncAnnotationsChanges.swift in Sources */,
 				D4ACFD3A1C99EB37008CEF22 /* AnnotationStore+Tag.swift in Sources */,
 				D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */,
 				D9C470E01C61773D00EDCD69 /* AnnotationStore.swift in Sources */,

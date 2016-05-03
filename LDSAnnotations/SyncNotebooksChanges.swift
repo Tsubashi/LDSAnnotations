@@ -22,15 +22,10 @@
 
 import Foundation
 
-/// Result of syncing notebooks and annotations.
-public enum SyncResult {
+struct SyncNotebooksChanges {
     
-    /// Result when sync is successful.
-    ///
-    /// The `token` should be used for the next sync.
-    case Success(token: SyncToken, changes: SyncChanges)
-    
-    /// Result when a sync fails.
-    case Error(errors: [NSError])
+    let notebookAnnotationIDs: [String: [String]]
+    let uploadedNotebooks: [Notebook]
+    let downloadedNotebooks: [Notebook]
     
 }

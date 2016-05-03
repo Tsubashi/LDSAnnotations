@@ -22,31 +22,47 @@
 
 import XCTest
 @testable import LDSAnnotations
+import Swiftification
 
-class BookmarkTests: XCTestCase {
+class HighlightTests: XCTestCase {
     
-    func testBookmarkWithOffset() {
+    func testHighlightWithOffset() {
         let input = [
-            "@offset": 3,
+            "@offset-start": "3",
+            "@offset-end": "7",
             "@pid": "20527924",
+            "@color": "yellow",
         ]
-        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 2)
-        let actual = Bookmark(jsonObject: input, annotationID: 1)
+        let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: 2, offsetEnd: 6, colorName: "yellow", style: .Highlight, annotationID: 1)
+        let actual = Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual!.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, input)
+        XCTAssertEqual(output, expectedOutputFromInput(input))
     }
     
-    func testBookmarkWithSentinelOffset() {
+    func testHighlightWithSentinelOffset() {
         let input = [
-            "@offset": -1,
+            "@offset-start": "-1",
+            "@offset-end": "-1",
             "@pid": "20527924",
+            "@color": "yellow",
         ]
-        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: nil)
-        let actual = Bookmark(jsonObject: input, annotationID: 1)
+        let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: nil, offsetEnd: nil, colorName: "yellow", style: .Highlight, annotationID: 1)
+        let actual = Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual!.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, input)
+        XCTAssertEqual(output, expectedOutputFromInput(input))
+    }
+    
+    private func expectedOutputFromInput(input: [String: AnyObject]) -> [String: NSObject] {
+        return input.mapValues { key, value in
+            switch key {
+            case "@offset-start", "@offset-end":
+                return Int(value as! String)!
+            default:
+                return value as! NSObject
+            }
+        }
     }
     
 }

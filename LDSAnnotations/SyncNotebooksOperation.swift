@@ -36,7 +36,7 @@ class SyncNotebooksOperation: Operation {
     var uploadedNotebooks = [Notebook]()
     var downloadedNotebooks = [Notebook]()
     
-    var notebookAnnotationIDs: [String: [String]]?
+    var notebookAnnotationIDs = [String: [String]]()
     
     init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, completion: (SyncNotebooksResult) -> Void) {
         self.session = session
@@ -49,7 +49,8 @@ class SyncNotebooksOperation: Operation {
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
-                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: self.notebookAnnotationIDs ?? [:], uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks))
+                let changes = SyncNotebooksChanges(notebookAnnotationIDs: self.notebookAnnotationIDs, uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks)
+                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes))
             } else {
                 completion(.Error(errors: errors))
             }

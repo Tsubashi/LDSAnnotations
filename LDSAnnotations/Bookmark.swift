@@ -28,19 +28,19 @@ public struct Bookmark: Equatable {
     /// Local ID.
     public internal(set) var id: Int64?
     
-    /// Name
+    /// The name.
     public var name: String?
     
-    /// Paragraph Annotation ID
+    /// Paragraph Annotation ID.
     public var paragraphAID: String?
     
-    /// Display order
+    /// Display order.
     public internal(set) var displayOrder: Int?
     
-    /// ID of annotation
+    /// ID of annotation.
     public var annotationID: Int64
     
-    /// The word offset that marks the word for this bookmark. It is one based, so zero is not allowed. `nil` means the beginning of the paragraph.
+    /// The zero-based word offset of this bookmark location, or `nil` for the beginning of the paragraph.
     public internal(set) var offset: Int?
     
     init(id: Int64?, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int?) {
@@ -59,12 +59,19 @@ public struct Bookmark: Equatable {
         self.displayOrder = jsonObject["sort"] as? Int
         self.annotationID = annotationID
         
-        let offset = jsonObject["@offset"] as? Int
-        self.offset = (offset < 1 ? nil : offset)
+        if let offset = jsonObject["@offset"] as? Int where offset >= 1 {
+            self.offset = offset - 1
+        }
     }
     
     func jsonObject() -> [String: AnyObject] {
-        var result: [String: AnyObject] = ["@offset": offset ?? -1]
+        var result = [String: AnyObject]()
+        
+        if let offset = offset {
+            result["@offset"] = offset + 1
+        } else {
+            result["@offset"] = -1
+        }
         
         if let name = name {
             result["name"] = name

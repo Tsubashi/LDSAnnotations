@@ -92,12 +92,27 @@ public class Session: NSObject {
     public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
         let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, localSyncNotebooksDate: token?.localSyncNotebooksDate, serverSyncNotebooksDate: token?.serverSyncNotebooksDate) { syncNotebooksResult in
             switch syncNotebooksResult {
-            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, notebookAnnotationIDs: notebookAnnotationIDs, uploadedNotebooks: uploadedNotebooks, downloadedNotebooks: downloadedNotebooks):
-                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, notebookAnnotationIDs: notebookAnnotationIDs, localSyncAnnotationsDate: token?.localSyncAnnotationsDate, serverSyncAnnotationsDate: token?.serverSyncAnnotationsDate) { syncAnnotationsResult in
+            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: syncNotebooksChanges):
+                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, notebookAnnotationIDs: syncNotebooksChanges.notebookAnnotationIDs, localSyncAnnotationsDate: token?.localSyncAnnotationsDate, serverSyncAnnotationsDate: token?.serverSyncAnnotationsDate) { syncAnnotationsResult in
                     switch syncAnnotationsResult {
-                    case let .Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, uploadAnnotationCount: uploadAnnotationCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadAnnotationCount: downloadAnnotationCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount):
+                    case let .Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: syncAnnotationsChanges):
                         let token = SyncToken(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate)
-                        completion(SyncResult.Success(token: token, uploadedNotebooks: uploadedNotebooks, uploadAnnotationCount: uploadAnnotationCount, uploadNoteCount: uploadNoteCount, uploadBookmarkCount: uploadBookmarkCount, uploadHighlightCount: uploadHighlightCount, uploadTagCount: uploadTagCount, uploadLinkCount: uploadLinkCount, downloadedNotebooks: downloadedNotebooks, downloadAnnotationCount: downloadAnnotationCount, downloadNoteCount: downloadNoteCount, downloadBookmarkCount: downloadBookmarkCount, downloadHighlightCount: downloadHighlightCount, downloadTagCount: downloadTagCount, downloadLinkCount: downloadLinkCount))
+                        let changes = SyncChanges(
+                            uploadedNotebooks: syncNotebooksChanges.uploadedNotebooks,
+                            uploadAnnotationCount: syncAnnotationsChanges.uploadAnnotationCount,
+                            uploadNoteCount: syncAnnotationsChanges.uploadNoteCount,
+                            uploadBookmarkCount: syncAnnotationsChanges.uploadBookmarkCount,
+                            uploadHighlightCount: syncAnnotationsChanges.uploadHighlightCount,
+                            uploadTagCount: syncAnnotationsChanges.uploadTagCount,
+                            uploadLinkCount: syncAnnotationsChanges.uploadLinkCount,
+                            downloadedNotebooks: syncNotebooksChanges.downloadedNotebooks,
+                            downloadAnnotationCount: syncAnnotationsChanges.downloadAnnotationCount,
+                            downloadNoteCount: syncAnnotationsChanges.downloadNoteCount,
+                            downloadBookmarkCount: syncAnnotationsChanges.downloadBookmarkCount,
+                            downloadHighlightCount: syncAnnotationsChanges.downloadHighlightCount,
+                            downloadTagCount: syncAnnotationsChanges.downloadTagCount,
+                            downloadLinkCount: syncAnnotationsChanges.downloadLinkCount)
+                        completion(SyncResult.Success(token: token, changes: changes))
                     case let .Error(errors: errors):
                         completion(SyncResult.Error(errors: errors))
                     }
