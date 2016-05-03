@@ -1,0 +1,6 @@
+framework module Pods_LDSAnnotationsDemo {
+  umbrella header "Pods-LDSAnnotationsDemo-umbrella.h"
+
+  export *
+  module * { export * }
+}
