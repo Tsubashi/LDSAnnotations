@@ -31,8 +31,8 @@ public struct Highlight: Equatable {
     /// Paragraph Annotation ID.
     public let paragraphAID: String
     
-    /// The zero-based word offset of the start of this highlight range, or `nil` for the beginning of the paragraph.
-    public var offsetStart: Int?
+    /// The zero-based word offset of the start of this highlight range.
+    public var offsetStart: Int
     
     /// The zero-based word offset of the end of this highlight range, or `nil` for the end of the paragraph.
     public var offsetEnd: Int?
@@ -46,7 +46,7 @@ public struct Highlight: Equatable {
     /// ID of annotation.
     public var annotationID: Int64
     
-    init(id: Int64?, paragraphAID: String, offsetStart: Int?, offsetEnd: Int?, colorName: String, style: HighlightStyle?, annotationID: Int64) {
+    init(id: Int64?, paragraphAID: String, offsetStart: Int, offsetEnd: Int?, colorName: String, style: HighlightStyle?, annotationID: Int64) {
         self.id = id
         self.paragraphAID = paragraphAID
         self.offsetStart = offsetStart
@@ -66,6 +66,8 @@ public struct Highlight: Equatable {
         
         if offsetStart >= 1 {
             self.offsetStart = offsetStart - 1
+        } else {
+            self.offsetStart = 0
         }
         
         if offsetEnd >= 1 {
@@ -83,10 +85,10 @@ public struct Highlight: Equatable {
             "@pid": paragraphAID,
         ]
         
-        if let offsetStart = offsetStart {
-            result["@offset-start"] = offsetStart + 1
-        } else {
+        if offsetStart <= 0 {
             result["@offset-start"] = -1
+        } else {
+            result["@offset-start"] = offsetStart + 1
         }
         
         if let offsetEnd = offsetEnd {

@@ -31,7 +31,7 @@ class HighlightTable {
     static let table = Table("highlight")
     static let id = Expression<Int64>("_id")
     static let paragraphAID = Expression<String>("paragraph_aid")
-    static let offsetStart = Expression<Int?>("offset_start")
+    static let offsetStart = Expression<Int>("offset_start")
     static let offsetEnd = Expression<Int?>("offset_end")
     static let colorName = Expression<String>("color")
     static let style = Expression<HighlightStyle?>("style")

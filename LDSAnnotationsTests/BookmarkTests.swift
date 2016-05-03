@@ -42,7 +42,7 @@ class BookmarkTests: XCTestCase {
             "@offset": -1,
             "@pid": "20527924",
         ]
-        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: nil)
+        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 0)
         let actual = Bookmark(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual!.jsonObject() as! [String: NSObject]

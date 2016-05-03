@@ -34,7 +34,7 @@ class BookmarkTable {
     static let paragraphAID = Expression<String?>("paragraph_aid")
     static let displayOrder = Expression<Int?>("display_order")
     static let annotationID = Expression<Int64>("annotation_id")
-    static let offset = Expression<Int?>("offset")
+    static let offset = Expression<Int>("offset")
     
     static func fromRow(row: Row) -> Bookmark {
         return Bookmark(id: row[id],
