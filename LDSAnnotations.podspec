@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name         = "LDSAnnotations"
   s.version      = "1.1.0"
   s.summary      = "Swift client library for LDS annotation sync."
-  s.author       = 'Hilton Campbell'
+  s.author       = 'Hilton Campbell', 'Stephan Heilner'
   s.homepage     = "https://github.com/CrossWaterBridge/LDSAnnotations"
   s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.source       = { :git => "https://github.com/CrossWaterBridge/LDSAnnotations.git", :tag => s.version.to_s }

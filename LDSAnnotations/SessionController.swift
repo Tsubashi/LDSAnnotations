@@ -24,16 +24,16 @@ import Foundation
 
 public class SessionController {
     
-    public static let sharedController = SessionController()
+    private var sessionCache = [String: Session]()
     
-    private let cache = NSCache()
+    public init() {}
     
     public func addSession(session: Session, withUsername username: String) {
-        cache.setObject(session, forKey: username)
+        sessionCache[username] = session
     }
     
     public func sessionForUsername(username: String) -> Session? {
-        return cache.objectForKey(username) as? Session
+        return sessionCache[username]
     }
     
 }

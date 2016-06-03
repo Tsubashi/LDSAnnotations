@@ -68,7 +68,7 @@ public class Session: NSObject {
     
     var lastSuccessfulAuthenticationDate: NSDate?
     
-    public var authenticated: Bool {
+    var authenticated: Bool {
         let gracePeriod: NSTimeInterval = 15 * 60
         if let lastSuccessfulAuthenticationDate = lastSuccessfulAuthenticationDate where NSDate().timeIntervalSinceDate(lastSuccessfulAuthenticationDate) < gracePeriod {
             return true

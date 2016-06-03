@@ -26,13 +26,12 @@ import Locksmith
 
 public class AccountController {
     
-    public static let sharedController = AccountController()
-    
-    private static let service = "LDSAccount"
-    private static let tokensKey = "tokens"
-    
     public let addAccountObservers = ObserverSet<String>()
     public let deleteAccountObservers = ObserverSet<String>()
+
+    public init() {}
+    
+    private static let service = "LDSAccount"
     
     public func addAccountWithUsername(username: String, password: String) throws {
         if !usernames.contains(username) {
@@ -71,6 +70,8 @@ public class AccountController {
         return Locksmith.loadDataForUserAccount(username, inService: AccountController.service)?["password"] as? String
     }
     
+    private static let tokensKey = "tokens"
+    
     public func syncTokenForUsername(username: String) -> SyncToken? {
         guard let tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String], rawToken = tokens[username] else { return nil }
         
@@ -81,11 +82,6 @@ public class AccountController {
         var tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String] ?? [:]
         tokens[username] = token?.rawValue
         NSUserDefaults.standardUserDefaults().setObject(tokens, forKey: AccountController.tokensKey)
-    }
-    
-    public func annotationStoreForUsername(username: String) -> AnnotationStore? {
-        let storeName = String(format: "%@.sqlite", username)
-        return AnnotationStore(path: NSFileManager.privateDocumentsURL.URLByAppendingPathComponent(storeName).path)
     }
     
 }

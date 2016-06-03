@@ -56,9 +56,13 @@ public struct Highlight: Equatable {
         self.annotationID = annotationID
     }
     
-    init?(jsonObject: [String: AnyObject], annotationID: Int64) {
-        guard let paragraphAID = jsonObject["@pid"] as? String, offsetStartString = jsonObject["@offset-start"] as? String, offsetStart = Int(offsetStartString), offsetEndString = jsonObject["@offset-end"] as? String, offsetEnd = Int(offsetEndString), colorName = jsonObject["@color"] as? String else {
-            return nil
+    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
+        guard let offsetStartString = jsonObject["@offset-start"] as? String, offsetStart = Int(offsetStartString), offsetEndString = jsonObject["@offset-end"] as? String, offsetEnd = Int(offsetEndString), colorName = jsonObject["@color"] as? String else {
+            throw Error.errorWithCode(.InvalidHighlight, failureReason: "Failed to deserialize highlight: \(jsonObject)")
+        }
+        
+        guard let paragraphAID = jsonObject["@pid"] as? String else {
+            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize highlight, missing PID: \(jsonObject)")
         }
         
         self.id = nil

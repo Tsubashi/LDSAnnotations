@@ -44,8 +44,10 @@ public struct Note: Equatable {
         self.annotationID = annotationID
     }
     
-    init?(jsonObject: [String: AnyObject], annotationID: Int64) {
-        guard let content = jsonObject["content"] as? String else { return nil }
+    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
+        guard let content = jsonObject["content"] as? String else {
+            throw Error.errorWithCode(.InvalidNote, failureReason: "Failed to deserialize note: \(jsonObject)")
+        }
         
         self.id = nil
         self.content = content
