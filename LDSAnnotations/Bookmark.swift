@@ -53,6 +53,11 @@ public struct Bookmark: Equatable {
     }
     
     init?(jsonObject: [String: AnyObject], annotationID: Int64) {
+        if jsonObject["@pid"] == nil && jsonObject["uri"] != nil {
+            // Bookmark has a URI, but no @pid so its invalid
+            return nil
+        }
+        
         self.id = nil
         self.name = jsonObject["name"] as? String
         self.paragraphAID = jsonObject["@pid"] as? String

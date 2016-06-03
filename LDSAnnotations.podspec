@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "LDSAnnotations"
-  s.version      = "1.0.0"
+  s.version      = "1.1.0"
   s.summary      = "Swift client library for LDS annotation sync."
   s.author       = 'Hilton Campbell'
   s.homepage     = "https://github.com/CrossWaterBridge/LDSAnnotations"
@@ -13,6 +13,7 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   
   s.dependency 'PSOperations'
-  s.dependency 'SQLite.swift', '~> 0.9.2'
+  s.dependency 'SQLite.swift'
   s.dependency 'Swiftification'
+  s.dependency 'Locksmith'
 end

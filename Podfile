@@ -11,6 +11,7 @@ target 'LDSAnnotations' do
     pod 'PSOperations'
     pod 'SQLite.swift'
     pod 'Swiftification'
+    pod 'Locksmith'
 end
 
 target 'LDSAnnotationsTests' do
@@ -18,15 +19,15 @@ target 'LDSAnnotationsTests' do
     pod 'PSOperations'
     pod 'SQLite.swift'
     pod 'Swiftification'
+    pod 'Locksmith'
 end
 
 target 'LDSAnnotationsDemo' do
     xcodeproj 'LDSAnnotationsDemo.xcodeproj'
     
-    pod 'Locksmith'
-    
     # Required by LDSAnnotations
     pod 'PSOperations'
     pod 'SQLite.swift'
     pod 'Swiftification'
+    pod 'Locksmith'
 end

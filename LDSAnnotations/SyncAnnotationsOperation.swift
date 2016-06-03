@@ -270,7 +270,8 @@ class SyncAnnotationsOperation: Operation {
                                 try annotationStore.addOrUpdateBookmark(downloadedBookmark)
                                 downloadBookmarkCount += 1
                             } else {
-                                throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize bookmark: \(bookmark)")
+                                // Don't throw an error, this annotation will eventually come down when an HTML5 version becomes available
+                                NSLog("Failed to deserialize bookmark: \(bookmark)")
                             }
                         }
                         
@@ -295,7 +296,9 @@ class SyncAnnotationsOperation: Operation {
                         if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                             for highlight in highlights["highlight"] ?? [] {
                                 guard let downloadedHighlight = Highlight(jsonObject: highlight, annotationID: annotationID) else {
-                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize highlight: \(highlight)")
+                                    // Don't throw an error, this annotation will eventually come down when an HTML5 version becomes available
+                                    NSLog("Failed to deserialize highlight: %@", highlight)
+                                    continue
                                 }
                                 
                                 try annotationStore.addOrUpdateHighlight(downloadedHighlight)
@@ -306,7 +309,9 @@ class SyncAnnotationsOperation: Operation {
                         if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                             for link in links["ref"] ?? [] {
                                 guard let downloadedLink = Link(jsonObject: link, annotationID: annotationID) else {
-                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize link: \(link)")
+                                    // Don't throw an error, this annotation will eventually come down when an HTML5 version becomes available
+                                    NSLog("Failed to deserialize link: %@", link)
+                                    continue
                                 }
                                 
                                 try annotationStore.addOrUpdateLink(downloadedLink)
