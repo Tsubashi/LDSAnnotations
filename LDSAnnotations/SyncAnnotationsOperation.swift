@@ -263,17 +263,14 @@ class SyncAnnotationsOperation: Operation {
                         
                         // Bookmark
                         if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
-                            let downloadedBookmark: Bookmark
-                            
                             do {
-                                downloadedBookmark = try Bookmark(jsonObject: bookmark, annotationID: annotationID)
+                                let downloadedBookmark = try Bookmark(jsonObject: bookmark, annotationID: annotationID)
+                                try annotationStore.addOrUpdateBookmark(downloadedBookmark)
+                                downloadBookmarkCount += 1
                             } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                 // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
                                 continue
                             }
-                            
-                            try annotationStore.addOrUpdateBookmark(downloadedBookmark)
-                            downloadBookmarkCount += 1
                         }
                         
                         // Annotation order within notebook
@@ -296,33 +293,27 @@ class SyncAnnotationsOperation: Operation {
                         
                         if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                             for highlight in highlights["highlight"] ?? [] {
-                                let downloadedHighlight: Highlight
-                                
                                 do {
-                                    downloadedHighlight = try Highlight(jsonObject: highlight, annotationID: annotationID)
+                                    let downloadedHighlight = try Highlight(jsonObject: highlight, annotationID: annotationID)
+                                    try annotationStore.addOrUpdateHighlight(downloadedHighlight)
+                                    downloadHighlightCount += 1
                                 } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                     // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
                                     continue
                                 }
-
-                                try annotationStore.addOrUpdateHighlight(downloadedHighlight)
-                                downloadHighlightCount += 1
                             }
                         }
                         
                         if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                             for link in links["ref"] ?? [] {
-                                let downloadedLink: Link
-
                                 do {
-                                    downloadedLink = try Link(jsonObject: link, annotationID: annotationID)
+                                    let downloadedLink = try Link(jsonObject: link, annotationID: annotationID)
+                                    try annotationStore.addOrUpdateLink(downloadedLink)
+                                    downloadLinkCount += 1
                                 } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                     // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
                                     continue
                                 }
-                                
-                                try annotationStore.addOrUpdateLink(downloadedLink)
-                                downloadLinkCount += 1
                             }
                         }
                         
