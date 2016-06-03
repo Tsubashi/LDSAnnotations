@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "LDSAnnotations"
-  s.version      = "1.1.0"
+  s.version      = "1.1.1"
   s.summary      = "Swift client library for LDS annotation sync."
   s.author       = 'Hilton Campbell', 'Stephan Heilner'
   s.homepage     = "https://github.com/CrossWaterBridge/LDSAnnotations"

@@ -52,11 +52,11 @@ public struct Link {
     }
     
     init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
-        guard let name = jsonObject["$"] as? String, docID = jsonObject["@docId"] as? String, docVersionString = jsonObject["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
-            throw Error.errorWithCode(.InvalidHighlight, failureReason: "Failed to deserialize highlight: \(jsonObject)")
+        guard let name = jsonObject["$"] as? String else {
+            throw Error.errorWithCode(.InvalidLink, failureReason: "Failed to deserialize link: \(jsonObject)")
         }
         
-        guard let paragraphAIDs = jsonObject["@pid"] as? String else {
+        guard let paragraphAIDs = jsonObject["@pid"] as? String, docID = jsonObject["@docId"] as? String, docVersionString = jsonObject["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
             throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize link, missing PID: \(jsonObject)")
         }
         
