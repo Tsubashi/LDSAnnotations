@@ -256,21 +256,20 @@ class SyncAnnotationsOperation: Operation {
                         
                         // Note
                         if let note = rawAnnotation["note"] as? [String: AnyObject] {
-                            if let downloadedNote = Note(jsonObject: note, annotationID: annotationID) {
-                                try annotationStore.addOrUpdateNote(downloadedNote)
-                                downloadNoteCount += 1
-                            } else {
-                                throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize note: \(note)")
-                            }
+                            let downloadedNote = try Note(jsonObject: note, annotationID: annotationID)
+                            try annotationStore.addOrUpdateNote(downloadedNote)
+                            downloadNoteCount += 1
                         }
                         
                         // Bookmark
                         if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
-                            if let downloadedBookmark = Bookmark(jsonObject: bookmark, annotationID: annotationID) {
+                            do {
+                                let downloadedBookmark = try Bookmark(jsonObject: bookmark, annotationID: annotationID)
                                 try annotationStore.addOrUpdateBookmark(downloadedBookmark)
                                 downloadBookmarkCount += 1
-                            } else {
-                                throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize bookmark: \(bookmark)")
+                            } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+                                // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
+                                continue
                             }
                         }
                         
@@ -294,32 +293,33 @@ class SyncAnnotationsOperation: Operation {
                         
                         if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                             for highlight in highlights["highlight"] ?? [] {
-                                guard let downloadedHighlight = Highlight(jsonObject: highlight, annotationID: annotationID) else {
-                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize highlight: \(highlight)")
+                                do {
+                                    let downloadedHighlight = try Highlight(jsonObject: highlight, annotationID: annotationID)
+                                    try annotationStore.addOrUpdateHighlight(downloadedHighlight)
+                                    downloadHighlightCount += 1
+                                } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+                                    // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
+                                    continue
                                 }
-                                
-                                try annotationStore.addOrUpdateHighlight(downloadedHighlight)
-                                downloadHighlightCount += 1
                             }
                         }
                         
                         if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                             for link in links["ref"] ?? [] {
-                                guard let downloadedLink = Link(jsonObject: link, annotationID: annotationID) else {
-                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize link: \(link)")
+                                do {
+                                    let downloadedLink = try Link(jsonObject: link, annotationID: annotationID)
+                                    try annotationStore.addOrUpdateLink(downloadedLink)
+                                    downloadLinkCount += 1
+                                } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+                                    // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
+                                    continue
                                 }
-                                
-                                try annotationStore.addOrUpdateLink(downloadedLink)
-                                downloadLinkCount += 1
                             }
                         }
                         
                         if let tags = rawAnnotation["tags"] as? [String: [String]] {
                             for tagName in tags["tag"] ?? [] {
-                                guard let downloadedTag = Tag(name: tagName) else {
-                                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize tag: \(tagName)")
-                                }
-                                
+                                let downloadedTag = try Tag(name: tagName)
                                 let tag = try annotationStore.addOrUpdateTag(downloadedTag)
                                 downloadTagCount += 1
                                 

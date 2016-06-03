@@ -22,26 +22,18 @@
 
 import Foundation
 
-public struct Error {
+public class SessionController {
     
-    public static let Domain = "com.crosswaterbridge.LDSAnnotations"
+    private var sessionCache = [String: Session]()
     
-    public enum Code: Int {
-        case Unknown = -1000
-        case AuthenticationFailed = -1001
-        case LockedOut = -1002
-        case PasswordExpired = -1003
-        case InvalidParagraphAID = -2000
-        case InvalidHighlight = -2001
-        case InvalidLink = -2002
-        case InvalidBookmark = -2003
-        case InvalidNote = -2004
-        case InvalidTag = -2005
+    public init() {}
+    
+    public func addSession(session: Session, withUsername username: String) {
+        sessionCache[username] = session
     }
     
-    static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {
-        let userInfo = [NSLocalizedFailureReasonErrorKey: failureReason]
-        return NSError(domain: Error.Domain, code: code.rawValue, userInfo: userInfo)
+    public func sessionForUsername(username: String) -> Session? {
+        return sessionCache[username]
     }
     
 }

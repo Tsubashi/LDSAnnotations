@@ -23,36 +23,33 @@
 import Foundation
 import Swiftification
 import Locksmith
-import LDSAnnotations
 
-class AccountController {
+public class AccountController {
     
-    static let sharedController = AccountController()
+    public let addAccountObservers = ObserverSet<String>()
+    public let deleteAccountObservers = ObserverSet<String>()
+
+    public init() {}
     
     private static let service = "LDSAccount"
     
-    let addAccountObservers = ObserverSet<String>()
-    let deleteAccountObservers = ObserverSet<String>()
-    
-    func addAccountWithUsername(username: String, password: String) throws {
-        assert(NSThread.isMainThread())
-        
+    public func addAccountWithUsername(username: String, password: String) throws {
         if !usernames.contains(username) {
             try Locksmith.updateData(["password": password], forUserAccount: username, inService: AccountController.service)
-            usernames += [username]
+
+            usernames.append(username)
             
             addAccountObservers.notify(username)
         }
     }
     
-    func deleteAccountWithUsername(username: String) throws {
-        assert(NSThread.isMainThread())
-        
+    public func deleteAccountWithUsername(username: String) throws {
         do {
             try Locksmith.deleteDataForUserAccount(username, inService: AccountController.service)
         } catch {
             // It's not catastrophic if the password cannot be deleted
         }
+        
         usernames = usernames.filter { $0 != username }
         
         deleteAccountObservers.notify(username)
@@ -60,36 +57,28 @@ class AccountController {
     
     private static let usernamesKey = "usernames"
     
-    private(set) var usernames: [String] {
+    private(set) public var usernames: [String] {
         get {
-            assert(NSThread.isMainThread())
-            
             return (NSUserDefaults.standardUserDefaults().arrayForKey(AccountController.usernamesKey) as? [String] ?? []).sort()
         }
         set {
-            assert(NSThread.isMainThread())
-            
             NSUserDefaults.standardUserDefaults().setObject(newValue, forKey: AccountController.usernamesKey)
         }
     }
     
-    func passwordForUsername(username: String) -> String? {
+    public func passwordForUsername(username: String) -> String? {
         return Locksmith.loadDataForUserAccount(username, inService: AccountController.service)?["password"] as? String
     }
     
     private static let tokensKey = "tokens"
     
-    func syncTokenForUsername(username: String) -> SyncToken? {
-        assert(NSThread.isMainThread())
-        
+    public func syncTokenForUsername(username: String) -> SyncToken? {
         guard let tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String], rawToken = tokens[username] else { return nil }
         
         return SyncToken(rawValue: rawToken)
     }
     
-    func setSyncToken(token: SyncToken?, forUsername username: String) {
-        assert(NSThread.isMainThread())
-        
+    public func setSyncToken(token: SyncToken?, forUsername username: String) {
         var tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String] ?? [:]
         tokens[username] = token?.rawValue
         NSUserDefaults.standardUserDefaults().setObject(tokens, forKey: AccountController.tokensKey)

@@ -21,6 +21,7 @@
 //
 
 import UIKit
+import LDSAnnotations
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

@@ -84,14 +84,14 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "Pods-LDSAnnotationsDemo/Locksmith.framework"
   install_framework "Pods-LDSAnnotationsDemo/PSOperations.framework"
   install_framework "Pods-LDSAnnotationsDemo/SQLite.framework"
   install_framework "Pods-LDSAnnotationsDemo/Swiftification.framework"
-  install_framework "Pods-LDSAnnotationsDemo/Locksmith.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "Pods-LDSAnnotationsDemo/Locksmith.framework"
   install_framework "Pods-LDSAnnotationsDemo/PSOperations.framework"
   install_framework "Pods-LDSAnnotationsDemo/SQLite.framework"
   install_framework "Pods-LDSAnnotationsDemo/Swiftification.framework"
-  install_framework "Pods-LDSAnnotationsDemo/Locksmith.framework"
 fi

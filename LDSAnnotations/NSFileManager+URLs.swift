@@ -22,26 +22,10 @@
 
 import Foundation
 
-public struct Error {
+public extension NSFileManager {
     
-    public static let Domain = "com.crosswaterbridge.LDSAnnotations"
-    
-    public enum Code: Int {
-        case Unknown = -1000
-        case AuthenticationFailed = -1001
-        case LockedOut = -1002
-        case PasswordExpired = -1003
-        case InvalidParagraphAID = -2000
-        case InvalidHighlight = -2001
-        case InvalidLink = -2002
-        case InvalidBookmark = -2003
-        case InvalidNote = -2004
-        case InvalidTag = -2005
-    }
-    
-    static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {
-        let userInfo = [NSLocalizedFailureReasonErrorKey: failureReason]
-        return NSError(domain: Error.Domain, code: code.rawValue, userInfo: userInfo)
+    public static var privateDocumentsURL: NSURL {
+        return NSFileManager.defaultManager().URLsForDirectory(.LibraryDirectory, inDomains: .UserDomainMask).last!.URLByAppendingPathComponent("Private Documents")
     }
     
 }

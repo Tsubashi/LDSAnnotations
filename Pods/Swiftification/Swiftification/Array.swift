@@ -36,7 +36,7 @@ public extension Array {
     }
     
     /// Returns the first occurence of item, if found
-    func find(condition: (Element) -> Bool) -> Element? {
+    func find(@noescape condition: (Element) -> Bool) -> Element? {
         if let index = indexOf({ condition($0) }) {
             return self[index]
         }
@@ -71,7 +71,7 @@ public extension Array {
     }
     
     /// Groups the array into a dictionary by key specified in closure
-    func groupBy<U>(groupClosure: (Element) -> U) -> [U: Array] {
+    func groupBy<U>(@noescape groupClosure: (Element) -> U) -> [U: Array] {
         var grouped = [U: Array]()
         for element in self {
             let key = groupClosure(element)
@@ -79,6 +79,23 @@ public extension Array {
         }
         
         return grouped
+    }
+    
+    /// Splits the array each time the closure returns a new value.
+    func partitionBy<T: Equatable>(@noescape closure: (Element) -> T) -> [[Element]] {
+        var partitions = [[Element]]()
+        var lastValue: T?
+        for element in self {
+            let value = closure(element)
+            if value == lastValue {
+                partitions[partitions.count - 1].append(element)
+            } else {
+                partitions.append([element])
+                lastValue = value
+            }
+        }
+        
+        return partitions
     }
     
     /// Sections the ordered array by the string specified in the closure, preserving the order of the original array.
@@ -125,6 +142,15 @@ public extension Array {
     @warn_unused_result
     func take(numberOfElements: Int) -> Array {
         return Array(self[0..<max(min(numberOfElements, count), 0)])
+    }
+    
+    /// Returns an array containing the remaining elements of self after skipping the first n.
+    @warn_unused_result
+    func skip(numberOfElements: Int) -> Array {
+        if count > numberOfElements {
+            return Array(self[numberOfElements..<count])
+        }
+        return []
     }
 
 }

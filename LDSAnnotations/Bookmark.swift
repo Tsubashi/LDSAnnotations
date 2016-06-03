@@ -52,7 +52,12 @@ public struct Bookmark: Equatable {
         self.offset = offset
     }
     
-    init?(jsonObject: [String: AnyObject], annotationID: Int64) {
+    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
+        if jsonObject["@pid"] == nil && jsonObject["uri"] != nil {
+            // Bookmark has a URI, but no @pid so its invalid. If both ar nil, its a valid chapter-level bookmark
+            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize bookmark, missing PID: \(jsonObject)")
+        }
+        
         self.id = nil
         self.name = jsonObject["name"] as? String
         self.paragraphAID = jsonObject["@pid"] as? String

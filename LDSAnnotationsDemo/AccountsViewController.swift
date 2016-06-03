@@ -143,7 +143,8 @@ extension AccountsViewController {
     }
     
     func addAccountWithUsername(username: String, password: String) {
-        let session = Session(username: username, password: password, source: "LDSAnnotations Demo")
+        
+        let session = SessionController.sharedController.sessionForUsername(username) ?? Session(username: username, password: password)
         session.authenticate { error in
             if let error = error {
                 NSLog("Failed to authenticate account: %@", error)
@@ -156,6 +157,8 @@ extension AccountsViewController {
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
+                    SessionController.sharedController.addSession(session, withUsername: username)
+                    
                     do {
                         try AccountController.sharedController.addAccountWithUsername(username, password: password)
                     } catch {
@@ -214,8 +217,8 @@ extension AccountsViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let username = usernames[indexPath.row]
-        if let password = AccountController.sharedController.passwordForUsername(username), path = NSFileManager.privateDocumentsURL.URLByAppendingPathComponent("\(username).sqlite").path, annotationStore = AnnotationStore(path: path) {
-            let viewController = AccountViewController(session: Session(username: username, password: password, source: "LDSAnnotations Demo"), annotationStore: annotationStore)
+        if let password = AccountController.sharedController.passwordForUsername(username), annotationStore = AccountController.sharedController.annotationStoreForUsername(username) {
+            let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)
         } else {

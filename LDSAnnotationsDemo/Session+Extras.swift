@@ -25,7 +25,7 @@ import LDSAnnotations
 
 extension Session {
     
-    convenience init(username: String, password: String, source: String) {
+    convenience init(username: String, password: String) {
         guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
             fatalError("Missing bundle name")
         }
