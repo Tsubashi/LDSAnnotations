@@ -23,7 +23,7 @@
 import Foundation
 
 /// A Link.
-public struct Link {
+public struct Link: Equatable {
 
     /// Local ID.
     public internal(set) var id: Int64?
@@ -72,9 +72,18 @@ public struct Link {
         return [
             "$": name,
             "@docId": docID,
-            "@contentVersion":  docVersion,
+            "@contentVersion": docVersion,
             "@pid": paragraphAIDs.joinWithSeparator(",")
         ]
     }
     
+}
+
+public func == (lhs: Link, rhs: Link) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.name == rhs.name
+        && lhs.docID == rhs.docID
+        && lhs.docVersion == rhs.docVersion
+        && lhs.annotationID == rhs.annotationID
+        && lhs.paragraphAIDs == rhs.paragraphAIDs
 }

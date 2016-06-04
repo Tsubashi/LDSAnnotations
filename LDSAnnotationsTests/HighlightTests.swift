@@ -26,6 +26,21 @@ import Swiftification
 
 class HighlightTests: XCTestCase {
     
+    func testHighlightMissingPID() {
+        let input = [
+            "@offset-start": "3",
+            "@offset-end": "7",
+            "@color": "yellow",
+        ]
+        do {
+            let _ = try Highlight(jsonObject: input, annotationID: 1)
+            XCTFail("Expected an error")
+        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+    
     func testHighlightWithOffset() {
         let input = [
             "@offset-start": "3",
