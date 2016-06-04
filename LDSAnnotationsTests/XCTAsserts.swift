@@ -20,12 +20,29 @@
 // THE SOFTWARE.
 //
 
-import Foundation
+import XCTest
 
-public extension NSFileManager {
-    
-    public static var privateDocumentsURL: NSURL {
-        return NSFileManager.defaultManager().URLsForDirectory(.LibraryDirectory, inDomains: .UserDomainMask).last!.URLByAppendingPathComponent("Private Documents")
+func XCTAssertThrows<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+    do {
+        try expression()
+        XCTFail("No error to catch! - \(message)", file: file, line: line)
+    } catch {}
+}
+
+func XCTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+    do {
+        try expression()
+    } catch let error {
+        XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
     }
-    
+}
+
+func XCTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () throws -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+    do {
+        let result1 = try expression1()
+        let result2 = try expression2()
+        XCTAssertEqual(result1, result2, message, file: file, line: line)
+    } catch let error {
+        XCTFail("Caught error: \(error) - \(message)", file: file, line: line)
+    }
 }

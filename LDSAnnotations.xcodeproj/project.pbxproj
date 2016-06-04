@@ -21,7 +21,6 @@
 		D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */; };
 		D49E240A1D0072D100052511 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E24091D0072D100052511 /* AccountController.swift */; };
 		D49E240D1D0072ED00052511 /* SessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E240C1D0072ED00052511 /* SessionController.swift */; };
-		D49E240F1D00752200052511 /* NSFileManager+URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E240E1D00752200052511 /* NSFileManager+URLs.swift */; };
 		D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */; };
 		D4A90CE21C986FB40010F8F2 /* SyncAnnotationsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */; };
 		D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */; };
@@ -38,6 +37,8 @@
 		D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */; };
 		D94305621C5C184B00FA14B6 /* LDSAnnotations.h in Headers */ = {isa = PBXBuildFile; fileRef = D94305611C5C184B00FA14B6 /* LDSAnnotations.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D94305791C5C237B00FA14B6 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = D94305781C5C237B00FA14B6 /* Session.swift */; };
+		D95392CE1D025FA100CB4921 /* XCTAsserts.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95392CD1D025FA100CB4921 /* XCTAsserts.swift */; };
+		D95392D01D02611200CB4921 /* LinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95392CF1D02611200CB4921 /* LinkTests.swift */; };
 		D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B21CD664B2008618AA /* BookmarkTests.swift */; };
 		D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */; };
 		D95F19B71CD6CE67008618AA /* SyncResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95F19B61CD6CE67008618AA /* SyncResult.swift */; };
@@ -92,7 +93,6 @@
 		D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationNotebook.swift"; sourceTree = "<group>"; };
 		D49E24091D0072D100052511 /* AccountController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
 		D49E240C1D0072ED00052511 /* SessionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionController.swift; sourceTree = "<group>"; };
-		D49E240E1D00752200052511 /* NSFileManager+URLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSFileManager+URLs.swift"; sourceTree = "<group>"; };
 		D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsOperation.swift; sourceTree = "<group>"; };
 		D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsResult.swift; sourceTree = "<group>"; };
 		D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Notebook.swift"; sourceTree = "<group>"; };
@@ -112,6 +112,8 @@
 		D94305611C5C184B00FA14B6 /* LDSAnnotations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LDSAnnotations.h; sourceTree = "<group>"; };
 		D94305631C5C184B00FA14B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D94305781C5C237B00FA14B6 /* Session.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		D95392CD1D025FA100CB4921 /* XCTAsserts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XCTAsserts.swift; sourceTree = "<group>"; };
+		D95392CF1D02611200CB4921 /* LinkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkTests.swift; sourceTree = "<group>"; };
 		D95F19B21CD664B2008618AA /* BookmarkTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BookmarkTests.swift; sourceTree = "<group>"; };
 		D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStoreTests.swift; sourceTree = "<group>"; };
 		D95F19B61CD6CE67008618AA /* SyncResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncResult.swift; sourceTree = "<group>"; };
@@ -183,7 +185,6 @@
 		D49E240B1D0072E000052511 /* Account */ = {
 			isa = PBXGroup;
 			children = (
-				D49E240E1D00752200052511 /* NSFileManager+URLs.swift */,
 				D49E24091D0072D100052511 /* AccountController.swift */,
 				D49E240C1D0072ED00052511 /* SessionController.swift */,
 			);
@@ -197,7 +198,9 @@
 				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
 				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
 				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
+				D95392CF1D02611200CB4921 /* LinkTests.swift */,
 				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
+				D95392CD1D025FA100CB4921 /* XCTAsserts.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
 			);
 			path = LDSAnnotationsTests;
@@ -506,9 +509,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D95392D01D02611200CB4921 /* LinkTests.swift in Sources */,
 				D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */,
 				D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */,
 				D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */,
+				D95392CE1D025FA100CB4921 /* XCTAsserts.swift in Sources */,
 				D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */,
 				D95F19D51CD8E4C3008618AA /* HighlightTests.swift in Sources */,
 			);
@@ -533,7 +538,6 @@
 				D95F19CF1CD8DC42008618AA /* SyncChanges.swift in Sources */,
 				D9C470951C60273400EDCD69 /* AuthenticateOperation.swift in Sources */,
 				D4ACFD401C99F6A5008CEF22 /* AnnotationStore+Link.swift in Sources */,
-				D49E240F1D00752200052511 /* NSFileManager+URLs.swift in Sources */,
 				D9C4708A1C60144800EDCD69 /* SyncNotebooksOperation.swift in Sources */,
 				D9C470DC1C61655100EDCD69 /* Response.swift in Sources */,
 				D40F0A241C975988002D61EA /* AnnotationType.swift in Sources */,

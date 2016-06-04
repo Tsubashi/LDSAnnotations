@@ -26,6 +26,21 @@ import Swiftification
 
 class HighlightTests: XCTestCase {
     
+    func testHighlightMissingPID() {
+        let input = [
+            "@offset-start": "3",
+            "@offset-end": "7",
+            "@color": "yellow",
+        ]
+        do {
+            let _ = try Highlight(jsonObject: input, annotationID: 1)
+            XCTFail("Expected an error")
+        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+    }
+    
     func testHighlightWithOffset() {
         let input = [
             "@offset-start": "3",
@@ -34,9 +49,9 @@ class HighlightTests: XCTestCase {
             "@color": "yellow",
         ]
         let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: 2, offsetEnd: 6, colorName: "yellow", style: .Highlight, annotationID: 1)
-        let actual = Highlight(jsonObject: input, annotationID: 1)
+        let actual = try! Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
-        let output = actual!.jsonObject() as! [String: NSObject]
+        let output = actual.jsonObject() as! [String: NSObject]
         XCTAssertEqual(output, expectedOutputFromInput(input))
     }
     
@@ -48,9 +63,9 @@ class HighlightTests: XCTestCase {
             "@color": "yellow",
         ]
         let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: 0, offsetEnd: nil, colorName: "yellow", style: .Highlight, annotationID: 1)
-        let actual = Highlight(jsonObject: input, annotationID: 1)
+        let actual = try! Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
-        let output = actual!.jsonObject() as! [String: NSObject]
+        let output = actual.jsonObject() as! [String: NSObject]
         XCTAssertEqual(output, expectedOutputFromInput(input))
     }
     
