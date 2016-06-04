@@ -31,9 +31,9 @@ class BookmarkTests: XCTestCase {
             "@pid": "20527924",
         ]
         let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 2)
-        let actual = Bookmark(jsonObject: input, annotationID: 1)
+        let actual = try! Bookmark(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
-        let output = actual!.jsonObject() as! [String: NSObject]
+        let output = actual.jsonObject() as! [String: NSObject]
         XCTAssertEqual(output, input)
     }
     
@@ -43,9 +43,9 @@ class BookmarkTests: XCTestCase {
             "@pid": "20527924",
         ]
         let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 0)
-        let actual = Bookmark(jsonObject: input, annotationID: 1)
+        let actual = try! Bookmark(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
-        let output = actual!.jsonObject() as! [String: NSObject]
+        let output = actual.jsonObject() as! [String: NSObject]
         XCTAssertEqual(output, input)
     }
     

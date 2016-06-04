@@ -21,7 +21,6 @@
 		D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */; };
 		D49E240A1D0072D100052511 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E24091D0072D100052511 /* AccountController.swift */; };
 		D49E240D1D0072ED00052511 /* SessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E240C1D0072ED00052511 /* SessionController.swift */; };
-		D49E240F1D00752200052511 /* NSFileManager+URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E240E1D00752200052511 /* NSFileManager+URLs.swift */; };
 		D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */; };
 		D4A90CE21C986FB40010F8F2 /* SyncAnnotationsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */; };
 		D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */; };
@@ -92,7 +91,6 @@
 		D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationNotebook.swift"; sourceTree = "<group>"; };
 		D49E24091D0072D100052511 /* AccountController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
 		D49E240C1D0072ED00052511 /* SessionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionController.swift; sourceTree = "<group>"; };
-		D49E240E1D00752200052511 /* NSFileManager+URLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSFileManager+URLs.swift"; sourceTree = "<group>"; };
 		D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsOperation.swift; sourceTree = "<group>"; };
 		D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsResult.swift; sourceTree = "<group>"; };
 		D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Notebook.swift"; sourceTree = "<group>"; };
@@ -183,7 +181,6 @@
 		D49E240B1D0072E000052511 /* Account */ = {
 			isa = PBXGroup;
 			children = (
-				D49E240E1D00752200052511 /* NSFileManager+URLs.swift */,
 				D49E24091D0072D100052511 /* AccountController.swift */,
 				D49E240C1D0072ED00052511 /* SessionController.swift */,
 			);
@@ -533,7 +530,6 @@
 				D95F19CF1CD8DC42008618AA /* SyncChanges.swift in Sources */,
 				D9C470951C60273400EDCD69 /* AuthenticateOperation.swift in Sources */,
 				D4ACFD401C99F6A5008CEF22 /* AnnotationStore+Link.swift in Sources */,
-				D49E240F1D00752200052511 /* NSFileManager+URLs.swift in Sources */,
 				D9C4708A1C60144800EDCD69 /* SyncNotebooksOperation.swift in Sources */,
 				D9C470DC1C61655100EDCD69 /* Response.swift in Sources */,
 				D40F0A241C975988002D61EA /* AnnotationType.swift in Sources */,
