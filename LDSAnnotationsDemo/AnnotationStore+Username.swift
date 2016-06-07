@@ -23,11 +23,9 @@
 import Foundation
 import LDSAnnotations
 
-extension AccountController {
+extension AnnotationStore {
     
-    static let sharedController = AccountController()
-    
-    func annotationStoreForUsername(username: String) -> AnnotationStore? {
+    class func annotationStoreForUsername(username: String) -> AnnotationStore? {
         let storeName = String(format: "%@.sqlite", username)
         return AnnotationStore(path: NSFileManager.privateDocumentsURL.URLByAppendingPathComponent(storeName).path)
     }

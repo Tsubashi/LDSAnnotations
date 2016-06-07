@@ -160,7 +160,7 @@ extension AccountsViewController {
                     SessionController.sharedController.addSession(session, withUsername: username)
                     
                     do {
-                        try AccountController.sharedController.addAccountWithUsername(username, password: password)
+                        try AccountController.sharedController.addOrUpdateAccountWithUsername(username, password: password)
                     } catch {
                         NSLog("Failed to add account: %@", "\(error)")
                     
@@ -217,7 +217,7 @@ extension AccountsViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let username = usernames[indexPath.row]
-        if let password = AccountController.sharedController.passwordForUsername(username), annotationStore = AccountController.sharedController.annotationStoreForUsername(username) {
+        if let password = AccountController.sharedController.passwordForUsername(username), annotationStore = AnnotationStore.annotationStoreForUsername(username) {
             let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)

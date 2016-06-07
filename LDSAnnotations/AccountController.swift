@@ -26,21 +26,21 @@ import Locksmith
 
 public class AccountController {
     
-    public let addAccountObservers = ObserverSet<String>()
-    public let deleteAccountObservers = ObserverSet<String>()
-
-    public init() {}
+    public static let sharedController = AccountController()
+    
+    public var addAccountObservers = ObserverSet<String>()
+    public var deleteAccountObservers = ObserverSet<String>()
     
     private static let service = "LDSAccount"
     
-    public func addAccountWithUsername(username: String, password: String) throws {
+    public func addOrUpdateAccountWithUsername(username: String, password: String) throws {
+        try Locksmith.updateData(["password": password], forUserAccount: username, inService: AccountController.service)
+        
         if !usernames.contains(username) {
-            try Locksmith.updateData(["password": password], forUserAccount: username, inService: AccountController.service)
-
             usernames.append(username)
-            
-            addAccountObservers.notify(username)
         }
+        
+        addAccountObservers.notify(username)
     }
     
     public func deleteAccountWithUsername(username: String) throws {

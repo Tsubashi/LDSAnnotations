@@ -24,16 +24,16 @@ import Foundation
 
 public class SessionController {
     
-    private var sessionCache = [String: Session]()
+    public static let sharedController = SessionController()
     
-    public init() {}
+    private var sessionByUsername = [String: Session]()
     
     public func addSession(session: Session, withUsername username: String) {
-        sessionCache[username] = session
+        sessionByUsername[username] = session
     }
     
     public func sessionForUsername(username: String) -> Session? {
-        return sessionCache[username]
+        return sessionByUsername[username]
     }
     
 }
