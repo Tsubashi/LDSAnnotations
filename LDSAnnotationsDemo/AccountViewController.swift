@@ -132,7 +132,7 @@ class AccountViewController: UIViewController {
     }
     
     func syncFolders() {
-        let token = AccountController.sharedController.syncTokenForUsername(session.username)
+        let token = AccountController.syncTokenForUsername(session.username)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             dispatch_sync(dispatch_get_main_queue()) {
                 switch syncResult {
@@ -158,7 +158,7 @@ class AccountViewController: UIViewController {
                     
                     NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joinWithSeparator(", "), downloaded.joinWithSeparator(", "))
                     
-                    AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
+                    AccountController.setSyncToken(token, forUsername: self.session.username)
                 case let .Error(errors: errors):
                     NSLog("Sync failed: %@", errors)
                 }

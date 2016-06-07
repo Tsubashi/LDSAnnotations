@@ -7,8 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D442777F1D01E6D70064C1AC /* AccountController+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = D442777E1D01E6D70064C1AC /* AccountController+Shared.swift */; };
-		D44277811D01E7E30064C1AC /* SessionController+Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44277801D01E7E30064C1AC /* SessionController+Shared.swift */; };
+		D442777F1D01E6D70064C1AC /* AnnotationStore+Username.swift in Sources */ = {isa = PBXBuildFile; fileRef = D442777E1D01E6D70064C1AC /* AnnotationStore+Username.swift */; };
 		D44277831D01E82F0064C1AC /* NSFileManager+URLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44277821D01E82F0064C1AC /* NSFileManager+URLs.swift */; };
 		D4BCDA1C1CA5A40B001EE71F /* AnnotationsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BCDA1B1CA5A40B001EE71F /* AnnotationsViewController.swift */; };
 		D4BCDA1E1CA5A5AD001EE71F /* AnnotationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4BCDA1D1CA5A5AD001EE71F /* AnnotationViewController.swift */; };
@@ -31,8 +30,7 @@
 		8BE4FFF93929CA3366A7D7B3 /* Pods_LDSAnnotationsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotationsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6F9664386A6FDD2A5FD86E1 /* Pods-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		C0D08D4477F8D21FD1594603 /* Pods-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
-		D442777E1D01E6D70064C1AC /* AccountController+Shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountController+Shared.swift"; sourceTree = "<group>"; };
-		D44277801D01E7E30064C1AC /* SessionController+Shared.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SessionController+Shared.swift"; sourceTree = "<group>"; };
+		D442777E1D01E6D70064C1AC /* AnnotationStore+Username.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Username.swift"; sourceTree = "<group>"; };
 		D44277821D01E82F0064C1AC /* NSFileManager+URLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSFileManager+URLs.swift"; sourceTree = "<group>"; };
 		D4BCDA1B1CA5A40B001EE71F /* AnnotationsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationsViewController.swift; sourceTree = "<group>"; };
 		D4BCDA1D1CA5A5AD001EE71F /* AnnotationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationViewController.swift; sourceTree = "<group>"; };
@@ -118,8 +116,7 @@
 			children = (
 				D99234981C669D7800177FD2 /* Account */,
 				D9C470AC1C612E0A00EDCD69 /* AccountsViewController.swift */,
-				D442777E1D01E6D70064C1AC /* AccountController+Shared.swift */,
-				D44277801D01E7E30064C1AC /* SessionController+Shared.swift */,
+				D442777E1D01E6D70064C1AC /* AnnotationStore+Username.swift */,
 			);
 			name = Accounts;
 			sourceTree = "<group>";
@@ -301,9 +298,8 @@
 				D9C470AB1C612E0A00EDCD69 /* AppDelegate.swift in Sources */,
 				D4BCDA1C1CA5A40B001EE71F /* AnnotationsViewController.swift in Sources */,
 				D992349C1C669DA600177FD2 /* NotebooksViewController.swift in Sources */,
-				D44277811D01E7E30064C1AC /* SessionController+Shared.swift in Sources */,
 				D99234951C668FE300177FD2 /* Value1TableViewCell.swift in Sources */,
-				D442777F1D01E6D70064C1AC /* AccountController+Shared.swift in Sources */,
+				D442777F1D01E6D70064C1AC /* AnnotationStore+Username.swift in Sources */,
 				D992348B1C663FF500177FD2 /* Session+Extras.swift in Sources */,
 				D4BCDA1E1CA5A5AD001EE71F /* AnnotationViewController.swift in Sources */,
 			);

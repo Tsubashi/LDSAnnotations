@@ -33,7 +33,7 @@ class SetBox<T where T: Hashable>: NSObject {
 /// A local annotation store backed by a SQLite database.
 public class AnnotationStore {
     
-    let db: Connection!
+    let db: Connection
     
     private static let currentVersion = 1
     
@@ -41,13 +41,14 @@ public class AnnotationStore {
     ///
     /// Returns `nil` if a database connection to the annotation store cannot be opened.
     public init?(path: String? = nil) {
-        db = try? Connection(path ?? "")
-        if db == nil {
+        do {
+            db = try Connection(path ?? "")
+            
+            if databaseVersion < self.dynamicType.currentVersion {
+                upgradeDatabaseFromVersion(databaseVersion)
+            }
+        } catch {
             return nil
-        }
-        
-        if databaseVersion < self.dynamicType.currentVersion {
-            upgradeDatabaseFromVersion(databaseVersion)
         }
     }
     

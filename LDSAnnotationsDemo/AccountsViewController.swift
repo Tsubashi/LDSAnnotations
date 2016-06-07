@@ -68,8 +68,8 @@ class AccountsViewController: UIViewController {
         
         reloadData()
         
-        AccountController.sharedController.addAccountObservers.add(self, self.dynamicType.didAddAccount)
-        AccountController.sharedController.deleteAccountObservers.add(self, self.dynamicType.didDeleteAccount)
+        AccountController.addAccountObservers.add(self, self.dynamicType.didAddAccount)
+        AccountController.deleteAccountObservers.add(self, self.dynamicType.didDeleteAccount)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -89,7 +89,7 @@ class AccountsViewController: UIViewController {
     var usernames = [String]()
     
     func reloadData() {
-        usernames = AccountController.sharedController.usernames
+        usernames = AccountController.usernames
     }
     
     func didAddAccount(username: String) {
@@ -144,7 +144,7 @@ extension AccountsViewController {
     
     func addAccountWithUsername(username: String, password: String) {
         
-        let session = SessionController.sharedController.sessionForUsername(username) ?? Session(username: username, password: password)
+        let session = SessionController.sessionForUsername(username) ?? Session(username: username, password: password)
         session.authenticate { error in
             if let error = error {
                 NSLog("Failed to authenticate account: %@", error)
@@ -157,10 +157,10 @@ extension AccountsViewController {
                 }
             } else {
                 dispatch_async(dispatch_get_main_queue()) {
-                    SessionController.sharedController.addSession(session, withUsername: username)
+                    SessionController.addSession(session, withUsername: username)
                     
                     do {
-                        try AccountController.sharedController.addAccountWithUsername(username, password: password)
+                        try AccountController.addOrUpdateAccountWithUsername(username, password: password)
                     } catch {
                         NSLog("Failed to add account: %@", "\(error)")
                     
@@ -202,7 +202,7 @@ extension AccountsViewController: UITableViewDataSource {
         if editingStyle == .Delete {
             let username = usernames[indexPath.row]
             do {
-                try AccountController.sharedController.deleteAccountWithUsername(username)
+                try AccountController.deleteAccountWithUsername(username)
             } catch {
                 NSLog("Failed to delete account: %@", "\(error)")
             }
@@ -217,7 +217,7 @@ extension AccountsViewController: UITableViewDelegate {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let username = usernames[indexPath.row]
-        if let password = AccountController.sharedController.passwordForUsername(username), annotationStore = AccountController.sharedController.annotationStoreForUsername(username) {
+        if let password = AccountController.passwordForUsername(username), annotationStore = AnnotationStore.annotationStoreForUsername(username) {
             let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)
