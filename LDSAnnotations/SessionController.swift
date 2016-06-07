@@ -24,13 +24,15 @@ import Foundation
 
 public class SessionController {
     
-    private static var sessionByUsername = [String: Session]()
+    public static let sharedController = SessionController()
     
-    public class func addSession(session: Session, withUsername username: String) {
+    private var sessionByUsername = [String: Session]()
+    
+    public func addSession(session: Session, withUsername username: String) {
         sessionByUsername[username] = session
     }
     
-    public class func sessionForUsername(username: String) -> Session? {
+    public func sessionForUsername(username: String) -> Session? {
         return sessionByUsername[username]
     }
     

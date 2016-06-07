@@ -26,12 +26,14 @@ import Locksmith
 
 public class AccountController {
     
-    public static var addAccountObservers = ObserverSet<String>()
-    public static var deleteAccountObservers = ObserverSet<String>()
+    public static let sharedController = AccountController()
+    
+    public var addAccountObservers = ObserverSet<String>()
+    public var deleteAccountObservers = ObserverSet<String>()
     
     private static let service = "LDSAccount"
     
-    public class func addOrUpdateAccountWithUsername(username: String, password: String) throws {
+    public func addOrUpdateAccountWithUsername(username: String, password: String) throws {
         try Locksmith.updateData(["password": password], forUserAccount: username, inService: AccountController.service)
         
         if !usernames.contains(username) {
@@ -41,7 +43,7 @@ public class AccountController {
         addAccountObservers.notify(username)
     }
     
-    public class func deleteAccountWithUsername(username: String) throws {
+    public func deleteAccountWithUsername(username: String) throws {
         do {
             try Locksmith.deleteDataForUserAccount(username, inService: AccountController.service)
         } catch {
@@ -55,7 +57,7 @@ public class AccountController {
     
     private static let usernamesKey = "usernames"
     
-    private(set) public class var usernames: [String] {
+    private(set) public var usernames: [String] {
         get {
             return (NSUserDefaults.standardUserDefaults().arrayForKey(AccountController.usernamesKey) as? [String] ?? []).sort()
         }
@@ -64,19 +66,19 @@ public class AccountController {
         }
     }
     
-    public class func passwordForUsername(username: String) -> String? {
+    public func passwordForUsername(username: String) -> String? {
         return Locksmith.loadDataForUserAccount(username, inService: AccountController.service)?["password"] as? String
     }
     
     private static let tokensKey = "tokens"
     
-    public class func syncTokenForUsername(username: String) -> SyncToken? {
+    public func syncTokenForUsername(username: String) -> SyncToken? {
         guard let tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String], rawToken = tokens[username] else { return nil }
         
         return SyncToken(rawValue: rawToken)
     }
     
-    public class func setSyncToken(token: SyncToken?, forUsername username: String) {
+    public func setSyncToken(token: SyncToken?, forUsername username: String) {
         var tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String] ?? [:]
         tokens[username] = token?.rawValue
         NSUserDefaults.standardUserDefaults().setObject(tokens, forKey: AccountController.tokensKey)
