@@ -326,6 +326,22 @@ extension AnnotationStore {
         }
     }
     
+    public func annotationsWithNotebookIDCount(notebookID: Int64) -> Int {
+        return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: NotebookTable.id == AnnotationNotebookTable.notebookID).count)
+    }
+    
+    public func annotationsWithTagID(tagID: Int64) -> [Annotation] {
+        do {
+            return try db.prepare(AnnotationTable.table.join(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID), on: AnnotationTable.id == AnnotationTagTable.annotationID)).map { AnnotationTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
+    public func annotationsWithTagIDCount(tagID: Int64) -> Int {
+        return db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Active).join(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID), on: AnnotationTable.id == AnnotationTagTable.annotationID).count)
+    }
+    
     func deleteAnnotationWithID(id: Int64) {
         do {
             try db.run(AnnotationTable.table.filter(AnnotationTable.id == id).delete())

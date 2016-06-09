@@ -23,7 +23,7 @@
 import Foundation
 
 /// A notebook.
-public struct Notebook {
+public class Notebook {
 
     /// Local ID.
     public internal(set) var id: Int64?

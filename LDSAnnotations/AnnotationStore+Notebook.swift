@@ -62,15 +62,6 @@ extension AnnotationStore {
         return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).count)
     }
     
-    /// Returns an unordered list of active notebooks.
-    public func notebooks() -> [Notebook] {
-        do {
-            return try db.prepare(NotebookTable.table.filter(NotebookTable.status == .Active)).map { NotebookTable.fromRow($0) }
-        } catch {
-            return []
-        }
-    }
-    
     /// Adds a new notebook with `name`.
     public func addNotebook(name name: String) throws -> Notebook {
         guard name.length > 0 else {
@@ -89,7 +80,7 @@ extension AnnotationStore {
         
         notifyModifiedNotebooksWithIDs([id])
         
-        var modifiedNotebook = notebook
+        let modifiedNotebook = notebook
         modifiedNotebook.id = id
         return modifiedNotebook
     }
@@ -100,7 +91,7 @@ extension AnnotationStore {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot update a notebook without a name.")
         }
         
-        var modifiedNotebook = notebook
+        let modifiedNotebook = notebook
         modifiedNotebook.lastModified = NSDate()
         
         guard let id = notebook.id else {
@@ -210,8 +201,42 @@ extension AnnotationStore {
             self.notifyModifiedNotebooksWithIDs(ids)
         }
     }
+
+    /// Returns an unordered list of active notebooks.
+    public func notebooks(ids ids: [Int64]? = nil) -> [Notebook] {
+        do {
+            var query = NotebookTable.table.filter(NotebookTable.status == .Active)
+            if let ids = ids {
+                query = query.filter(ids.contains(NotebookTable.id))
+            }
+            return try db.prepare(query).map { NotebookTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
     
-    func allNotebooks(ids ids: [Int64]? = nil, lastModifiedAfter: NSDate? = nil, lastModifiedOnOrBefore: NSDate? = nil) -> [Notebook] {
+    /// Returns a list of active notebooks order by number of annotations in notebook descending.
+    public func notebooksOrderedByCount(ids ids: [Int64]? = nil) -> [Notebook] {
+        let inClause: String = {
+            guard let ids = ids else { return "" }
+            
+            return String(format: "AND notebook._id IN (%@)", ids.map({ String($0) }).joinWithSeparator(","))
+        }()
+        
+        let statement = "SELECT notebook.* FROM notebook, (SELECT notebook_id, count(annotation_id) AS cnt FROM annotation_notebook GROUP BY notebook_id) AS counts WHERE notebook.status = '' AND notebook._id = counts.notebook_id \(inClause) ORDER BY counts.cnt DESC, notebook.name ASC"
+
+        do {
+            return try db.prepare(statement).flatMap { bindings in
+                guard let uniqueID = bindings[1] as? String, name = bindings[2] as? String, lastModifiedString = bindings[5] as? String, lastModifiedDate = dateFormatter.dateFromString(lastModifiedString) else { return nil }
+                
+                return Notebook(id: bindings[0] as? Int64, uniqueID: uniqueID, name: name, description: bindings[3] as? String, status: .Active, lastModified: lastModifiedDate)
+            }
+        } catch {
+            return []
+        }
+    }
+    
+    public func allNotebooks(ids ids: [Int64]? = nil, lastModifiedAfter: NSDate? = nil, lastModifiedOnOrBefore: NSDate? = nil) -> [Notebook] {
         do {
             var query = NotebookTable.table
             if let ids = ids {
@@ -273,8 +298,9 @@ extension AnnotationStore {
         }
     }
     
-    func deleteNotebookWithID(id: Int64) {
+    public func deleteNotebookWithID(id: Int64) {
         do {
+            try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id).delete())
             try db.run(NotebookTable.table.filter(NotebookTable.id == id).delete())
             notifySyncModifiedNotebooksWithIDs([id])
         } catch {}

@@ -319,7 +319,7 @@ class SyncAnnotationsOperation: Operation {
                         
                         if let tags = rawAnnotation["tags"] as? [String: [String]] {
                             for tagName in tags["tag"] ?? [] {
-                                let downloadedTag = try Tag(name: tagName)
+                                let downloadedTag = try Tag(name: tagName.trimmed())
                                 let tag = try annotationStore.addOrUpdateTag(downloadedTag)
                                 downloadTagCount += 1
                                 
