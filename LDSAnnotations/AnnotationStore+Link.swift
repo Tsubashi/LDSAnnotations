@@ -70,7 +70,7 @@ extension AnnotationStore {
         
         do {
             if let id = link.id {
-                try db.run(HighlightTable.table.filter(HighlightTable.id == id).update(
+                try db.run(LinkTable.table.filter(LinkTable.id == id).update(
                     LinkTable.name <- link.name,
                     LinkTable.docID <- link.docID,
                     LinkTable.docVersion <- link.docVersion,
@@ -79,7 +79,7 @@ extension AnnotationStore {
                 ))
                 return link
             } else {
-                let id = try db.run(HighlightTable.table.insert(
+                let id = try db.run(LinkTable.table.insert(
                     LinkTable.name <- link.name,
                     LinkTable.docID <- link.docID,
                     LinkTable.docVersion <- link.docVersion,

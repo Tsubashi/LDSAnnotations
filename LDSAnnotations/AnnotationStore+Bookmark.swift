@@ -58,6 +58,7 @@ extension AnnotationStore {
             builder.column(BookmarkTable.paragraphAID)
             builder.column(BookmarkTable.annotationID, references: AnnotationTable.table, AnnotationTable.id)
             builder.column(BookmarkTable.offset)
+            builder.column(BookmarkTable.displayOrder)
         })
     }
     
