@@ -72,4 +72,13 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
     
+    func testAddLink() {
+        let annotationStore = AnnotationStore()!
+        let linkToAdd = Link(id: nil, name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1)
+        try! annotationStore.addOrUpdateLink(linkToAdd)
+        let expected = Link(id: 1, name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1)
+        let actual = annotationStore.linkWithID(1)
+        XCTAssertEqual(actual, expected)
+    }
+    
 }
