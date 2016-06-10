@@ -63,4 +63,13 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
     
+    func testAddBookmark() {
+        let annotationStore = AnnotationStore()!
+        let bookmarkToAdd = Bookmark(id: nil, name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0)
+        try! annotationStore.addOrUpdateBookmark(bookmarkToAdd)
+        let expected = Bookmark(id: 1, name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0)
+        let actual = annotationStore.bookmarkWithID(1)
+        XCTAssertEqual(actual, expected)
+    }
+    
 }
