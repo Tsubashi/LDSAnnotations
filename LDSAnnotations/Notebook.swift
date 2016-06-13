@@ -23,7 +23,7 @@
 import Foundation
 
 /// A notebook.
-public class Notebook {
+public struct Notebook {
 
     /// Local ID.
     public internal(set) var id: Int64?
@@ -37,7 +37,7 @@ public class Notebook {
     /// When the notebook was last modified in local time.
     public internal(set) var lastModified: NSDate
     
-    var uniqueID: String
+    public var uniqueID: String
     var description: String?
     
     init(id: Int64?, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: NSDate) {

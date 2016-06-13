@@ -23,7 +23,7 @@
 import Foundation
 
 /// A Tag.
-public class Tag {
+public struct Tag {
     
     /// Local ID.
     public internal(set) var id: Int64?

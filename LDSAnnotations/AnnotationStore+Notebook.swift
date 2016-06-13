@@ -80,7 +80,7 @@ extension AnnotationStore {
         
         notifyModifiedNotebooksWithIDs([id])
         
-        let modifiedNotebook = notebook
+        var modifiedNotebook = notebook
         modifiedNotebook.id = id
         return modifiedNotebook
     }
@@ -91,7 +91,7 @@ extension AnnotationStore {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot update a notebook without a name.")
         }
         
-        let modifiedNotebook = notebook
+        var modifiedNotebook = notebook
         modifiedNotebook.lastModified = NSDate()
         
         guard let id = notebook.id else {
@@ -202,13 +202,25 @@ extension AnnotationStore {
         }
     }
 
-    /// Returns an unordered list of active notebooks.
-    public func notebooks(ids ids: [Int64]? = nil) -> [Notebook] {
+    /// Returns a list of active notebooks, order by OrderBy.
+    public func notebooks(ids ids: [Int64]? = nil, orderBy: OrderBy = .Name) -> [Notebook] {
+        guard orderBy != .NumberOfAnnotations else { return notebooksOrderedByCount(ids: ids) }
+
+        var query = NotebookTable.table.filter(NotebookTable.status == .Active)
+        if let ids = ids {
+            query = query.filter(ids.contains(NotebookTable.id))
+        }
+        
+        switch orderBy {
+        case .Name:
+            query = query.order(NotebookTable.name.asc)
+        case .MostRecent:
+            query = query.order(NotebookTable.lastModified.desc)
+        case .NumberOfAnnotations:
+            break
+        }
+        
         do {
-            var query = NotebookTable.table.filter(NotebookTable.status == .Active)
-            if let ids = ids {
-                query = query.filter(ids.contains(NotebookTable.id))
-            }
             return try db.prepare(query).map { NotebookTable.fromRow($0) }
         } catch {
             return []
@@ -216,14 +228,14 @@ extension AnnotationStore {
     }
     
     /// Returns a list of active notebooks order by number of annotations in notebook descending.
-    public func notebooksOrderedByCount(ids ids: [Int64]? = nil) -> [Notebook] {
+    private func notebooksOrderedByCount(ids ids: [Int64]? = nil) -> [Notebook] {
         let inClause: String = {
             guard let ids = ids else { return "" }
             
             return String(format: "AND notebook._id IN (%@)", ids.map({ String($0) }).joinWithSeparator(","))
         }()
         
-        let statement = "SELECT notebook.* FROM notebook, (SELECT notebook_id, count(annotation_id) AS cnt FROM annotation_notebook GROUP BY notebook_id) AS counts WHERE notebook.status = '' AND notebook._id = counts.notebook_id \(inClause) ORDER BY counts.cnt DESC, notebook.name ASC"
+        let statement = "SELECT notebook.* FROM notebook LEFT JOIN (SELECT notebook_id, count(annotation_id) AS cnt FROM annotation_notebook GROUP BY notebook_id) AS counts ON notebook._id = counts.notebook_id WHERE notebook.status = '' \(inClause) ORDER BY counts.cnt DESC, notebook.name ASC"
 
         do {
             return try db.prepare(statement).flatMap { bindings in

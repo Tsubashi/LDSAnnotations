@@ -326,7 +326,7 @@ extension AnnotationStore {
         }
     }
     
-    public func annotationsWithNotebookIDCount(notebookID: Int64) -> Int {
+    public func numberOfAnnotationsWithNotebookID(notebookID: Int64) -> Int {
         return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: NotebookTable.id == AnnotationNotebookTable.notebookID).count)
     }
     
@@ -338,7 +338,7 @@ extension AnnotationStore {
         }
     }
     
-    public func annotationsWithTagIDCount(tagID: Int64) -> Int {
+    public func numberOfAnnotationsWithTagID(tagID: Int64) -> Int {
         return db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Active).join(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID), on: AnnotationTable.id == AnnotationTagTable.annotationID).count)
     }
     

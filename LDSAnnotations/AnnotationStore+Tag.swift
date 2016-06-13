@@ -79,33 +79,23 @@ extension AnnotationStore {
         }
     }
     
-    public func tags() -> [Tag] {
-        do {
-            return try db.prepare(TagTable.table.select(distinct: TagTable.id, TagTable.name).join(AnnotationTagTable.table.join(AnnotationTable.table.select(AnnotationTable.id).filter(AnnotationTable.status == .Active), on: AnnotationTable.id == AnnotationTagTable.annotationID), on: TagTable.id == AnnotationTagTable.tagID)).map { TagTable.fromRow($0) }
-        } catch {
-            return []
-        }
-    }
-    
-    public func tagsOrderedByMostRecent(withIDs ids: [Int64]? = nil) -> [Tag] {
-        do {
-            var query = TagTable.table.select(distinct: TagTable.id, TagTable.name).join(AnnotationTagTable.table.join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.lastModified).filter(AnnotationTable.status == .Active), on: AnnotationTable.id == AnnotationTagTable.annotationID), on: TagTable.id == AnnotationTagTable.tagID).order(AnnotationTable.lastModified.desc)
-            if let ids = ids {
-                query = query.filter(ids.contains(TagTable.id))
-            }
-            return try db.prepare(query).map { TagTable.fromRow($0) }
-        } catch {
-            return []
-        }
-    }
-    
-    public func tagsOrderedByCount(withIDs ids: [Int64]? = nil) -> [Tag] {
-        let inClause: String = {
+    public func tags(ids ids: [Int64]? = nil, orderBy: OrderBy = .Name) -> [Tag] {
+        var inClause: String = {
             guard let ids = ids else { return "" }
-            return String(format: "AND annotation_tag.tag_id IN (%@)", ids.map({ String($0) }).joinWithSeparator(","))
+            
+            return "AND tag._id IN (" + ids.map { String($0) }.joinWithSeparator(",") + ")"
         }()
         
-        let statement = "SELECT tag.* FROM tag, (SELECT annotation_tag.tag_id, COUNT(annotation_id) AS annotation_count FROM annotation_tag JOIN annotation ON annotation_tag.annotation_id = annotation._id WHERE annotation.status = '' \(inClause) GROUP BY tag_id) AS counts ON tag._id = counts.tag_id ORDER BY counts.annotation_count DESC, tag.name ASC"
+        let statement: String
+        switch orderBy {
+        case .Name:
+            statement = "SELECT DISTINCT tag.* FROM tag JOIN annotation_tag ON annotation_tag.tag_id = tag._id JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '' \(inClause) ORDER BY tag.name"
+        case .MostRecent:
+            statement = "SELECT DISTINCT tag.* FROM tag JOIN annotation_tag ON annotation_tag.tag_id = tag._id JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '' \(inClause) ORDER BY annotation.last_modified DESC, tag.name ASC"
+        case .NumberOfAnnotations:
+            inClause = inClause.stringByReplacingOccurrencesOfString("AND ", withString: "WHERE ")
+            statement = "SELECT DISTINCT tag.* FROM tag JOIN (SELECT annotation_tag.tag_id, COUNT(annotation_id) AS annotation_count FROM annotation_tag JOIN annotation ON annotation_tag.annotation_id = annotation._id WHERE annotation.status = '' GROUP BY tag_id) AS counts ON tag._id = counts.tag_id \(inClause) ORDER BY counts.annotation_count DESC, tag.name ASC"
+        }
         
         do {
             return try db.prepare(statement).flatMap { row in
