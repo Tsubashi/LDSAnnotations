@@ -37,7 +37,7 @@ public struct Notebook {
     /// When the notebook was last modified in local time.
     public internal(set) var lastModified: NSDate
     
-    var uniqueID: String
+    public var uniqueID: String
     var description: String?
     
     init(id: Int64?, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: NSDate) {

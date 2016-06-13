@@ -28,7 +28,7 @@ import Swiftification
 
 class AnnotationNotebookTable {
     
-    static let table = Table("annotation_folder")
+    static let table = Table("annotation_notebook")
     static let annotationID = Expression<Int64>("annotation_id")
     static let notebookID = Expression<Int64>("notebook_id")
     static let displayOrder = Expression<Int>("display_order")

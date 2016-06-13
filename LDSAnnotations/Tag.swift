@@ -36,7 +36,7 @@ public struct Tag {
         self.name = name
     }
     
-    init(name tagName: String?) throws {
+    public init(name tagName: String?) throws {
         guard let name = tagName else {
             throw Error.errorWithCode(.InvalidTag, failureReason: "Failed to deserialize tag: \(tagName)")
         }
@@ -48,5 +48,5 @@ public struct Tag {
     func jsonObject() -> String {
         return name
     }
-    
+
 }

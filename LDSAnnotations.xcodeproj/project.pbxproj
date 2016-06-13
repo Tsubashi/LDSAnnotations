@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		17C647A9F408968E6B7EDC69 /* Pods_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C2FFF5E37CC2AA0648EC7AD /* Pods_LDSAnnotationsTests.framework */; };
 		5CCA4B49970BAA5FDAD1C8C5 /* Pods_LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A104C3E25584A2A80020A6D6 /* Pods_LDSAnnotations.framework */; };
+		D40ADDD01D0F0BEE004FA7F5 /* OrderBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */; };
 		D40F0A221C975368002D61EA /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A211C975368002D61EA /* Annotation.swift */; };
 		D40F0A241C975988002D61EA /* AnnotationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A231C975988002D61EA /* AnnotationType.swift */; };
 		D40F0A261C976507002D61EA /* Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A251C976507002D61EA /* Highlight.swift */; };
@@ -81,6 +82,7 @@
 		97DC6EE3078F03199869E3DB /* Pods-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		A104C3E25584A2A80020A6D6 /* Pods_LDSAnnotations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A8EB6ABEC73A54B5DBF98A17 /* Pods-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotationsTests/Pods-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
+		D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderBy.swift; sourceTree = "<group>"; };
 		D40F0A211C975368002D61EA /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		D40F0A231C975988002D61EA /* AnnotationType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationType.swift; sourceTree = "<group>"; };
 		D40F0A251C976507002D61EA /* Highlight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Highlight.swift; sourceTree = "<group>"; };
@@ -194,14 +196,14 @@
 		D90A3CDD1C95C6FE0060094B /* LDSAnnotationsTests */ = {
 			isa = PBXGroup;
 			children = (
+				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
 				D90A3CE71C95C7280060094B /* AuthenticationTests.swift */,
-				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
 				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
 				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
-				D95392CF1D02611200CB4921 /* LinkTests.swift */,
-				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
-				D95392CD1D025FA100CB4921 /* XCTAsserts.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
+				D95392CF1D02611200CB4921 /* LinkTests.swift */,
+				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
+				D95392CD1D025FA100CB4921 /* XCTAsserts.swift */,
 			);
 			path = LDSAnnotationsTests;
 			sourceTree = "<group>";
@@ -304,6 +306,7 @@
 				D992347D1C627E6F00177FD2 /* Notebook.swift */,
 				D992349D1C66CC7100177FD2 /* NotificationSource.swift */,
 				D40F0A2B1C976A58002D61EA /* Tag.swift */,
+				D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */,
 			);
 			name = "Local Data";
 			sourceTree = "<group>";
@@ -567,6 +570,7 @@
 				D992347E1C627E6F00177FD2 /* Notebook.swift in Sources */,
 				D9C470E01C61773D00EDCD69 /* AnnotationStore.swift in Sources */,
 				D40F0A301C977129002D61EA /* Bookmark.swift in Sources */,
+				D40ADDD01D0F0BEE004FA7F5 /* OrderBy.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

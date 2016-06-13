@@ -45,7 +45,8 @@ extension AnnotationStore {
     func createAnnotationTagTable() throws {
         try db.run(AnnotationTagTable.table.create(ifNotExists: true) { builder in
             builder.column(AnnotationTagTable.annotationID, references: AnnotationTable.table, AnnotationTable.id)
-            builder.column(AnnotationTagTable.tagID, references: TagTable.table, TagTable.id)
+            builder.column(AnnotationTagTable.tagID)
+            builder.foreignKey(AnnotationTagTable.tagID, references: TagTable.table, TagTable.id)
             builder.primaryKey(AnnotationTagTable.annotationID, AnnotationTagTable.tagID)
         })
     }
