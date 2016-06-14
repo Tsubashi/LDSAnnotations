@@ -274,7 +274,8 @@ extension AnnotationStore {
         }
     }
     
-    func notebookWithUniqueID(uniqueID: String) -> Notebook? {
+    /// Returns a notebook with uniqueID
+    public func notebookWithUniqueID(uniqueID: String) -> Notebook? {
         return db.pluck(NotebookTable.table.filter(NotebookTable.uniqueID == uniqueID)).map { NotebookTable.fromRow($0) }
     }
     
@@ -310,6 +311,7 @@ extension AnnotationStore {
         }
     }
     
+    /// Deletes notebook with ID
     public func deleteNotebookWithID(id: Int64) {
         do {
             try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id).delete())

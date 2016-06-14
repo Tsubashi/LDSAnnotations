@@ -36,7 +36,7 @@ public struct Tag {
         self.name = name
     }
     
-    public init(name tagName: String?) throws {
+    init(name tagName: String?) throws {
         guard let name = tagName else {
             throw Error.errorWithCode(.InvalidTag, failureReason: "Failed to deserialize tag: \(tagName)")
         }

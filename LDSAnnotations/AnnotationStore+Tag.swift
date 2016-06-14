@@ -50,6 +50,12 @@ extension AnnotationStore {
     }
     
     /// Adds a new tag with `name`.
+    public func addTag(name name: String) throws -> Tag? {
+        let tag = try Tag(name: name)
+        return try addOrUpdateTag(tag)
+    }
+    
+    /// Adds or updates tag
     public func addOrUpdateTag(tag: Tag) throws -> Tag? {
         guard !tag.name.isEmpty else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a tag without a name.")
@@ -79,6 +85,7 @@ extension AnnotationStore {
         }
     }
     
+    /// Returns a list of active tags, order by OrderBy.
     public func tags(ids ids: [Int64]? = nil, orderBy: OrderBy = .Name) -> [Tag] {
         var inClause: String = {
             guard let ids = ids else { return "" }
@@ -108,6 +115,7 @@ extension AnnotationStore {
         }
     }
     
+    /// Selects tag with annotation ID
     public func tagsWithAnnotationID(annotationID: Int64) -> [Tag] {
         do {
             return try db.prepare(TagTable.table.join(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID), on: TagTable.id == AnnotationTagTable.tagID)).map { TagTable.fromRow($0) }
@@ -116,14 +124,21 @@ extension AnnotationStore {
         }
     }
     
+    /// Selects the date of the most recent annotation associated with tagID
     public func dateOfMostRecentAnnotationWithTagID(tagID: Int64) -> NSDate? {
         return db.pluck(AnnotationTable.table.select(AnnotationTable.lastModified).join(AnnotationTagTable.table.join(TagTable.table.select(TagTable.id).filter(TagTable.id == tagID), on: AnnotationTagTable.tagID == TagTable.id), on: AnnotationTable.id == AnnotationTagTable.annotationID).order(AnnotationTable.lastModified.desc)).map { $0[AnnotationTable.lastModified] }
+    }
+    
+    /// Returns a tag with name (case insensitive)
+    public func tagWithName(name: String) -> Tag? {
+        return db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercaseString)).map { TagTable.fromRow($0) }
     }
     
     func tagWithID(id: Int64) -> Tag? {
         return db.pluck(TagTable.table.filter(TagTable.id == id)).map { TagTable.fromRow($0) }
     }
     
+    /// Deletes tag and annotation tags with ID
     public func deleteTagWithID(id: Int64) {
         do {
             try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id).delete())
