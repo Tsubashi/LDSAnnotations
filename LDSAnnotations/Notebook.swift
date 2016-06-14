@@ -37,7 +37,9 @@ public struct Notebook {
     /// When the notebook was last modified in local time.
     public internal(set) var lastModified: NSDate
     
+    /// Unique Identifier for a notebook across devices
     public var uniqueID: String
+    
     var description: String?
     
     init(id: Int64?, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: NSDate) {
