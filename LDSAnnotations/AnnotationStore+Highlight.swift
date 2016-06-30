@@ -81,6 +81,9 @@ extension AnnotationStore {
                     HighlightTable.annotationID <- highlight.annotationID
                 ))
                 
+                // Mark associated annotation as having been updated
+                try updateLastModifiedDate(annotationID: highlight.annotationID)
+                
                 return highlight
             } else {
                 let id = try db.run(HighlightTable.table.insert(

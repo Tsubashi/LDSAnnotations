@@ -5,7 +5,7 @@ platform :ios, '8.0'
 use_frameworks!
 
 workspace 'LDSAnnotations'
-xcodeproj 'LDSAnnotations.xcodeproj'
+project 'LDSAnnotations.xcodeproj'
 
 target 'LDSAnnotations' do
     pod 'PSOperations'
@@ -23,7 +23,7 @@ target 'LDSAnnotationsTests' do
 end
 
 target 'LDSAnnotationsDemo' do
-    xcodeproj 'LDSAnnotationsDemo.xcodeproj'
+    project 'LDSAnnotationsDemo.xcodeproj'
     
     # Required by LDSAnnotations
     pod 'PSOperations'

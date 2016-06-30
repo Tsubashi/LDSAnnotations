@@ -52,17 +52,11 @@ public struct Annotation {
     /// When the annotation was last modified in local time.
     public internal(set) var lastModified: NSDate
 
-    /// ID of associated note. This is a one-to-one relationship
-    public var noteID: Int64?
-
-    /// ID of associated bookmark. This is a one-to-one relationship
-    public var bookmarkID: Int64?
-    
     public var source: String?
     
     public var device: String?
     
-    init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String, docVersion: Int, type: AnnotationType, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, noteID: Int64?, bookmarkID: Int64?, source: String?, device: String?) {
+    public init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String, docVersion: Int, type: AnnotationType, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
         self.type = type
@@ -72,8 +66,6 @@ public struct Annotation {
         self.status = status
         self.created = created
         self.lastModified = lastModified
-        self.noteID = noteID
-        self.bookmarkID = bookmarkID
         self.source = source
         self.device = device
     }
@@ -126,11 +118,11 @@ public struct Annotation {
             result["device"] = device
         }
         
-        if let noteID = noteID, note = annotationStore.noteWithID(noteID) {
+        if let id = id, note = annotationStore.noteWithAnnotationID(id) {
             result["note"] = note.jsonObject()
         }
 
-        if let bookmarkID = bookmarkID, bookmark = annotationStore.bookmarkWithID(bookmarkID) {
+        if let id = id, bookmark = annotationStore.bookmarkWithAnnotationID(id) {
             result["bookmark"] = bookmark.jsonObject()
         }
         

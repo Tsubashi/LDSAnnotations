@@ -25,6 +25,8 @@ import Foundation
 /// A Bookmark.
 public struct Bookmark: Equatable {
     
+    static let Offset = -1
+    
     /// Local ID.
     public internal(set) var id: Int64?
     
@@ -40,10 +42,10 @@ public struct Bookmark: Equatable {
     /// ID of annotation.
     public var annotationID: Int64
     
-    /// The zero-based word offset of this bookmark location.
-    public internal(set) var offset: Int
+    /// The word offset of this bookmark location.
+    var offset: Int
     
-    init(id: Int64?, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int) {
+    init(id: Int64?, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int = Bookmark.Offset) {
         self.id = id
         self.name = name
         self.paragraphAID = paragraphAID
@@ -63,22 +65,13 @@ public struct Bookmark: Equatable {
         self.paragraphAID = jsonObject["@pid"] as? String
         self.displayOrder = jsonObject["sort"] as? Int
         self.annotationID = annotationID
-        
-        if let offset = jsonObject["@offset"] as? Int where offset >= 1 {
-            self.offset = offset - 1
-        } else {
-            self.offset = 0
-        }
+        self.offset = jsonObject["@offset"] as? Int ?? Bookmark.Offset
     }
     
     func jsonObject() -> [String: AnyObject] {
         var result = [String: AnyObject]()
         
-        if offset <= 0 {
-            result["@offset"] = -1
-        } else {
-            result["@offset"] = offset + 1
-        }
+        result["@offset"] = offset
         
         if let name = name {
             result["name"] = name

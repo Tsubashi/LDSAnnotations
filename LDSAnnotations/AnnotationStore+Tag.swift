@@ -50,58 +50,53 @@ extension AnnotationStore {
     }
     
     /// Adds a new tag with `name`.
-    public func addTag(name name: String) throws -> Tag? {
+    public func addTag(name name: String) throws -> Tag {
         let tag = try Tag(name: name)
         return try addOrUpdateTag(tag)
     }
     
     /// Adds or updates tag
-    public func addOrUpdateTag(tag: Tag) throws -> Tag? {
+    public func addOrUpdateTag(tag: Tag) throws -> Tag {
         guard !tag.name.isEmpty else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a tag without a name.")
         }
         
-        do {
-            if let id = tag.id {
-                // Update an existing tag
-                try db.run(TagTable.table.filter(TagTable.id == id).update(
-                    TagTable.name <- tag.name
-                ))
-                return tag
-                
-            } else if let tag = db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == tag.name.lowercaseString)).map({ TagTable.fromRow($0) }) {
-                // Tag already exists with this name
-                return tag
-                
-            } else {
-                // Insert this new tag
-                let id = try db.run(TagTable.table.insert(
-                    TagTable.name <- tag.name
-                ))
-                return Tag(id: id, name: tag.name)
-            }
-        } catch {
-            return nil
+        if let id = tag.id {
+            // Update an existing tag
+            try db.run(TagTable.table.filter(TagTable.id == id).update(
+                TagTable.name <- tag.name
+            ))
+            return tag
+            
+        } else if let tag = db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == tag.name.lowercaseString)).map({ TagTable.fromRow($0) }) {
+            // Tag already exists with this name
+            return tag
+            
+        } else {
+            // Insert this new tag
+            let id = try db.run(TagTable.table.insert(
+                TagTable.name <- tag.name
+            ))
+            return Tag(id: id, name: tag.name)
         }
     }
     
     /// Returns a list of active tags, order by OrderBy.
     public func tags(ids ids: [Int64]? = nil, orderBy: OrderBy = .Name) -> [Tag] {
-        var inClause: String = {
-            guard let ids = ids else { return "" }
+        let inClause: String? = {
+            guard let ids = ids else { return nil }
             
-            return "AND tag._id IN (" + ids.map { String($0) }.joinWithSeparator(",") + ")"
+            return "tag._id IN (" + ids.map { String($0) }.joinWithSeparator(",") + ")"
         }()
         
         let statement: String
         switch orderBy {
         case .Name:
-            statement = "SELECT DISTINCT tag.* FROM tag JOIN annotation_tag ON annotation_tag.tag_id = tag._id JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '' \(inClause) ORDER BY tag.name"
+            statement = "SELECT tag.* FROM tag \(inClause?.insert("WHERE ", at: 0) ?? "") ORDER BY tag.name"
         case .MostRecent:
-            statement = "SELECT DISTINCT tag.* FROM tag JOIN annotation_tag ON annotation_tag.tag_id = tag._id JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '' \(inClause) ORDER BY annotation.last_modified DESC, tag.name ASC"
+            statement = "SELECT DISTINCT tag.* FROM tag JOIN annotation_tag ON annotation_tag.tag_id = tag._id JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '' \(inClause?.insert("AND ", at: 0) ?? "") ORDER BY annotation.last_modified DESC, tag.name ASC"
         case .NumberOfAnnotations:
-            inClause = inClause.stringByReplacingOccurrencesOfString("AND ", withString: "WHERE ")
-            statement = "SELECT DISTINCT tag.* FROM tag JOIN (SELECT annotation_tag.tag_id, COUNT(annotation_id) AS annotation_count FROM annotation_tag JOIN annotation ON annotation_tag.annotation_id = annotation._id WHERE annotation.status = '' GROUP BY tag_id) AS counts ON tag._id = counts.tag_id \(inClause) ORDER BY counts.annotation_count DESC, tag.name ASC"
+            statement = "SELECT DISTINCT tag.* FROM tag JOIN (SELECT annotation_tag.tag_id, COUNT(annotation_id) AS annotation_count FROM annotation_tag JOIN annotation ON annotation_tag.annotation_id = annotation._id WHERE annotation.status = '' GROUP BY tag_id) AS counts ON tag._id = counts.tag_id \(inClause?.insert("WHERE ", at: 0) ?? "") ORDER BY counts.annotation_count DESC, tag.name ASC"
         }
         
         do {
@@ -134,16 +129,31 @@ extension AnnotationStore {
         return db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercaseString)).map { TagTable.fromRow($0) }
     }
     
+    public func tagsContainingString(string: String) -> [Tag] {
+        do {
+            let likeClause = String(format: "%%%@%%", string.lowercaseString)
+            return try db.prepare(TagTable.table.filter(TagTable.name.lowercaseString.like(likeClause)).order(TagTable.name)).map { TagTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     func tagWithID(id: Int64) -> Tag? {
         return db.pluck(TagTable.table.filter(TagTable.id == id)).map { TagTable.fromRow($0) }
     }
     
+    func trashTagWithID(id: Int64) throws {
+        let annotationIDs = try db.prepare(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id)).map { $0[AnnotationTagTable.annotationID] }
+        
+        try deleteTagWithID(id)
+        
+        try annotationIDs.forEach { try trashAnnotationIfEmptyWithID($0) }
+    }
+    
     /// Deletes tag and annotation tags with ID
-    public func deleteTagWithID(id: Int64) {
-        do {
-            try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id).delete())
-            try db.run(TagTable.table.filter(TagTable.id == id).delete())
-        } catch {}
+    public func deleteTagWithID(id: Int64) throws {
+        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id).delete())
+        try db.run(TagTable.table.filter(TagTable.id == id).delete())
     }
     
 }

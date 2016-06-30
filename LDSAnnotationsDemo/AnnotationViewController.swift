@@ -65,9 +65,9 @@ class AnnotationViewController: UITableViewController {
         
         switch section {
         case .Note:
-            return annotation.noteID != nil ? 1 : 0
+            return annotationStore.noteWithAnnotationID(annotationID) != nil ? 1 : 0
         case .Bookmark:
-            return annotation.bookmarkID != nil ? 1 : 0
+            return annotationStore.bookmarkWithAnnotationID(annotationID) != nil ? 1 : 0
         case .Highlights:
             return annotationStore.highlightsWithAnnotationID(annotationID).count
         case .Tags:
@@ -89,11 +89,11 @@ class AnnotationViewController: UITableViewController {
         
         switch section {
         case .Note:
-            if let noteID = annotation.noteID, note = annotationStore.noteWithID(noteID) {
+            if let note = annotationStore.noteWithAnnotationID(annotationID) {
                 cell.textLabel?.text = note.title ?? note.content
             }
         case .Bookmark:
-            if let bookmarkID = annotation.bookmarkID, bookmark = annotationStore.bookmarkWithID(bookmarkID) {
+            if let bookmark = annotationStore.bookmarkWithAnnotationID(annotationID) {
                 cell.textLabel?.text = bookmark.name
             }
         case .Highlights:

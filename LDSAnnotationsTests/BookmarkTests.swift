@@ -41,7 +41,7 @@ class BookmarkTests: XCTestCase {
     
     func testBookmarkWithOffset() {
         let input = [
-            "@offset": 3,
+            "@offset": 2,
             "@pid": "20527924",
         ]
         let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 2)
@@ -56,7 +56,7 @@ class BookmarkTests: XCTestCase {
             "@offset": -1,
             "@pid": "20527924",
         ]
-        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 0)
+        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: -1)
         let actual = try! Bookmark(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual.jsonObject() as! [String: NSObject]
