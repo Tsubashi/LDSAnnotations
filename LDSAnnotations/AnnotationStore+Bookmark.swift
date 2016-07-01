@@ -99,7 +99,7 @@ extension AnnotationStore {
     
     public func bookmarks(docID docID: String? = nil) -> [Bookmark] {
         do {
-            var query = BookmarkTable.table.join(AnnotationTable.table.select(AnnotationTable.table[AnnotationTable.id], AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active)
+            var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active)
             
             if let docID = docID {
                 query = query.filter(AnnotationTable.docID == docID)

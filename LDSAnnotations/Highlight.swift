@@ -87,7 +87,7 @@ public struct Highlight: Equatable {
         result["@offset-start"] = offsetStart > 1 ? offsetStart : Highlight.OffsetStart
         result["@offset-end"] = offsetEnd ?? Highlight.OffsetEnd
         
-        if style == .Underline && style == .Clear {
+        if style == .Underline || style == .Clear {
             result["@style"] = style.rawValue
         }
         

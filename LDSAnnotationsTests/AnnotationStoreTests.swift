@@ -325,6 +325,50 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(names, annotationStore.tags().map({ $0.name }), "Duplicate tags loaded from the database")
     }
     
+    func testAnnotationWithBookmarkID() {
+        let annotationStore = AnnotationStore()!
+        let annotation = try! annotationStore.addAnnotation("eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let bookmark = try! annotationStore.addBookmark(name: "Bookmark", paragraphAID: nil, displayOrder: 1, annotationID: annotation.id!)
+
+        XCTAssertEqual(annotation.id!, annotationStore.annotationWithBookmarkID(bookmark.id!)!.id!, "Annotation did not load correctly from database")
+    }
+    
+    func testAnnotationWithNoteID() {
+        let annotationStore = AnnotationStore()!
+        
+        let annotation = try! annotationStore.addAnnotation("eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        
+        let note = try! annotationStore.addNote("Title", content: "Content", annotationID: annotation.id!)
+        
+        XCTAssertEqual(annotation.id!, annotationStore.annotationWithNoteID(note.id!)!.id!, "Annotation did not load correctly from database")
+    }
+    
+    func testAnnotationWithLinkID() {
+        let annotationStore = AnnotationStore()!
+        
+        let annotation = try! annotationStore.addAnnotation("eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let links = [
+            try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link1", docID: "1", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id!)),
+            try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link2", docID: "2", docVersion: 1, paragraphAIDs: ["1", "2"], annotationID: annotation.id!)),
+        ]
+        
+        for link in links {
+            // Verify annotationloads correctly
+            XCTAssertEqual(annotation.id!, annotationStore.annotationWithLinkID(link.id!)!.id!, "Annotation did not load correctly from database")
+        }
+        
+        let annotation2 = try! annotationStore.addAnnotation("eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let links2 = [
+            try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link3", docID: "3", docVersion: 1, paragraphAIDs: ["1", "2", "3"], annotationID: annotation2.id!)),
+            try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link4", docID: "4", docVersion: 1, paragraphAIDs: ["1", "2", "3", "4"], annotationID: annotation2.id!))
+        ]
+        
+        for link in links2 {
+            // Verify annotationloads correctly
+            XCTAssertEqual(annotation2.id!, annotationStore.annotationWithLinkID(link.id!)!.id!, "Annotation did not load correctly from database")
+        }
+    }
+    
 }
 
 extension String {
