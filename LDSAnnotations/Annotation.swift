@@ -56,7 +56,7 @@ public struct Annotation {
     
     public var device: String?
     
-    public init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String, docVersion: Int, type: AnnotationType, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
+    init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String, docVersion: Int, type: AnnotationType, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
         self.type = type
