@@ -53,30 +53,35 @@ extension AnnotationStore {
         })
     }
     
+    public func addNote(title: String?, content: String, annotationID: Int64) throws -> Note {
+        return try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
+    }
+    
     /// Adds a new note with `content`.
-    public func addOrUpdateNote(note: Note) throws -> Note? {
+    public func addOrUpdateNote(note: Note) throws -> Note {
         guard note.annotationID != 0 else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a note without content and an annotation ID.")
         }
         
-        do {
-            if let id = note.id {
-                try db.run(NoteTable.table.filter(NoteTable.id == id).update(
-                    NoteTable.title <- note.title,
-                    NoteTable.content <- note.content,
-                    NoteTable.annotationID <- note.annotationID
-                ))
-                return note
-            } else {
-                let id = try db.run(NoteTable.table.insert(
-                    NoteTable.title <- note.title,
-                    NoteTable.content <- note.content,
-                    NoteTable.annotationID <- note.annotationID
-                ))
-                return Note(id: id, title: note.title, content: note.content, annotationID: note.annotationID)
-            }
-        } catch {
-            return nil
+        if let id = note.id {
+            try db.run(NoteTable.table.filter(NoteTable.id == id).update(
+                NoteTable.title <- note.title,
+                NoteTable.content <- note.content,
+                NoteTable.annotationID <- note.annotationID
+            ))
+            
+            // Mark associated annotation as having been updated
+            try updateLastModifiedDate(annotationID: note.annotationID)
+            
+            return note
+        } else {
+            let id = try db.run(NoteTable.table.insert(
+                NoteTable.title <- note.title,
+                NoteTable.content <- note.content,
+                NoteTable.annotationID <- note.annotationID
+            ))
+            
+            return Note(id: id, title: note.title, content: note.content, annotationID: note.annotationID)
         }
     }
     
@@ -84,10 +89,20 @@ extension AnnotationStore {
         return db.pluck(NoteTable.table.filter(NoteTable.id == id)).map { NoteTable.fromRow($0) }
     }
     
-    func deleteNoteWithID(id: Int64) {
-        do {
-            try db.run(NoteTable.table.filter(NoteTable.id == id).delete())
-        } catch {}
+    public func noteWithAnnotationID(annotationID: Int64) -> Note? {
+        return db.pluck(NoteTable.table.filter(NoteTable.annotationID == annotationID)).map { NoteTable.fromRow($0) }
+    }
+    
+    func trashNoteWithID(id: Int64) throws {
+        guard let annotationID = db.pluck(NoteTable.table.select(NoteTable.id, NoteTable.annotationID).filter(NoteTable.id == id)).map({ $0[NoteTable.annotationID] }) else { return }
+
+        try deleteNoteWithID(id)
+        
+        try trashAnnotationIfEmptyWithID(annotationID)
+    }
+    
+    func deleteNoteWithID(id: Int64) throws {
+        try db.run(NoteTable.table.filter(NoteTable.id == id).delete())
     }
     
 }

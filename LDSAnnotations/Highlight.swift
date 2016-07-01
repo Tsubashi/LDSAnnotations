@@ -25,34 +25,38 @@ import Foundation
 /// A highlight.
 public struct Highlight: Equatable {
     
+    public static let OffsetStart = -1
+    
+    public static let OffsetEnd = -1
+    
     /// Local ID.
     public internal(set) var id: Int64?
     
     /// Paragraph Annotation ID.
     public let paragraphAID: String
     
-    /// The zero-based word offset of the start of this highlight range.
+    /// The word offset of the start of this highlight range.
     public var offsetStart: Int
     
-    /// The zero-based word offset of the end of this highlight range, or `nil` for the end of the paragraph.
+    /// The word offset of the end of this highlight range, or `nil` for the end of the paragraph.
     public var offsetEnd: Int?
     
     /// Color of the highlight.
     public var colorName: String
     
     /// Highlight Style.
-    public var style: HighlightStyle?
+    public var style: HighlightStyle
     
     /// ID of annotation.
     public var annotationID: Int64
     
-    init(id: Int64?, paragraphAID: String, offsetStart: Int, offsetEnd: Int?, colorName: String, style: HighlightStyle?, annotationID: Int64) {
+    public init(id: Int64?, paragraphAID: String, offsetStart: Int, offsetEnd: Int?, colorName: String, style: HighlightStyle?, annotationID: Int64) {
         self.id = id
         self.paragraphAID = paragraphAID
         self.offsetStart = offsetStart
         self.offsetEnd = offsetEnd
         self.colorName = colorName
-        self.style = style
+        self.style = style ?? .Highlight
         self.annotationID = annotationID
     }
     
@@ -67,17 +71,8 @@ public struct Highlight: Equatable {
         
         self.id = nil
         self.paragraphAID = paragraphAID
-        
-        if offsetStart >= 1 {
-            self.offsetStart = offsetStart - 1
-        } else {
-            self.offsetStart = 0
-        }
-        
-        if offsetEnd >= 1 {
-            self.offsetEnd = offsetEnd - 1
-        }
-        
+        self.offsetStart = offsetStart > 1 ? offsetStart : Highlight.OffsetStart
+        self.offsetEnd = offsetEnd != Highlight.OffsetEnd ? offsetEnd : nil
         self.colorName = colorName
         self.annotationID = annotationID
         self.style = (jsonObject["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
@@ -89,19 +84,10 @@ public struct Highlight: Equatable {
             "@pid": paragraphAID,
         ]
         
-        if offsetStart <= 0 {
-            result["@offset-start"] = -1
-        } else {
-            result["@offset-start"] = offsetStart + 1
-        }
+        result["@offset-start"] = offsetStart > 1 ? offsetStart : Highlight.OffsetStart
+        result["@offset-end"] = offsetEnd ?? Highlight.OffsetEnd
         
-        if let offsetEnd = offsetEnd {
-            result["@offset-end"] = offsetEnd + 1
-        } else {
-            result["@offset-end"] = -1
-        }
-        
-        if let style = style where style == .Underline {
+        if style == .Underline || style == .Clear {
             result["@style"] = style.rawValue
         }
         

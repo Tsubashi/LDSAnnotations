@@ -246,9 +246,9 @@ class SyncAnnotationsOperation: Operation {
                     if let existingAnnotation = annotationStore.annotationWithUniqueID(uniqueID) {
                         var mergedAnnotation = downloadedAnnotation
                         mergedAnnotation.id = existingAnnotation.id
-                        databaseAnnotation = annotationStore.addOrUpdateAnnotation(mergedAnnotation)
+                        databaseAnnotation = try annotationStore.addOrUpdateAnnotation(mergedAnnotation)
                     } else {
-                        databaseAnnotation = annotationStore.addOrUpdateAnnotation(downloadedAnnotation)
+                        databaseAnnotation = try annotationStore.addOrUpdateAnnotation(downloadedAnnotation)
                     }
                     downloadAnnotationCount += 1
                     
@@ -323,7 +323,7 @@ class SyncAnnotationsOperation: Operation {
                                 let tag = try annotationStore.addOrUpdateTag(downloadedTag)
                                 downloadTagCount += 1
                                 
-                                if let tagID = tag?.id {
+                                if let tagID = tag.id {
                                     try annotationStore.addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID)
                                 }
                             }

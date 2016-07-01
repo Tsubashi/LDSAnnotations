@@ -62,44 +62,80 @@ extension AnnotationStore {
         })
     }
     
-    public func addOrUpdateBookmark(bookmark: Bookmark) throws -> Bookmark? {
+    public func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int, annotationID: Int64) throws -> Bookmark {
+        return try addOrUpdateBookmark(Bookmark(id: nil, name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID))
+    }
+    
+    public func addOrUpdateBookmark(bookmark: Bookmark) throws -> Bookmark {
         guard bookmark.annotationID != 0 else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a bookmark without an annotation ID.")
         }
         
+        if let id = bookmark.id {
+            try db.run(BookmarkTable.table.filter(BookmarkTable.id == id).update(
+                BookmarkTable.name <- bookmark.name,
+                BookmarkTable.paragraphAID <- bookmark.paragraphAID,
+                BookmarkTable.displayOrder <- bookmark.displayOrder,
+                BookmarkTable.annotationID <- bookmark.annotationID,
+                BookmarkTable.offset <- bookmark.offset
+            ))
+            
+            // Mark associated annotation as having been updated
+            try updateLastModifiedDate(annotationID: bookmark.annotationID)
+            
+            return bookmark
+        } else {
+            let id = try db.run(BookmarkTable.table.insert(
+                BookmarkTable.name <- bookmark.name,
+                BookmarkTable.paragraphAID <- bookmark.paragraphAID,
+                BookmarkTable.displayOrder <- bookmark.displayOrder,
+                BookmarkTable.annotationID <- bookmark.annotationID,
+                BookmarkTable.offset <- bookmark.offset
+            ))
+            
+            return Bookmark(id: id, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: bookmark.annotationID, offset: bookmark.offset)
+        }
+    }
+    
+    public func bookmarks(docID docID: String? = nil) -> [Bookmark] {
         do {
-            if let id = bookmark.id {
-                try db.run(BookmarkTable.table.filter(BookmarkTable.id == id).update(
-                    BookmarkTable.name <- bookmark.name,
-                    BookmarkTable.paragraphAID <- bookmark.paragraphAID,
-                    BookmarkTable.displayOrder <- bookmark.displayOrder,
-                    BookmarkTable.annotationID <- bookmark.annotationID,
-                    BookmarkTable.offset <- bookmark.offset
-                ))
-                return bookmark
-            } else {
-                let id = try db.run(BookmarkTable.table.insert(
-                    BookmarkTable.name <- bookmark.name,
-                    BookmarkTable.paragraphAID <- bookmark.paragraphAID,
-                    BookmarkTable.displayOrder <- bookmark.displayOrder,
-                    BookmarkTable.annotationID <- bookmark.annotationID,
-                    BookmarkTable.offset <- bookmark.offset
-                ))
-                return Bookmark(id: id, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: bookmark.annotationID, offset: bookmark.offset)
+            var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active)
+            
+            if let docID = docID {
+                query = query.filter(AnnotationTable.docID == docID)
             }
+            
+            return try db.prepare(query).map { BookmarkTable.fromRow($0) }
         } catch {
-            return nil
+            return []
+        }
+    }
+    
+    public func reorderBookmarks(bookmarks: [Bookmark]) throws {
+        for (displayOrder, var bookmark) in bookmarks.enumerate() where bookmark.displayOrder != displayOrder {
+            bookmark.displayOrder = displayOrder
+            try addOrUpdateBookmark(bookmark)
         }
     }
     
     public func bookmarkWithID(id: Int64) -> Bookmark? {
         return db.pluck(BookmarkTable.table.filter(BookmarkTable.id == id)).map { BookmarkTable.fromRow($0) }
     }
+   
+    public func bookmarkWithAnnotationID(annotationID: Int64) -> Bookmark? {
+        return db.pluck(BookmarkTable.table.filter(BookmarkTable.annotationID == annotationID)).map { BookmarkTable.fromRow($0) }
+    }
     
-    public func deleteBookmarkWithID(id: Int64) {
-        do {
-            try db.run(BookmarkTable.table.filter(BookmarkTable.id == id).delete())
-        } catch {}
+    public func trashBookmarkWithID(id: Int64) throws {
+        guard let annotationID = db.pluck(BookmarkTable.table.select(BookmarkTable.id, BookmarkTable.annotationID).filter(BookmarkTable.id == id)).map({ $0[BookmarkTable.annotationID] }) else { return }
+        
+        try deleteBookmarkWithID(id)
+        
+        try trashAnnotationIfEmptyWithID(annotationID)
+    }
+    
+    public func deleteBookmarkWithID(id: Int64) throws {
+        try db.run(BookmarkTable.table.filter(BookmarkTable.id == id).delete())
     }
     
 }

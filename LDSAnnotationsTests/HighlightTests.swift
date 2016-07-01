@@ -43,8 +43,8 @@ class HighlightTests: XCTestCase {
     
     func testHighlightWithOffset() {
         let input = [
-            "@offset-start": "3",
-            "@offset-end": "7",
+            "@offset-start": "2",
+            "@offset-end": "6",
             "@pid": "20527924",
             "@color": "yellow",
         ]
@@ -62,7 +62,7 @@ class HighlightTests: XCTestCase {
             "@pid": "20527924",
             "@color": "yellow",
         ]
-        let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: 0, offsetEnd: nil, colorName: "yellow", style: .Highlight, annotationID: 1)
+        let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: Highlight.OffsetStart, offsetEnd: nil, colorName: "yellow", style: .Highlight, annotationID: 1)
         let actual = try! Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual.jsonObject() as! [String: NSObject]

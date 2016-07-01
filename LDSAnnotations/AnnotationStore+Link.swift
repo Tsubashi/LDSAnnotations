@@ -63,33 +63,34 @@ extension AnnotationStore {
     }
     
     
-    public func addOrUpdateLink(link: Link) throws -> Link? {
+    public func addOrUpdateLink(link: Link) throws -> Link {
         guard !link.name.isEmpty && !link.docID.isEmpty && link.docVersion > 0 && !link.paragraphAIDs.isEmpty && link.annotationID != 0 else {
             throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
-        do {
-            if let id = link.id {
-                try db.run(LinkTable.table.filter(LinkTable.id == id).update(
-                    LinkTable.name <- link.name,
-                    LinkTable.docID <- link.docID,
-                    LinkTable.docVersion <- link.docVersion,
-                    LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
-                    LinkTable.annotationID <- link.annotationID
-                ))
-                return link
-            } else {
-                let id = try db.run(LinkTable.table.insert(
-                    LinkTable.name <- link.name,
-                    LinkTable.docID <- link.docID,
-                    LinkTable.docVersion <- link.docVersion,
-                    LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
-                    LinkTable.annotationID <- link.annotationID
-                ))
-                return Link(id: id, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: link.annotationID)
-            }
-        } catch {
-            return nil
+        if let id = link.id {
+            try db.run(LinkTable.table.filter(LinkTable.id == id).update(
+                LinkTable.name <- link.name,
+                LinkTable.docID <- link.docID,
+                LinkTable.docVersion <- link.docVersion,
+                LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
+                LinkTable.annotationID <- link.annotationID
+            ))
+            
+            // Mark associated annotation as having been updated
+            try updateLastModifiedDate(annotationID: link.annotationID)
+            
+            return link
+        } else {
+            let id = try db.run(LinkTable.table.insert(
+                LinkTable.name <- link.name,
+                LinkTable.docID <- link.docID,
+                LinkTable.docVersion <- link.docVersion,
+                LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
+                LinkTable.annotationID <- link.annotationID
+            ))
+            
+            return Link(id: id, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: link.annotationID)
         }
     }
     
@@ -105,10 +106,16 @@ extension AnnotationStore {
         return db.pluck(LinkTable.table.filter(LinkTable.id == id)).map { LinkTable.fromRow($0) }
     }
     
-    func deleteLinkWithID(id: Int64) {
-        do {
-            try db.run(LinkTable.table.filter(LinkTable.id == id).delete())
-        } catch {}
+    public func trashLinkWithID(id: Int64) throws {
+        guard let annotationID = db.pluck(LinkTable.table.select(LinkTable.id, LinkTable.annotationID).filter(LinkTable.id == id)).map({ $0[LinkTable.annotationID] }) else { return }
+        
+        try deleteLinkWithID(id)
+        
+        try trashAnnotationIfEmptyWithID(annotationID)
+    }
+    
+    func deleteLinkWithID(id: Int64) throws {
+        try db.run(LinkTable.table.filter(LinkTable.id == id).delete())
     }
     
 }
