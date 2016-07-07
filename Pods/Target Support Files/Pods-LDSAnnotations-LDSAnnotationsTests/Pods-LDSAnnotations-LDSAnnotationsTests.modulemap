@@ -1,0 +1,6 @@
+framework module Pods_LDSAnnotations_LDSAnnotationsTests {
+  umbrella header "Pods-LDSAnnotations-LDSAnnotationsTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

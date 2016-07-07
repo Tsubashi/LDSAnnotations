@@ -113,7 +113,6 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(byNameWithIDs.map { $0.name }, ["e", "j", "o"])
 
         let actualMostRecent = annotationStore.tags(orderBy: .MostRecent).map { $0.name }
-        print(actualMostRecent)
         XCTAssert(actualMostRecent == Array(alphabet.reverse()), "Most recent tags ordered incorrectly")
 
         let actualMostRecentWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .MostRecent).map { $0.name }
