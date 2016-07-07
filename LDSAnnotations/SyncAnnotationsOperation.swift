@@ -198,11 +198,6 @@ class SyncAnnotationsOperation: Operation {
             case .Success(let payload):
                 do {
                     try self.annotationStore.inSyncTransaction {
-                        if let localSyncDate = self.localSyncAnnotationsDate {
-                            let deletedAnnotations = self.annotationStore.deletedAnnotations(lastModifiedOnOrBefore: localSyncDate)
-                            // TODO: Do we need to actually delete these?
-                            print(deletedAnnotations)
-                        }
                         try self.applyServerChanges(payload)
                     }
                     self.finish()

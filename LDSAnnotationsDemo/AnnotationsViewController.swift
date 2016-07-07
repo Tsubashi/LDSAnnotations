@@ -25,7 +25,6 @@ import Swiftification
 import LDSAnnotations
 
 class AnnotationsViewController: UIViewController {
-    
     let annotationStore: AnnotationStore
     let status: AnnotationStatus
     
@@ -67,7 +66,7 @@ class AnnotationsViewController: UIViewController {
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: AnnotationsViewController.CellIdentifier)
+        tableView.registerClass(SubtitleTableViewCell.self, forCellReuseIdentifier: AnnotationsViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -103,9 +102,9 @@ class AnnotationsViewController: UIViewController {
     func reloadData() {
         switch status {
         case .Active:
-            annotations = annotationStore.annotations().sort { $0.docID < $1.docID }
+            annotations = annotationStore.annotations().sort { $0.lastModified > $1.lastModified }
         case .Trashed:
-            annotations = annotationStore.trashedAnnotations().sort { $0.docID < $1.docID }
+            annotations = annotationStore.trashedAnnotations().sort { $0.lastModified > $1.lastModified }
         case .Deleted:
             fatalError("Deleted annotations are not supported")
         }
@@ -117,13 +116,10 @@ class AnnotationsViewController: UIViewController {
         reloadData()
         tableView.reloadData()
     }
-    
 }
 
 // MARK: - Add/rename/delete annotations
-
 extension AnnotationsViewController {
-    
     func textFieldDidChange(textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
             let name = alertController.textFields?[safe: 0]?.text ?? ""
@@ -138,13 +134,10 @@ extension AnnotationsViewController {
             NSLog("Failed to delete annotations: %@", "\(error)")
         }
     }
-    
 }
 
 // MARK: - UITableViewDataSource
-
 extension AnnotationsViewController: UITableViewDataSource {
-    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
@@ -157,9 +150,40 @@ extension AnnotationsViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(AnnotationsViewController.CellIdentifier, forIndexPath: indexPath)
         
         let annotation = annotations[indexPath.row]
-        cell.textLabel?.text = annotation.docID
+        cell.textLabel?.text = "\(annotation.id ?? 0)"
+        cell.detailTextLabel?.text = subtitleFor(annotation: annotation)
         
         return cell
+    }
+    
+    private func subtitleFor(annotation annotation: Annotation) -> String {
+        guard let annotationID = annotation.id else { return "" }
+        
+        var parts = [String]()
+        if let _ = annotationStore.noteWithAnnotationID(annotationID) {
+            parts.append("1 note")
+        }
+        if let _ = annotationStore.bookmarkWithAnnotationID(annotationID) {
+            parts.append("1 bookmark")
+        }
+        let highlights = annotationStore.highlightsWithAnnotationID(annotationID)
+        if !highlights.isEmpty {
+            parts.append("\(highlights.count) highlight(s)")
+        }
+        let tags = annotationStore.tagsWithAnnotationID(annotationID)
+        if !tags.isEmpty {
+            parts.append("\(tags.count) tag(s)")
+        }
+        let links = annotationStore.linksWithAnnotationID(annotationID)
+        if !links.isEmpty {
+            parts.append("\(links.count) link(s)")
+        }
+        let notebooks = annotationStore.notebooksWithAnnotationID(annotationID)
+        if !notebooks.isEmpty {
+            parts.append("\(notebooks.count) notebook(s)")
+        }
+        
+        return parts.joinWithSeparator(", ")
     }
     
     func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String? {
@@ -194,21 +218,18 @@ extension AnnotationsViewController: UITableViewDataSource {
             }
         }
     }
-    
 }
 
 // MARK: - UITableViewDelegate
-
 extension AnnotationsViewController: UITableViewDelegate {
-    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: false)
-        
         switch status {
         case .Active:
             let annotation = annotations[indexPath.row]
             navigationController?.pushViewController(AnnotationViewController(annotation: annotation, annotationStore: annotationStore), animated: true)
         case .Trashed:
+            tableView.deselectRowAtIndexPath(indexPath, animated: false)
+            
             let annotation = annotations[indexPath.row]
             do {
                 try annotationStore.restoreAnnotations([annotation])
@@ -219,5 +240,4 @@ extension AnnotationsViewController: UITableViewDelegate {
             fatalError("Deleted annotations are not supported")
         }
     }
-    
 }

@@ -23,11 +23,11 @@
 import UIKit
 import LDSAnnotations
 
-class AnnotationViewController: UITableViewController {
+private let cellIdentifier = "cellIdentifier"
 
+class AnnotationViewController: UITableViewController {
     let annotation: Annotation
     let annotationStore: AnnotationStore
-    private let cellIdentifier = "cellIdentifier"
     
     enum Section: Int {
         case Note
@@ -46,16 +46,23 @@ class AnnotationViewController: UITableViewController {
         super.init(style: .Grouped)
         
         title = "Annotation"
-
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 44
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 44
+    }
+}
+
+// MARK: - UITableViewDataSource
+extension AnnotationViewController {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return Section.Count.rawValue
     }
@@ -140,5 +147,4 @@ class AnnotationViewController: UITableViewController {
             return nil
         }
     }
-
 }

@@ -393,7 +393,7 @@ extension AnnotationStore {
         
         let inTransactionKey = "txn:\(unsafeAddressOf(self))"
         if NSThread.currentThread().threadDictionary[inTransactionKey] != nil {
-            let annotationIDsKey = "ids:\(unsafeAddressOf(self))"
+            let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
             let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> ?? SetBox()
             annotationIDs.set.unionInPlace(ids)
             NSThread.currentThread().threadDictionary[annotationIDsKey] = annotationIDs
@@ -411,7 +411,7 @@ extension AnnotationStore {
         
         let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
         if NSThread.currentThread().threadDictionary[inSyncTransactionKey] != nil {
-            let annotationIDsKey = "ids:\(unsafeAddressOf(self))"
+            let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
             let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> ?? SetBox()
             annotationIDs.set.unionInPlace(ids)
             NSThread.currentThread().threadDictionary[annotationIDsKey] = annotationIDs

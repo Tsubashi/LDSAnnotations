@@ -21,6 +21,7 @@
 		D9C470AD1C612E0A00EDCD69 /* AccountsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470AC1C612E0A00EDCD69 /* AccountsViewController.swift */; };
 		D9C470B21C612E0A00EDCD69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D9C470B11C612E0A00EDCD69 /* Assets.xcassets */; };
 		D9C470B51C612E0A00EDCD69 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D9C470B31C612E0A00EDCD69 /* LaunchScreen.storyboard */; };
+		D9E25A5E1D2EA9740065A2C2 /* SubtitleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E25A5D1D2EA9740065A2C2 /* SubtitleTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +44,7 @@
 		D9C470B41C612E0A00EDCD69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D9C470B61C612E0A00EDCD69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D9C470C01C612E8D00EDCD69 /* LDSAnnotations.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = LDSAnnotations.framework; path = "../build/Debug-iphoneos/LDSAnnotations.framework"; sourceTree = "<group>"; };
+		D9E25A5D1D2EA9740065A2C2 /* SubtitleTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubtitleTableViewCell.swift; sourceTree = "<group>"; };
 		DC73609DE0CE0189776889C3 /* Pods-LDSAnnotations-LDSAnnotationsDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations-LDSAnnotationsDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations-LDSAnnotationsDemo/Pods-LDSAnnotations-LDSAnnotationsDemo.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				D4BCDA1B1CA5A40B001EE71F /* AnnotationsViewController.swift */,
+				D9E25A5D1D2EA9740065A2C2 /* SubtitleTableViewCell.swift */,
 				D4BCDA1D1CA5A5AD001EE71F /* AnnotationViewController.swift */,
 			);
 			name = Annotations;
@@ -291,6 +294,7 @@
 				D99234931C668D3200177FD2 /* AccountViewController.swift in Sources */,
 				D44277831D01E82F0064C1AC /* NSFileManager+URLs.swift in Sources */,
 				D9C470AB1C612E0A00EDCD69 /* AppDelegate.swift in Sources */,
+				D9E25A5E1D2EA9740065A2C2 /* SubtitleTableViewCell.swift in Sources */,
 				D4BCDA1C1CA5A40B001EE71F /* AnnotationsViewController.swift in Sources */,
 				D992349C1C669DA600177FD2 /* NotebooksViewController.swift in Sources */,
 				D99234951C668FE300177FD2 /* Value1TableViewCell.swift in Sources */,

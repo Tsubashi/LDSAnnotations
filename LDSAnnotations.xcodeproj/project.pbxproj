@@ -63,6 +63,7 @@
 		D9C470DC1C61655100EDCD69 /* Response.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470DB1C61655100EDCD69 /* Response.swift */; };
 		D9C470E01C61773D00EDCD69 /* AnnotationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */; };
 		D9C470E21C617A0400EDCD69 /* AnnotationStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */; };
+		D9E25A601D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9E25A5F1D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -140,6 +141,7 @@
 		D9C470DB1C61655100EDCD69 /* Response.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Response.swift; sourceTree = "<group>"; };
 		D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStore.swift; sourceTree = "<group>"; };
 		D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStatus.swift; sourceTree = "<group>"; };
+		D9E25A5F1D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStoreNotificationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
+				D9E25A5F1D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift */,
 				D90A3CE71C95C7280060094B /* AuthenticationTests.swift */,
 				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
 				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
@@ -517,6 +520,7 @@
 				D95392D01D02611200CB4921 /* LinkTests.swift in Sources */,
 				D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */,
 				D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */,
+				D9E25A601D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift in Sources */,
 				D95F19B31CD664B2008618AA /* BookmarkTests.swift in Sources */,
 				D95392CE1D025FA100CB4921 /* XCTAsserts.swift in Sources */,
 				D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */,

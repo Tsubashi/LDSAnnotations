@@ -26,37 +26,7 @@ import XCTest
 // swiftlint:disable force_unwrapping
 
 class AnnotationStoreTests: XCTestCase {
-
     private let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-    
-    func testAddAndUpdateNotebook() {
-        let annotationStore = AnnotationStore()!
-        
-        let addExpectation = expectationWithDescription("Notebook added")
-        let addObserver = annotationStore.notebookObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
-                addExpectation.fulfill()
-            } else {
-                XCTFail()
-            }
-        }
-        var notebook = try! annotationStore.addNotebook(name: "Test Notebook")
-        annotationStore.notebookObservers.remove(addObserver)
-        
-        let updateExpectation = expectationWithDescription("Notebook updated")
-        let updateObserver = annotationStore.notebookObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
-                updateExpectation.fulfill()
-            } else {
-                XCTFail()
-            }
-        }
-        notebook.name = "Renamed Notebook"
-        try! annotationStore.updateNotebook(notebook)
-        annotationStore.notebookObservers.remove(updateObserver)
-        
-        waitForExpectationsWithTimeout(2, handler: nil)
-    }
     
     func testAddNote() {
         let annotationStore = AnnotationStore()!

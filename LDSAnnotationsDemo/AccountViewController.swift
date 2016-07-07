@@ -25,7 +25,6 @@ import Swiftification
 import LDSAnnotations
 
 class AccountViewController: UIViewController {
-    
     let session: Session
     let annotationStore: AnnotationStore
     
@@ -55,11 +54,11 @@ class AccountViewController: UIViewController {
         (title: "Active", rows: [
             .Notebooks,
             .Annotations
-            ]),
+        ]),
         (title: "Trashed", rows: [
             .TrashedNotebooks,
             .TrashedAnnotations
-            ]),
+        ]),
     ]
     
     lazy var tableView: UITableView = {
@@ -92,8 +91,9 @@ class AccountViewController: UIViewController {
         reloadData()
         
         annotationStore.notebookObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.notebooksDidChange)
+        annotationStore.annotationObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.annotationsDidChange)
         
-        syncFolders()
+        performSync()
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -127,11 +127,20 @@ class AccountViewController: UIViewController {
         tableView.reloadData()
         
         if source != .Sync {
-            syncFolders()
+            performSync()
         }
     }
     
-    func syncFolders() {
+    func annotationsDidChange(source: NotificationSource, annotations: [Annotation]) {
+        reloadData()
+        tableView.reloadData()
+        
+        if source != .Sync {
+            performSync()
+        }
+    }
+    
+    func performSync() {
         let token = AccountController.sharedController.syncTokenForUsername(session.username)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             dispatch_sync(dispatch_get_main_queue()) {
@@ -165,13 +174,10 @@ class AccountViewController: UIViewController {
             }
         }
     }
-    
 }
 
 // MARK: - UITableViewDataSource
-
 extension AccountViewController: UITableViewDataSource {
-    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return sections.count
     }
@@ -208,13 +214,10 @@ extension AccountViewController: UITableViewDataSource {
         
         return cell
     }
-    
 }
 
 // MARK: - UITableViewDelegate
-
 extension AccountViewController: UITableViewDelegate {
-    
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         switch sections[indexPath.section].rows[indexPath.row] {
         case .Notebooks:
