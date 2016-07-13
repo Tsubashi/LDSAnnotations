@@ -62,5 +62,5 @@ class BookmarkTests: XCTestCase {
         let output = actual.jsonObject() as! [String: NSObject]
         XCTAssertEqual(output, input)
     }
-    
+
 }

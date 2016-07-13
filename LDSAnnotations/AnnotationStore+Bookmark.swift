@@ -97,12 +97,16 @@ extension AnnotationStore {
         }
     }
     
-    public func bookmarks(docID docID: String? = nil) -> [Bookmark] {
+    public func bookmarks(docID docID: String? = nil, paragraphAID: String? = nil) -> [Bookmark] {
         do {
             var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active)
             
             if let docID = docID {
                 query = query.filter(AnnotationTable.docID == docID)
+            }
+            
+            if let paragraphAID = paragraphAID {
+                query = query.filter(BookmarkTable.paragraphAID == paragraphAID)
             }
             
             return try db.prepare(query).map { BookmarkTable.fromRow($0) }
