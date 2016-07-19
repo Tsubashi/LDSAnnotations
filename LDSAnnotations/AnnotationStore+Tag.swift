@@ -50,15 +50,20 @@ extension AnnotationStore {
     }
     
     /// Adds a new tag with `name`.
-    public func addTag(name name: String) throws -> Tag {
-        let tag = try Tag(name: name)
-        return try addOrUpdateTag(tag)
+    public func addTag(name name: String, annotationID: Int64? = nil) throws -> Tag {
+        let tag = try addOrUpdateTag(Tag(name: name))
+        
+        if let annotationID = annotationID, tagID = tag.id {
+            try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID)
+        }
+        
+        return tag
     }
     
     /// Adds or updates tag
     public func addOrUpdateTag(tag: Tag) throws -> Tag {
         guard !tag.name.isEmpty else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a tag without a name.")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
         }
         
         if let id = tag.id {
@@ -113,7 +118,7 @@ extension AnnotationStore {
     /// Selects tag with annotation ID
     public func tagsWithAnnotationID(annotationID: Int64) -> [Tag] {
         do {
-            return try db.prepare(TagTable.table.join(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID), on: TagTable.id == AnnotationTagTable.tagID)).map { TagTable.fromRow($0) }
+            return try db.prepare(TagTable.table.join(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID), on: TagTable.id == AnnotationTagTable.tagID).order(TagTable.name.lowercaseString)).map { TagTable.fromRow($0) }
         } catch {
             return []
         }
@@ -152,8 +157,13 @@ extension AnnotationStore {
     
     /// Deletes tag and annotation tags with ID
     public func deleteTagWithID(id: Int64) throws {
+        let annotationIDs = try db.prepare(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id)).map { $0[AnnotationTagTable.annotationID] }
+        
         try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id).delete())
         try db.run(TagTable.table.filter(TagTable.id == id).delete())
+        
+        // Mark any annotations that were associated with this tag as changed
+        try annotationIDs.forEach { try updateLastModifiedDate(annotationID: $0) }
     }
     
 }

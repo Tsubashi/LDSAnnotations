@@ -62,10 +62,26 @@ extension AnnotationStore {
         })
     }
     
+    /// Creates a link and adds it to annotation with ID
+    public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], annotationID: Int64) throws -> Link {
+        return try addOrUpdateLink(Link(id: nil, name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID))
+    }
     
+    /// Creates a link and adds related annotation and highlights
+    public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source:
+        String, device: String) throws -> Link {
+        // Create annotation and highlights for this link
+        let highlights = try addHighlights(docID: fromDocID, docVersion: fromDocVersion, paragraphRanges: fromParagraphRanges, colorName: colorName, style: style, iso639_3Code: iso639_3Code, source: source, device: device)
+        
+        guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
+        
+        return try addOrUpdateLink(Link(id: nil, name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID))
+    }
+    
+    /// Adds or updates link
     public func addOrUpdateLink(link: Link) throws -> Link {
         guard !link.name.isEmpty && !link.docID.isEmpty && link.docVersion > 0 && !link.paragraphAIDs.isEmpty && link.annotationID != 0 else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
         if let id = link.id {
@@ -94,6 +110,7 @@ extension AnnotationStore {
         }
     }
     
+    /// Returns list of links with annotation ID
     public func linksWithAnnotationID(annotationID: Int64) -> [Link] {
         do {
             return try db.prepare(LinkTable.table.filter(LinkTable.annotationID == annotationID)).map { LinkTable.fromRow($0) }
@@ -106,6 +123,7 @@ extension AnnotationStore {
         return db.pluck(LinkTable.table.filter(LinkTable.id == id)).map { LinkTable.fromRow($0) }
     }
     
+    /// Reash link with ID, then marks annotation as trashed if is has no other related annotation objects
     public func trashLinkWithID(id: Int64) throws {
         guard let annotationID = db.pluck(LinkTable.table.select(LinkTable.id, LinkTable.annotationID).filter(LinkTable.id == id)).map({ $0[LinkTable.annotationID] }) else { return }
         
@@ -116,6 +134,10 @@ extension AnnotationStore {
     
     func deleteLinkWithID(id: Int64) throws {
         try db.run(LinkTable.table.filter(LinkTable.id == id).delete())
+    }
+    
+    func deleteLinksWithAnnotationID(annotationID: Int64) throws {
+        try db.run(LinkTable.table.filter(LinkTable.annotationID == annotationID).delete())
     }
     
 }

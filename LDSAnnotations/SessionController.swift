@@ -31,6 +31,10 @@ public class SessionController {
     public func addSession(session: Session, withUsername username: String) {
         sessionByUsername[username] = session
     }
+
+    public func removeSessionForUsername(username: String) {
+        sessionByUsername.removeValueForKey(username)
+    }
     
     public func sessionForUsername(username: String) -> Session? {
         return sessionByUsername[username]

@@ -22,15 +22,12 @@
 
 import Foundation
 
-public enum OrderBy: Int {
-    
-    /// Order alphabetically by name
-    case Name = 0
-    
-    /// Order by most recent, descending
-    case MostRecent = 1
-    
-    // Order by number of annotations, descending
-    case NumberOfAnnotations = 2
-    
+public protocol CaseCountable: RawRepresentable {}
+
+public extension CaseCountable where RawValue: IntegerType {
+    static var count: Int {
+        var i: RawValue = 0
+        while let _ = Self(rawValue: i) { i = i.successor() }
+        return Int(i.toIntMax())
+    }
 }

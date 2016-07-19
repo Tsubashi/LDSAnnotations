@@ -48,7 +48,7 @@ class HighlightTests: XCTestCase {
             "@pid": "20527924",
             "@color": "yellow",
         ]
-        let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: 2, offsetEnd: 6, colorName: "yellow", style: .Highlight, annotationID: 1)
+        let expected = Highlight(id: nil, paragraphRange: ParagraphRange(paragraphAID: "20527924", startWordOffset: 2, endWordOffset: 6), colorName: "yellow", style: .Highlight, annotationID: 1)
         let actual = try! Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual.jsonObject() as! [String: NSObject]
@@ -62,7 +62,7 @@ class HighlightTests: XCTestCase {
             "@pid": "20527924",
             "@color": "yellow",
         ]
-        let expected = Highlight(id: nil, paragraphAID: "20527924", offsetStart: Highlight.OffsetStart, offsetEnd: nil, colorName: "yellow", style: .Highlight, annotationID: 1)
+        let expected = Highlight(id: nil, paragraphRange: ParagraphRange(paragraphAID: "20527924"), colorName: "yellow", style: .Highlight, annotationID: 1)
         let actual = try! Highlight(jsonObject: input, annotationID: 1)
         XCTAssertEqual(actual, expected)
         let output = actual.jsonObject() as! [String: NSObject]

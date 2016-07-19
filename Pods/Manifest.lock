@@ -1,8 +1,16 @@
 PODS:
   - Locksmith (2.0.8)
-  - PSOperations (2.2.0)
+  - PSOperations (2.3.0):
+    - PSOperations/Core (= 2.3.0)
+    - PSOperations/Health (= 2.3.0)
+    - PSOperations/Passbook (= 2.3.0)
+  - PSOperations/Core (2.3.0)
+  - PSOperations/Health (2.3.0):
+    - PSOperations/Core
+  - PSOperations/Passbook (2.3.0):
+    - PSOperations/Core
   - SQLite.swift (0.10.1)
-  - Swiftification (5.8.0)
+  - Swiftification (5.9.0)
 
 DEPENDENCIES:
   - Locksmith
@@ -12,10 +20,10 @@ DEPENDENCIES:
 
 SPEC CHECKSUMS:
   Locksmith: a8ed41ac4c06506ea8cb199d8ec8a8d3d108eb2a
-  PSOperations: 9abf8b5f513ca2934d0a20634d3e7a77b0449dfe
+  PSOperations: 81a4d50a4efe96f6d090dc0e7eb45d9fef79ff45
   SQLite.swift: 6a6e4b034efc317ce4e203b6af2d3024fee2b570
-  Swiftification: 740dc7131f4db6846019f8c17a055bbae43551e8
+  Swiftification: 3a4ccfca418db7ce71861b7f0731fcc402952c30
 
-PODFILE CHECKSUM: 39530ab2443e3d6f776fb7cffa208c8dda511e66
+PODFILE CHECKSUM: 89fc9c76ecbb54e8a4c42ef0182163cf3450f3df
 
 COCOAPODS: 1.0.1

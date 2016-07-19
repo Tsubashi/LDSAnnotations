@@ -16,6 +16,20 @@ import Foundation
 */
 public class Operation: NSOperation {
     
+    /* The completionBlock property has unexpected behaviors such as executing twice and executing on unexpected threads. BlockObserver
+     * executes in an expected manner.
+     */
+    @available(*, deprecated, message="use BlockObserver completions instead")
+    override public var completionBlock: (() -> Void)? {
+        set {
+            fatalError("The completionBlock property on NSOperation has unexpected behavior and is not supported in PSOperations.Operation 😈")
+        }
+        get {
+            return nil
+        }
+    }
+    
+    
     // use the KVO mechanism to indicate that changes to "state" affect other properties as well
     class func keyPathsForValuesAffectingIsReady() -> Set<NSObject> {
         return ["state", "cancelledState"]
@@ -159,10 +173,8 @@ public class Operation: NSOperation {
                 // If super isReady, conditions can be evaluated
                 if super.ready {
                     evaluateConditions()
+                    _ready = state == .Ready
                 }
-                
-                // Until conditions have been evaluated, "isReady" returns false
-                _ready = false
                 
             case .Ready:
                 _ready = super.ready || cancelled
@@ -308,6 +320,12 @@ public class Operation: NSOperation {
     }
     
     private var _internalErrors = [NSError]()
+  
+  
+    public var errors : [NSError] {
+        return _internalErrors
+    }
+  
     override public func cancel() {
         if finished {
             return
@@ -364,11 +382,12 @@ public class Operation: NSOperation {
             hasFinishedAlready = true
             state = .Finishing
             
-            let combinedErrors = _internalErrors + errors
-            finished(combinedErrors)
+            _internalErrors += errors
+          
+            finished(_internalErrors)
             
             for observer in observers {
-                observer.operationDidFinish(self, errors: combinedErrors)
+                observer.operationDidFinish(self, errors: _internalErrors)
             }
             
             state = .Finished

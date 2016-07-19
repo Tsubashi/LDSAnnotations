@@ -53,14 +53,37 @@ extension AnnotationStore {
         })
     }
     
-    public func addNote(title: String?, content: String, annotationID: Int64) throws -> Note {
+    /// Adds note and links it to annotation
+    public func addNote(title title: String?, content: String, annotationID: Int64) throws -> Note {
+        return try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
+    }
+    
+    /// Adds note and related annotation, and associates it to notebook
+    public func addNote(title title: String?, content: String, source: String, device: String, notebook: Notebook) throws -> Note {
+        guard let notebookID = notebook.id, annotationID = try addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Journal, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+        
+        let note = try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
+        
+        let displayOrder = numberOfAnnotations(notebookID: notebookID)
+        try addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
+        
+        return note
+    }
+    
+    /// Adds note, related annotation & highlights
+    public func addNote(title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source:
+        String, device: String) throws -> Note {
+        let highlights = try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, iso639_3Code: iso639_3Code, source: source, device: device)
+        
+        guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
+        
         return try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
     }
     
     /// Adds a new note with `content`.
     public func addOrUpdateNote(note: Note) throws -> Note {
-        guard note.annotationID != 0 else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a note without content and an annotation ID.")
+        guard note.annotationID != 0 || ((note.title == nil || note.title?.isEmpty == true) && note.content.isEmpty) else {
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a note without content and an annotation ID.")
         }
         
         if let id = note.id {
@@ -85,15 +108,18 @@ extension AnnotationStore {
         }
     }
     
+    /// Returns note with ID
     public func noteWithID(id: Int64) -> Note? {
         return db.pluck(NoteTable.table.filter(NoteTable.id == id)).map { NoteTable.fromRow($0) }
     }
-    
+
+    /// Returns note with annotationID
     public func noteWithAnnotationID(annotationID: Int64) -> Note? {
         return db.pluck(NoteTable.table.filter(NoteTable.annotationID == annotationID)).map { NoteTable.fromRow($0) }
     }
     
-    func trashNoteWithID(id: Int64) throws {
+    /// Deletes note with id, and then trashes associated annotation if it has no other related annotation objects
+    public func trashNoteWithID(id: Int64) throws {
         guard let annotationID = db.pluck(NoteTable.table.select(NoteTable.id, NoteTable.annotationID).filter(NoteTable.id == id)).map({ $0[NoteTable.annotationID] }) else { return }
 
         try deleteNoteWithID(id)
@@ -103,6 +129,10 @@ extension AnnotationStore {
     
     func deleteNoteWithID(id: Int64) throws {
         try db.run(NoteTable.table.filter(NoteTable.id == id).delete())
+    }
+    
+    func deleteNotesWithAnnotationID(annotationID: Int64) throws {
+        try db.run(NoteTable.table.filter(NoteTable.annotationID == annotationID).delete())
     }
     
 }

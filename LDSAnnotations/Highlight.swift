@@ -25,21 +25,11 @@ import Foundation
 /// A highlight.
 public struct Highlight: Equatable {
     
-    public static let OffsetStart = -1
-    
-    public static let OffsetEnd = -1
-    
     /// Local ID.
     public internal(set) var id: Int64?
-    
-    /// Paragraph Annotation ID.
-    public let paragraphAID: String
-    
-    /// The word offset of the start of this highlight range.
-    public var offsetStart: Int
-    
-    /// The word offset of the end of this highlight range, or `nil` for the end of the paragraph.
-    public var offsetEnd: Int?
+
+    /// Paragraph Range (AID, start & end word offsets)
+    public let paragraphRange: ParagraphRange
     
     /// Color of the highlight.
     public var colorName: String
@@ -50,11 +40,9 @@ public struct Highlight: Equatable {
     /// ID of annotation.
     public var annotationID: Int64
     
-    public init(id: Int64?, paragraphAID: String, offsetStart: Int, offsetEnd: Int?, colorName: String, style: HighlightStyle?, annotationID: Int64) {
+    public init(id: Int64?, paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle?, annotationID: Int64) {
         self.id = id
-        self.paragraphAID = paragraphAID
-        self.offsetStart = offsetStart
-        self.offsetEnd = offsetEnd
+        self.paragraphRange = paragraphRange
         self.colorName = colorName
         self.style = style ?? .Highlight
         self.annotationID = annotationID
@@ -70,9 +58,7 @@ public struct Highlight: Equatable {
         }
         
         self.id = nil
-        self.paragraphAID = paragraphAID
-        self.offsetStart = offsetStart > 1 ? offsetStart : Highlight.OffsetStart
-        self.offsetEnd = offsetEnd != Highlight.OffsetEnd ? offsetEnd : nil
+        self.paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
         self.colorName = colorName
         self.annotationID = annotationID
         self.style = (jsonObject["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
@@ -81,11 +67,11 @@ public struct Highlight: Equatable {
     func jsonObject() -> [String: AnyObject] {
         var result: [String: AnyObject] = [
             "@color": colorName,
-            "@pid": paragraphAID,
+            "@pid": paragraphRange.paragraphAID,
         ]
         
-        result["@offset-start"] = offsetStart > 1 ? offsetStart : Highlight.OffsetStart
-        result["@offset-end"] = offsetEnd ?? Highlight.OffsetEnd
+        result["@offset-start"] = paragraphRange.startWordOffset
+        result["@offset-end"] = paragraphRange.endWordOffset ?? -1
         
         if style == .Underline || style == .Clear {
             result["@style"] = style.rawValue
@@ -96,11 +82,21 @@ public struct Highlight: Equatable {
     
 }
 
+extension Highlight: Hashable {
+    
+    public var hashValue: Int {
+        return (id ?? 0).hashValue
+            ^ paragraphRange.hashValue
+            ^ colorName.hashValue
+            ^ style.rawValue.hashValue
+            ^ annotationID.hashValue
+    }
+    
+}
+
 public func == (lhs: Highlight, rhs: Highlight) -> Bool {
     return lhs.id == rhs.id
-        && lhs.paragraphAID == rhs.paragraphAID
-        && lhs.offsetStart == rhs.offsetStart
-        && lhs.offsetEnd == rhs.offsetEnd
+        && lhs.paragraphRange == rhs.paragraphRange
         && lhs.colorName == rhs.colorName
         && lhs.style == rhs.style
         && lhs.annotationID == rhs.annotationID

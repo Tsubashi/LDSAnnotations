@@ -23,7 +23,7 @@
 import Foundation
 
 /// An annotation.
-public struct Annotation {
+public struct Annotation: Equatable {
     
     /// Local ID.
     public internal(set) var id: Int64?
@@ -150,4 +150,26 @@ public struct Annotation {
         
         return result
     }
+}
+
+extension Annotation: Hashable {
+    
+    public var hashValue: Int {
+        return id?.hashValue ?? 0 ^ uniqueID.hashValue ^ iso639_3Code.hashValue ^ docID.hashValue ^ docVersion.hashValue ^ type.hashValue ^ status.hashValue ^ lastModified.hashValue
+    }
+    
+}
+
+public func == (lhs: Annotation, rhs: Annotation) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.uniqueID == rhs.uniqueID
+        && lhs.iso639_3Code == rhs.iso639_3Code
+        && lhs.docID == rhs.docID
+        && lhs.docVersion == rhs.docVersion
+        && lhs.type == rhs.type
+        && lhs.status == rhs.status
+        && lhs.created == rhs.created
+        && lhs.lastModified == rhs.lastModified
+        && lhs.source == rhs.source
+        && lhs.device == rhs.device
 }

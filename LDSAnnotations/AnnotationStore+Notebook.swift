@@ -65,7 +65,7 @@ extension AnnotationStore {
     /// Adds a new notebook with `name`.
     public func addNotebook(name name: String) throws -> Notebook {
         guard name.length > 0 else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot add a notebook without a name.")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a notebook without a name.")
         }
         
         let notebook = Notebook(id: nil, uniqueID: NSUUID().UUIDString, name: name, description: nil, status: .Active, lastModified: NSDate())
@@ -88,14 +88,14 @@ extension AnnotationStore {
     /// Saves any changes to `notebook` and updates the `lastModified`.
     public func updateNotebook(notebook: Notebook) throws -> Notebook {
         guard notebook.name.length > 0 else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot update a notebook without a name.")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot update a notebook without a name.")
         }
         
         var modifiedNotebook = notebook
         modifiedNotebook.lastModified = NSDate()
         
         guard let id = notebook.id else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot update a notebook without an ID.")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot update a notebook without an ID.")
         }
         
         try db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
@@ -142,7 +142,7 @@ extension AnnotationStore {
                     try self.db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
                         NotebookTable.status <- .Trashed,
                         NotebookTable.lastModified <- lastModified
-                        ))
+                    ))
                     
                     ids.append(id)
                 }
@@ -227,6 +227,10 @@ extension AnnotationStore {
         }
     }
     
+    public func numberOfNotebooks() -> Int {
+        return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).count)
+    }
+    
     /// Returns a list of active notebooks order by number of annotations in notebook descending.
     private func notebooksOrderedByCount(ids ids: [Int64]? = nil) -> [Notebook] {
         let inClause: String = {
@@ -279,6 +283,7 @@ extension AnnotationStore {
         return db.pluck(NotebookTable.table.filter(NotebookTable.uniqueID == uniqueID)).map { NotebookTable.fromRow($0) }
     }
     
+    /// Add or update notebook
     func addOrUpdateNotebook(notebook: Notebook) -> Notebook? {
         do {
             if let id = notebook.id {
@@ -311,13 +316,38 @@ extension AnnotationStore {
         }
     }
     
+    func updateLastModifiedDate(notebookID id: Int64, status: AnnotationStatus? = nil) throws {
+        if let status = status {
+            try db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
+                NotebookTable.lastModified <- NSDate(),
+                NotebookTable.status <- status
+            ))
+        } else {
+            try db.run(NotebookTable.table.filter(NotebookTable.id == id).update(
+                NotebookTable.lastModified <- NSDate()
+            ))
+        }
+    }
+    
+    public func trashNotebookWithID(id: Int64) throws {
+        let annotationIDs = try db.prepare(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id)).map { $0[AnnotationNotebookTable.annotationID] }
+        
+        // Delete link between annotations and notebook
+        try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id).delete())
+
+        // Update lastmodified date and mark as trashed
+        try updateLastModifiedDate(notebookID: id, status: .Trashed)
+        
+        // Mark any annotations associated with this notebook as changed (for sync)
+        try annotationIDs.forEach { try updateLastModifiedDate(annotationID: $0) }
+
+        notifySyncModifiedNotebooksWithIDs([id])
+    }
+    
     /// Deletes notebook with ID
-    public func deleteNotebookWithID(id: Int64) {
-        do {
-            try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id).delete())
-            try db.run(NotebookTable.table.filter(NotebookTable.id == id).delete())
-            notifySyncModifiedNotebooksWithIDs([id])
-        } catch {}
+    func deleteNotebookWithID(id: Int64) throws {
+        try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id).delete())
+        try db.run(NotebookTable.table.filter(NotebookTable.id == id).delete())
     }
     
     public func notebooksWithAnnotationID(annotationID: Int64) -> [Notebook] {

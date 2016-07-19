@@ -23,7 +23,7 @@
 import Foundation
 
 /// A Tag.
-public struct Tag {
+public struct Tag: Equatable {
     
     /// Local ID.
     public internal(set) var id: Int64?
@@ -49,4 +49,9 @@ public struct Tag {
         return name
     }
 
+}
+
+public func == (lhs: Tag, rhs: Tag) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.name == rhs.name
 }

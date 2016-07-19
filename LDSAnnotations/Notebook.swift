@@ -23,7 +23,7 @@
 import Foundation
 
 /// A notebook.
-public struct Notebook {
+public struct Notebook: Equatable {
 
     /// Local ID.
     public internal(set) var id: Int64?
@@ -93,4 +93,13 @@ public struct Notebook {
         return ["@uri": String(format: "/study-tools/folders/x/%@", uniqueID)]
     }
 
+}
+
+public func == (lhs: Notebook, rhs: Notebook) -> Bool {
+    return lhs.id == rhs.id
+        && lhs.uniqueID == rhs.uniqueID
+        && lhs.name == rhs.name
+        && lhs.description == rhs.description
+        && lhs.status == rhs.status
+        && lhs.lastModified == rhs.lastModified
 }

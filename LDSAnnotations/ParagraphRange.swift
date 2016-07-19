@@ -22,15 +22,31 @@
 
 import Foundation
 
-public enum OrderBy: Int {
+public struct ParagraphRange: Equatable {
+
+    public static let FirstWordOffset = -1
     
-    /// Order alphabetically by name
-    case Name = 0
+    public let paragraphAID: String
+    public let startWordOffset: Int
+    public let endWordOffset: Int?
     
-    /// Order by most recent, descending
-    case MostRecent = 1
-    
-    // Order by number of annotations, descending
-    case NumberOfAnnotations = 2
+    public init(paragraphAID: String, startWordOffset: Int = ParagraphRange.FirstWordOffset, endWordOffset: Int? = nil) {
+        self.paragraphAID = paragraphAID
+        self.startWordOffset = startWordOffset <= 1 ? ParagraphRange.FirstWordOffset : startWordOffset
+        self.endWordOffset = endWordOffset != -1 ? endWordOffset : nil
+    }
     
 }
+
+extension ParagraphRange: Hashable {
+    
+    public var hashValue: Int {
+        return paragraphAID.hashValue ^ startWordOffset.hashValue ^ (endWordOffset ?? -1).hashValue
+    }
+
+}
+
+public func == (lhs: ParagraphRange, rhs: ParagraphRange) -> Bool {
+    return lhs.paragraphAID == rhs.paragraphAID && lhs.startWordOffset == rhs.startWordOffset && lhs.endWordOffset == rhs.endWordOffset
+}
+

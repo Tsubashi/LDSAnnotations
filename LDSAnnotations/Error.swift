@@ -37,6 +37,9 @@ public struct Error {
         case InvalidBookmark = -2003
         case InvalidNote = -2004
         case InvalidTag = -2005
+        case SaveAnnotationFailed = -3000
+        case SaveHighlightFailed = -3001
+        case RequiredFieldMissing = -3008
     }
     
     static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {

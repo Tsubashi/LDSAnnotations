@@ -25,6 +25,8 @@ import Foundation
 /// A note.
 public struct Note: Equatable {
     
+    public static let MaxLength = 20000
+    
     /// Local ID.
     public internal(set) var id: Int64?
     
@@ -45,23 +47,17 @@ public struct Note: Equatable {
     }
     
     init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
-        guard let content = jsonObject["content"] as? String else {
-            throw Error.errorWithCode(.InvalidNote, failureReason: "Failed to deserialize note: \(jsonObject)")
-        }
-        
         self.id = nil
-        self.content = content
-        self.annotationID = annotationID
         self.title = jsonObject["title"] as? String
+        self.content = jsonObject["content"] as? String ?? ""
+        self.annotationID = annotationID
     }
     
     func jsonObject() -> [String: AnyObject] {
         var result = ["content": content]
-        
         if let title = title {
             result["title"] = title
         }
-        
         return result
     }
     

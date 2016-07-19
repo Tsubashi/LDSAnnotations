@@ -52,27 +52,27 @@ extension AnnotationStore {
     }
     
     /// Adds a new annotation tag with 'annotationID' and 'tagID'.
-    public func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64) throws -> AnnotationTag? {
+    public func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64) throws -> AnnotationTag {
         guard annotationID > 0 && tagID > 0 else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot add an annotationID or tagID that is == 0")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotationID or tagID that is == 0")
         }
         
-        do {
-            try db.run(AnnotationTagTable.table.insert(or: .Replace,
-                AnnotationTagTable.annotationID <- annotationID,
-                AnnotationTagTable.tagID <- tagID
-            ))
-            
-            return AnnotationTag(annotationID: annotationID, tagID: tagID)
-        } catch {
-            return nil
-        }
+        try db.run(AnnotationTagTable.table.insert(or: .Replace,
+            AnnotationTagTable.annotationID <- annotationID,
+            AnnotationTagTable.tagID <- tagID
+        ))
+        
+        return AnnotationTag(annotationID: annotationID, tagID: tagID)
     }
     
-    func deleteAnnotationTagWithID(annotationID: Int64, tagID: Int64) {
-        do {
-            try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
-        } catch {}
+    // Removes tag from annotation, then marks annotation as trashed if that was the only related annotation object
+    public func deleteTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
+        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
+        try trashAnnotationIfEmptyWithID(annotationID)
+    }
+    
+    func removeFromTagsAnnotationWithID(annotationID: Int64) throws {
+        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID).delete())
     }
     
 }

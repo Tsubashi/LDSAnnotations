@@ -53,28 +53,35 @@ extension AnnotationStore {
     }
     
     /// Adds a new annotation notebook with 'annotationID', 'notebookID' and 'displayOrder'
-    public func addOrUpdateAnnotationNotebook(annotationID annotationID: Int64, notebookID: Int64, displayOrder: Int) throws -> AnnotationNotebook? {
+    public func addOrUpdateAnnotationNotebook(annotationID annotationID: Int64, notebookID: Int64, displayOrder: Int) throws -> AnnotationNotebook {
         guard annotationID > 0 && notebookID > 0 else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Cannot add an annotationID or notebookID that is == 0")
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotationID or notebookID that is == 0")
         }
         
-        do {
-            try db.run(AnnotationNotebookTable.table.insert(or: .Replace,
-                AnnotationNotebookTable.annotationID <- annotationID,
-                AnnotationNotebookTable.notebookID <- notebookID,
-                AnnotationNotebookTable.displayOrder <- displayOrder
-            ))
-            
-            return AnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
-        } catch {
-            return nil
+        try db.run(AnnotationNotebookTable.table.insert(or: .Replace,
+            AnnotationNotebookTable.annotationID <- annotationID,
+            AnnotationNotebookTable.notebookID <- notebookID,
+            AnnotationNotebookTable.displayOrder <- displayOrder
+        ))
+        
+        return AnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
+    }
+    
+    /// Reorder annotations within a notebook
+    public func reorderAnnotationIDs(annotationIDs: [Int64], notebookID: Int64) throws {
+        for (displayOrder, annotationID) in annotationIDs.enumerate() {
+            try addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
         }
     }
     
-    func deleteAnnotationNotebook(annotationID: Int64, notebookID: Int64) {
-        do {
-            try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID && AnnotationNotebookTable.notebookID == notebookID).delete())
-        } catch {}
+    /// Remove annotation from notebook and mark as trashed if it has no other related annotation objects (note, tag, link, etc)
+    public func deleteAnnotation(annotationID annotationID: Int64, fromNotebook notebookID: Int64) throws {
+        try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID && AnnotationNotebookTable.notebookID == notebookID).delete())
+        try trashAnnotationIfEmptyWithID(annotationID)
+    }
+    
+    func removeFromNotebooksAnnotationWithID(annotationID: Int64) throws {
+        try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID).delete())
     }
     
 }

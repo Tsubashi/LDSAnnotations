@@ -163,7 +163,7 @@ class SyncNotebooksOperation: Operation {
                     }
                 case .Delete:
                     if let existingNotebook = annotationStore.notebookWithUniqueID(uniqueID), existingNotebookID = existingNotebook.id {
-                        annotationStore.deleteNotebookWithID(existingNotebookID)
+                        try annotationStore.deleteNotebookWithID(existingNotebookID)
                     } else {
                         // If the notebook doesn't exist there's no need to delete it
                     }

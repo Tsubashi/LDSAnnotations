@@ -28,6 +28,16 @@ import PSOperations
 /// Instances are lightweight; construct a new instance whenever the user's credentials change.
 public class Session: NSObject {
     
+    public enum Status {
+        case Unauthenticated
+        case AuthenticationInProgress
+        case AuthenticationSuccessful
+        case AuthenticationFailed
+        case SyncInProgress
+        case SyncSuccessful
+        case SyncFailed
+    }
+    
     /// The username used to authenticate this session.
     public let username: String
     
@@ -41,6 +51,7 @@ public class Session: NSObject {
     let authenticationURL: NSURL?
     let domain: String
     let trustPolicy: TrustPolicy
+    public private(set) var status: Status = .Unauthenticated
     
     /// Callback to get the local doc version of the given doc IDs.
     ///
@@ -79,8 +90,10 @@ public class Session: NSObject {
     
     /// Authenticates against the server.
     public func authenticate(completion: (NSError?) -> Void) {
+        status = .AuthenticationInProgress
         let operation = AuthenticateOperation(session: self)
         operation.addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
+            self.status = errors.isEmpty ? .AuthenticationSuccessful : .AuthenticationFailed
             completion(errors.first)
         }))
         operationQueue.addOperation(operation)
@@ -90,6 +103,8 @@ public class Session: NSObject {
     ///
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
     public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
+        status = .SyncInProgress
+        
         let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, localSyncNotebooksDate: token?.localSyncNotebooksDate, serverSyncNotebooksDate: token?.serverSyncNotebooksDate) { syncNotebooksResult in
             switch syncNotebooksResult {
             case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: syncNotebooksChanges):
@@ -112,13 +127,16 @@ public class Session: NSObject {
                             downloadHighlightCount: syncAnnotationsChanges.downloadHighlightCount,
                             downloadTagCount: syncAnnotationsChanges.downloadTagCount,
                             downloadLinkCount: syncAnnotationsChanges.downloadLinkCount)
+                        self.status = .SyncSuccessful
                         completion(SyncResult.Success(token: token, changes: changes))
                     case let .Error(errors: errors):
+                        self.status = .SyncFailed
                         completion(SyncResult.Error(errors: errors))
                     }
                 }
                 self.operationQueue.addOperation(syncAnnotationsOperation)
             case let .Error(errors: errors):
+                self.status = .SyncFailed
                 completion(SyncResult.Error(errors: errors))
             }
         }
