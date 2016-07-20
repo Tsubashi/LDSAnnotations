@@ -99,9 +99,9 @@ extension AnnotationStore {
         case .Name:
             statement = "SELECT tag.* FROM tag \(inClause?.insert("WHERE ", at: 0) ?? "") ORDER BY tag.name"
         case .MostRecent:
-            statement = "SELECT DISTINCT tag.* FROM tag JOIN annotation_tag ON annotation_tag.tag_id = tag._id JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '' \(inClause?.insert("AND ", at: 0) ?? "") ORDER BY annotation.last_modified DESC, tag.name ASC"
+            statement = "SELECT DISTINCT tag.* FROM tag LEFT JOIN (SELECT annotation_tag.*, annotation.last_modified from annotation_tag  JOIN annotation ON annotation._id = annotation_tag.annotation_id WHERE annotation.status = '') as filtered_annotation_tag ON filtered_annotation_tag.tag_id = tag._id \(inClause?.insert("WHERE ", at: 0) ?? "") ORDER BY filtered_annotation_tag.last_modified DESC, tag.name ASC"
         case .NumberOfAnnotations:
-            statement = "SELECT DISTINCT tag.* FROM tag JOIN (SELECT annotation_tag.tag_id, COUNT(annotation_id) AS annotation_count FROM annotation_tag JOIN annotation ON annotation_tag.annotation_id = annotation._id WHERE annotation.status = '' GROUP BY tag_id) AS counts ON tag._id = counts.tag_id \(inClause?.insert("WHERE ", at: 0) ?? "") ORDER BY counts.annotation_count DESC, tag.name ASC"
+            statement = "SELECT DISTINCT tag.* FROM tag LEFT JOIN (SELECT annotation_tag.tag_id, COUNT(annotation_id) AS annotation_count FROM annotation_tag JOIN annotation ON annotation_tag.annotation_id = annotation._id WHERE annotation.status = '' GROUP BY tag_id) AS counts ON tag._id = counts.tag_id \(inClause?.insert("WHERE ", at: 0) ?? "") ORDER BY counts.annotation_count DESC, tag.name ASC"
         }
         
         do {

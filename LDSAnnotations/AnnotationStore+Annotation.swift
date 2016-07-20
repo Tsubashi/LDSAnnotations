@@ -384,7 +384,7 @@ extension AnnotationStore {
     public func numberOfAnnotations(notebookID notebookID: Int64? = nil) -> Int {
         var query = AnnotationTable.table.filter(AnnotationTable.status == .Active)
         if let notebookID = notebookID {
-            query = query.join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID && AnnotationTable.status == .Active), on: AnnotationTable.id == AnnotationNotebookTable.annotationID)
+            query = query.join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID)
         }
         return db.scalar(query.count)
     }
@@ -453,6 +453,37 @@ extension AnnotationStore {
             
             notifySyncModifiedAnnotationsWithIDs([id])
         } catch {}
+    }
+    
+    /// Creates a duplicate annotation, and duplicates all related annotation objects except for notebooks 
+    public func duplicateAnnotation(annotation: Annotation, source: String, device: String) throws -> Annotation {
+        guard let annotationID = annotation.id else { throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Annotation to duplicate is missing id") }
+        
+        let duplicateAnnotation = try addAnnotation(iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, type: annotation.type, source: source, device: device)
+        
+        guard let duplicateAnnotationID = duplicateAnnotation.id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Unable to duplicate annotation") }
+        
+        for highlight in highlightsWithAnnotationID(annotationID) {
+            try addOrUpdateHighlight(Highlight(id: nil, paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotationID))
+        }
+        
+        for link in linksWithAnnotationID(annotationID) {
+            try addOrUpdateLink(Link(id: nil, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: duplicateAnnotationID))
+        }
+        
+        if let note = noteWithAnnotationID(annotationID) {
+            try addOrUpdateNote(Note(id: nil, title: note.title, content: note.content, annotationID: duplicateAnnotationID))
+        }
+        
+        if let bookmark = bookmarkWithAnnotationID(annotationID) {
+            try addOrUpdateBookmark(Bookmark(id: nil, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotationID))
+        }
+        
+        for tagID in tagsWithAnnotationID(annotationID).flatMap({ $0.id }) {
+            try addOrUpdateAnnotationTag(annotationID: duplicateAnnotationID, tagID: tagID)
+        }
+        
+        return duplicateAnnotation
     }
     
 }

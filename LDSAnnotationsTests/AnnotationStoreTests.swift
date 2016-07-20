@@ -671,6 +671,54 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertNil(annotationStore.bookmarkWithID(bookmark.id!))
     }
     
+    func testDuplicateAnnotation() {
+        let annotationStore = AnnotationStore()!
+        
+        let paragraphRanges = [
+            ParagraphRange(paragraphAID: "1"),
+            ParagraphRange(paragraphAID: "2"),
+            ParagraphRange(paragraphAID: "3")
+        ]
+        
+        let highlights = try! annotationStore.addHighlights(docID: "1", docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .Highlight, iso639_3Code: "eng", source: "Test", device: "iphone")
+        let annotation = annotationStore.annotationWithID(highlights.first!.annotationID)!
+        let note = try! annotationStore.addNote(title: "TestTitle", content: "TestContent", annotationID: annotation.id!)
+        let link = try! annotationStore.addLink(name: "TestLink", toDocID: "2", toDocVersion: 1, toParagraphAIDs: ["4"], annotationID: annotation.id!)
+        let tag = try! annotationStore.addTag(name: "TestTag", annotationID: annotation.id!)
+
+        let duplicatedAnnotation = try! annotationStore.duplicateAnnotation(annotation, source: "Test", device: "iphone")
+        XCTAssertNotEqual(annotation.id!, duplicatedAnnotation.id!)
+        XCTAssertEqual(annotation.docID, duplicatedAnnotation.docID)
+        XCTAssertEqual(annotation.docVersion, duplicatedAnnotation.docVersion)
+        XCTAssertEqual(annotation.iso639_3Code, duplicatedAnnotation.iso639_3Code)
+        XCTAssertEqual(annotation.type, duplicatedAnnotation.type)
+
+        let duplicatedHighlights = annotationStore.highlightsWithAnnotationID(duplicatedAnnotation.id!)
+        XCTAssertTrue(duplicatedHighlights.count == highlights.count)
+        
+        for duplicatedHighlight in duplicatedHighlights {
+            let highlight = highlights.filter({ $0.paragraphRange == duplicatedHighlight.paragraphRange }).first!
+            XCTAssertNotEqual(highlight.id!, duplicatedHighlight.id!)
+            XCTAssertEqual(highlight.paragraphRange, duplicatedHighlight.paragraphRange)
+            XCTAssertEqual(highlight.colorName, duplicatedHighlight.colorName)
+            XCTAssertEqual(highlight.style, duplicatedHighlight.style)
+        }
+        
+        let duplicatedNote = annotationStore.noteWithAnnotationID(duplicatedAnnotation.id!)!
+        XCTAssertNotEqual(note.id!, duplicatedNote.id!)
+        XCTAssertEqual(note.title, duplicatedNote.title)
+        XCTAssertEqual(note.content, duplicatedNote.content)
+        
+        let duplicatedLink = annotationStore.linksWithAnnotationID(duplicatedAnnotation.id!).first!
+        XCTAssertNotEqual(link.id!, duplicatedLink.id!)
+        XCTAssertEqual(link.name, duplicatedLink.name)
+        XCTAssertEqual(link.docID, duplicatedLink.docID)
+        XCTAssertEqual(link.docVersion, duplicatedLink.docVersion)
+        XCTAssertEqual(link.paragraphAIDs, duplicatedLink.paragraphAIDs)
+        
+        XCTAssertEqual([tag], annotationStore.tagsWithAnnotationID(duplicatedAnnotation.id!))
+    }
+    
 }
 
 extension String {
