@@ -49,17 +49,17 @@ extension XCTestCase {
         return Session(username: username, password: useIncorrectPassword ? "wrong-\(password)" : password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
     }
     
-    func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, allowSyncFailure: Bool = false, completion: (uploadCount: Int, downloadCount: Int) -> Void) {
+    func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, allowSyncFailure: Bool = false, completion: ((uploadCount: Int, downloadCount: Int) -> Void)? = nil) {
         let expectation = expectationWithDescription(description)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             switch syncResult {
             case let .Success(token: newToken, changes: changes):
                 token = newToken
                 
-                completion(uploadCount: changes.uploadedNotebooks.count, downloadCount: changes.downloadedNotebooks.count)
+                completion?(uploadCount: changes.uploadedNotebooks.count + changes.uploadAnnotationCount, downloadCount: changes.downloadedNotebooks.count + changes.downloadAnnotationCount)
             case let .Error(errors: errors):
                 if allowSyncFailure {
-                    completion(uploadCount: 0, downloadCount: 0)
+                    completion?(uploadCount: 0, downloadCount: 0)
                 } else {
                     XCTFail("Failed with errors \(errors)")
                 }
@@ -67,6 +67,39 @@ extension XCTestCase {
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(300, handler: nil)
+    }
+    
+    func resetAnnotations(annotationStore annotationStore: AnnotationStore, session: Session, inout token: SyncToken?) {
+        sync(annotationStore, session: session, token: &token, description: "Initial sync") { uploadCount, downloadCount in
+            XCTAssertEqual(uploadCount, 0, "There were existing local annotations")
+            
+            let count = annotationStore.annotationCount() + annotationStore.trashedAnnotationCount() + annotationStore.notebookCount() + annotationStore.trashedNotebookCount()
+            XCTAssertEqual(downloadCount, count, "Not all downloaded annotations were saved locally")
+        }
+        
+        // Do we have any active annotations?
+        let deleteCount = annotationStore.annotationCount() + annotationStore.notebookCount()
+        if deleteCount > 0 {
+            for notebook in annotationStore.notebooks() {
+                guard let notebookID = notebook.id else { continue }
+                try! annotationStore.trashNotebookWithID(notebookID)
+            }
+            for annotation in annotationStore.annotations() {
+                guard let annotationID = annotation.id else { continue }
+                try! annotationStore.trashAnnotationWithID(annotationID)
+            }
+            
+            sync(annotationStore, session: session, token: &token, description: "Sync deleted annotations") { uploadCount, downloadCount in
+                XCTAssertEqual(uploadCount, deleteCount, "Not all local annotations were deleted")
+                XCTAssertEqual(downloadCount, 0)
+            }
+            
+            try! annotationStore.deleteNotebooks(annotationStore.trashedNotebooks())
+            try! annotationStore.deleteAnnotations(annotationStore.trashedAnnotations())
+            
+            let count = annotationStore.annotationCount() + annotationStore.notebookCount()
+            XCTAssertEqual(count, 0)
+        }
     }
     
 }

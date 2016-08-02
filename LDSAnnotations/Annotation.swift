@@ -32,17 +32,14 @@ public struct Annotation: Equatable {
     public let uniqueID: String
     
     /// Document ID.
-    public var docID: String
+    public var docID: String?
     
     /// Document version.
-    public var docVersion: Int
+    public var docVersion: Int?
 
     /// ISO639-3 Language Code.
     public var iso639_3Code: String
 
-    /// Annotation Type.
-    public var type: AnnotationType
-    
     /// Whether the annotation is active, trashed, or deleted.
     public internal(set) var status: AnnotationStatus
     
@@ -56,10 +53,9 @@ public struct Annotation: Equatable {
     
     public var device: String?
     
-    init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String, docVersion: Int, type: AnnotationType, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
+    init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
-        self.type = type
         self.iso639_3Code = iso639_3Code
         self.docID = docID
         self.docVersion = docVersion
@@ -71,26 +67,16 @@ public struct Annotation: Equatable {
     }
     
     init?(jsonObject: [String: AnyObject]) {
-        guard let uniqueID = jsonObject["@id"] as? String,
-            type = jsonObject["@type"] as? String,
-            annotationType = AnnotationType(rawValue: type),
-            rawLastModified = jsonObject["timestamp"] as? String,
-            lastModified = NSDate.parseFormattedISO8601(rawLastModified),
-            docID = jsonObject["@docId"] as? String where !docID.isEmpty || (docID.isEmpty && annotationType == .Journal),
-            let docVersionString = jsonObject["@contentVersion"] as? String,
-            docVersion = Int(docVersionString) else {
-                return nil
-        }
+        guard let uniqueID = jsonObject["@id"] as? String, rawLastModified = jsonObject["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else { return nil }
         
         self.id = nil
         self.uniqueID = uniqueID
-        self.type = annotationType
         self.lastModified = lastModified
-        self.docID = docID
-        self.docVersion = docVersion
         self.iso639_3Code = jsonObject["@locale"] as? String ?? "eng"
         self.source = jsonObject["source"] as? String
         self.device = jsonObject["device"] as? String
+        self.docID = jsonObject["@docId"] as? String
+        self.docVersion = (jsonObject["@contentVersion"] as? String).flatMap { Int($0) }
         self.created = (jsonObject["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
         self.status = (jsonObject["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
     }
@@ -99,17 +85,20 @@ public struct Annotation: Equatable {
         var result: [String: AnyObject] = [
             "@id": uniqueID,
             "@locale": iso639_3Code,
-            "@type": type.rawValue,
-            "timestamp": lastModified.formattedISO8601,
-            "@docId": docID,
-            "@contentVersion": docVersion
+            "timestamp": lastModified.formattedISO8601
         ]
         
-        if let created = created {
-            result["created"] = created.formattedISO8601
+        if let docID = docID {
+            result["@docId"] = docID
+        }
+        if let docVersion = docVersion {
+            result["@contentVersion"] = docVersion
         }
         if status != .Active {
             result["@status"] = status.rawValue
+        }
+        if let created = created {
+            result["created"] = created.formattedISO8601
         }
         if let source = source {
             result["source"] = source
@@ -122,7 +111,11 @@ public struct Annotation: Equatable {
             result["note"] = note.jsonObject()
         }
 
+        // Derive the annotation type
+        var type: AnnotationType?
+        
         if let id = id, bookmark = annotationStore.bookmarkWithAnnotationID(id) {
+            type = .Bookmark
             result["bookmark"] = bookmark.jsonObject()
         }
         
@@ -130,6 +123,7 @@ public struct Annotation: Equatable {
             let highlights = annotationStore.highlightsWithAnnotationID(id)
             if !highlights.isEmpty {
                 result["highlights"] = ["highlight": highlights.map({ $0.jsonObject() })]
+                type = .Highlight
             }
             
             let tags = annotationStore.tagsWithAnnotationID(id)
@@ -139,13 +133,19 @@ public struct Annotation: Equatable {
             
             let links = annotationStore.linksWithAnnotationID(id)
             if !links.isEmpty {
-                result["references"] = ["reference": links.map({ $0.jsonObject() })]
+                result["refs"] = ["ref": links.map({ $0.jsonObject() })]
+                type = .Link // If there are 1 or more links, it MUST be a .Link type
             }
             
             let notebooks = annotationStore.notebooksWithAnnotationID(id)
             if !notebooks.isEmpty {
                 result["folders"] = ["folder": notebooks.map({ $0.annotationNotebookJsonObject() })]
+                type = .Journal
             }
+        }
+        
+        if let type = type {
+            result["@type"] = type.rawValue
         }
         
         return result
@@ -155,7 +155,7 @@ public struct Annotation: Equatable {
 extension Annotation: Hashable {
     
     public var hashValue: Int {
-        return id?.hashValue ?? 0 ^ uniqueID.hashValue ^ iso639_3Code.hashValue ^ docID.hashValue ^ docVersion.hashValue ^ type.hashValue ^ status.hashValue ^ lastModified.hashValue
+        return id?.hashValue ?? 0 ^ uniqueID.hashValue ^ iso639_3Code.hashValue ^ (docID ?? "").hashValue ^ (docVersion ?? 0).hashValue ^ status.hashValue ^ lastModified.hashValue
     }
     
 }
@@ -166,10 +166,19 @@ public func == (lhs: Annotation, rhs: Annotation) -> Bool {
         && lhs.iso639_3Code == rhs.iso639_3Code
         && lhs.docID == rhs.docID
         && lhs.docVersion == rhs.docVersion
-        && lhs.type == rhs.type
         && lhs.status == rhs.status
         && lhs.created == rhs.created
         && lhs.lastModified == rhs.lastModified
         && lhs.source == rhs.source
         && lhs.device == rhs.device
 }
+
+private enum AnnotationType: String {
+
+    case Bookmark = "bookmark"
+    case Highlight = "highlight"
+    case Journal = "journal"
+    case Link = "reference"
+    
+}
+

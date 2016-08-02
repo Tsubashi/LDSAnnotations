@@ -67,7 +67,7 @@ class AnnotationStoreTests: XCTestCase {
                 let tag = try! annotationStore.addOrUpdateTag(Tag(id: nil, name: alphabet[i]))
                 tags.append(tag)
                 
-                let annotation = try! annotationStore.addOrUpdateAnnotation(Annotation(id: nil, uniqueID: "\(i)_\(j)", iso639_3Code: "eng", docID: alphabet[i], docVersion: 1, type: .Journal, status: .Active, created: nil, lastModified: date, source: nil, device: nil))
+                let annotation = try! annotationStore.addOrUpdateAnnotation(Annotation(id: nil, uniqueID: "\(i)_\(j)", iso639_3Code: "eng", docID: alphabet[i], docVersion: 1, status: .Active, created: nil, lastModified: date, source: nil, device: nil))
                 annotations.append(annotation)
                 
                 try! annotationStore.addOrUpdateAnnotationTag(annotationID: annotation.id!, tagID: tag.id!)
@@ -109,7 +109,7 @@ class AnnotationStoreTests: XCTestCase {
         var annotations = [Annotation]()
         
         for i in 0..<alphabet.count {
-            let annotation = Annotation(id: nil, uniqueID: "\(i)", iso639_3Code: "eng", docID: alphabet[i], docVersion: 1, type: .Journal, status: .Active, created: nil, lastModified: NSDate(), source: nil, device: nil)
+            let annotation = Annotation(id: nil, uniqueID: "\(i)", iso639_3Code: "eng", docID: alphabet[i], docVersion: 1, status: .Active, created: nil, lastModified: NSDate(), source: nil, device: nil)
             annotations.append(try! annotationStore.addOrUpdateAnnotation(annotation))
         }
         
@@ -152,7 +152,7 @@ class AnnotationStoreTests: XCTestCase {
     func testAnnotationWithID() {
         let annotationStore = AnnotationStore()!
         
-        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
         
         XCTAssertEqual(annotation.uniqueID, annotationStore.annotationWithID(annotation.id!)!.uniqueID, "Annotations should be the same")
     }
@@ -160,7 +160,7 @@ class AnnotationStoreTests: XCTestCase {
     func testCreateAndTrashTags() {
         let annotationStore = AnnotationStore()!
 
-        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
         
         let tags = ["sally", "sells", "seashells", "by", "the", "seashore"].map { try! annotationStore.addTag(name: $0) }
         
@@ -191,7 +191,7 @@ class AnnotationStoreTests: XCTestCase {
     func testCreateAndTrashLinks() {
         let annotationStore = AnnotationStore()!
         
-        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
         
         let links = [
             try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link1", docID: "1", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id!)),
@@ -331,7 +331,7 @@ class AnnotationStoreTests: XCTestCase {
     func testAnnotationWithLinkID() {
         let annotationStore = AnnotationStore()!
         
-        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
         let links = [
             try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link1", docID: "1", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id!)),
             try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link2", docID: "2", docVersion: 1, paragraphAIDs: ["1", "2"], annotationID: annotation.id!)),
@@ -342,7 +342,7 @@ class AnnotationStoreTests: XCTestCase {
             XCTAssertEqual(annotation.id!, annotationStore.annotationWithLinkID(link.id!)!.id!, "Annotation did not load correctly from database")
         }
         
-        let annotation2 = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+        let annotation2 = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
         let links2 = [
             try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link3", docID: "3", docVersion: 1, paragraphAIDs: ["1", "2", "3"], annotationID: annotation2.id!)),
             try! annotationStore.addOrUpdateLink(Link(id: nil, name: "Link4", docID: "4", docVersion: 1, paragraphAIDs: ["1", "2", "3", "4"], annotationID: annotation2.id!))
@@ -360,9 +360,9 @@ class AnnotationStoreTests: XCTestCase {
         let docID = "12345"
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, source: "Test", device: "iphone")
         ]
         
         XCTAssertEqual(Set(annotations.map({ $0.uniqueID })), Set(annotationStore.annotations(docID: docID).map({ $0.uniqueID })))
@@ -390,7 +390,7 @@ class AnnotationStoreTests: XCTestCase {
         var annotationIDs = [Int64]()
         
         for letter in alphabet {
-            let note = try! annotationStore.addNote(title: nil, content: letter, source: "Test", device: "iphone", notebook: notebook)
+            let note = try! annotationStore.addNote(title: nil, content: letter, source: "Test", device: "iphone", notebookID: notebook.id!)
             annotationIDs.append(note.annotationID)
         }
 
@@ -404,7 +404,7 @@ class AnnotationStoreTests: XCTestCase {
         var tagNameToAnnotationIDs = [String: [Int64]]()
         
         for letter in alphabet {
-            let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Journal, source: "Test", device: "iphone")
+            let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
             annotationIDs.append(annotation.id!)
             
             for annotationID in annotationIDs {
@@ -427,7 +427,7 @@ class AnnotationStoreTests: XCTestCase {
         
         var annotations = [Annotation]()
         for _ in 0..<20 {
-            annotations.append(try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"))
+            annotations.append(try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"))
         }
         
         for limit in [1, 5, 10, 15, 20] {
@@ -460,11 +460,11 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
@@ -480,11 +480,11 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
@@ -503,8 +503,8 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
@@ -528,8 +528,8 @@ class AnnotationStoreTests: XCTestCase {
         let tag = try! annotationStore.addTag(name: "TestTag")
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
         ]
         
         for annotation in annotations {
@@ -553,9 +553,9 @@ class AnnotationStoreTests: XCTestCase {
         let docID = "12345"
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, type: .Highlight, source: "Test", device: "iphone")
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: docID, docVersion: 1, source: "Test", device: "iphone")
         ]
         
         XCTAssertEqual(Set(annotations.map({ $0.uniqueID })), Set(annotationStore.annotations(docID: docID).map({ $0.uniqueID })))
@@ -593,8 +593,8 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Highlight, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
@@ -691,7 +691,6 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(annotation.docID, duplicatedAnnotation.docID)
         XCTAssertEqual(annotation.docVersion, duplicatedAnnotation.docVersion)
         XCTAssertEqual(annotation.iso639_3Code, duplicatedAnnotation.iso639_3Code)
-        XCTAssertEqual(annotation.type, duplicatedAnnotation.type)
 
         let duplicatedHighlights = annotationStore.highlightsWithAnnotationID(duplicatedAnnotation.id!)
         XCTAssertTrue(duplicatedHighlights.count == highlights.count)

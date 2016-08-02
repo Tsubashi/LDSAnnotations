@@ -69,8 +69,13 @@ extension AnnotationStore {
     
     /// Reorder annotations within a notebook
     public func reorderAnnotationIDs(annotationIDs: [Int64], notebookID: Int64) throws {
-        for (displayOrder, annotationID) in annotationIDs.enumerate() {
-            try addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
+        try inTransaction {
+            for (displayOrder, annotationID) in annotationIDs.enumerate() {
+                try self.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
+                // The last modified date needs to be updated on both the notebook and the annotation for the order to sync correctly
+                try self.updateLastModifiedDate(notebookID: notebookID)
+                try self.updateLastModifiedDate(annotationID: annotationID)
+            }
         }
     }
     

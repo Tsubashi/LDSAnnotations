@@ -40,6 +40,7 @@ public struct Error {
         case SaveAnnotationFailed = -3000
         case SaveHighlightFailed = -3001
         case RequiredFieldMissing = -3008
+        case SyncFailed = -4000
     }
     
     static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {
