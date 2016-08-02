@@ -26,6 +26,7 @@ import XCTest
 // swiftlint:disable force_unwrapping
 
 class AnnotationStoreNotificationTests: XCTestCase {
+    
     func testAddAndUpdateNotebook() {
         let annotationStore = AnnotationStore()!
         

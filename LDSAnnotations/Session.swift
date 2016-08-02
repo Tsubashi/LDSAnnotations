@@ -22,11 +22,14 @@
 
 import Foundation
 import PSOperations
+import Swiftification
 
 /// Communicates with the annotation service.
 ///
 /// Instances are lightweight; construct a new instance whenever the user's credentials change.
 public class Session: NSObject {
+    
+    public let statusObservers = ObserverSet<Status>()
     
     public enum Status {
         case Unauthenticated
@@ -51,7 +54,11 @@ public class Session: NSObject {
     let authenticationURL: NSURL?
     let domain: String
     let trustPolicy: TrustPolicy
-    public private(set) var status: Status = .Unauthenticated
+    public private(set) var status: Status = .Unauthenticated {
+        didSet {
+            statusObservers.notify(status)
+        }
+    }
     
     /// Callback to get the local doc version of the given doc IDs.
     ///

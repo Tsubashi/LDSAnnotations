@@ -19,6 +19,8 @@
 		D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2D1C976B7E002D61EA /* Link.swift */; };
 		D40F0A301C977129002D61EA /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2F1C977129002D61EA /* Bookmark.swift */; };
 		D466C6511D3B28F300F18A12 /* ParagraphRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = D466C6501D3B28F300F18A12 /* ParagraphRange.swift */; };
+		D48107561D50F99C00D70685 /* SessionNotificationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */; };
+		D48107581D51034A00D70685 /* XCTestCase+LDSAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48107571D51034A00D70685 /* XCTestCase+LDSAnnotations.swift */; };
 		D48FD6A31C9B0C640089EA68 /* AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */; };
 		D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */; };
 		D49E240A1D0072D100052511 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E24091D0072D100052511 /* AccountController.swift */; };
@@ -94,6 +96,8 @@
 		D40F0A2D1C976B7E002D61EA /* Link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
 		D40F0A2F1C977129002D61EA /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bookmark.swift; sourceTree = "<group>"; };
 		D466C6501D3B28F300F18A12 /* ParagraphRange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParagraphRange.swift; sourceTree = "<group>"; };
+		D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionNotificationsTests.swift; sourceTree = "<group>"; };
+		D48107571D51034A00D70685 /* XCTestCase+LDSAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+LDSAnnotations.swift"; sourceTree = "<group>"; };
 		D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationNotebook.swift; sourceTree = "<group>"; };
 		D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationNotebook.swift"; sourceTree = "<group>"; };
 		D49E24091D0072D100052511 /* AccountController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
@@ -200,15 +204,17 @@
 		D90A3CDD1C95C6FE0060094B /* LDSAnnotationsTests */ = {
 			isa = PBXGroup;
 			children = (
-				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
 				D9E25A5F1D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift */,
+				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
 				D90A3CE71C95C7280060094B /* AuthenticationTests.swift */,
 				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
 				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
 				D95392CF1D02611200CB4921 /* LinkTests.swift */,
+				D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */,
 				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
 				D95392CD1D025FA100CB4921 /* XCTAsserts.swift */,
+				D48107571D51034A00D70685 /* XCTestCase+LDSAnnotations.swift */,
 			);
 			path = LDSAnnotationsTests;
 			sourceTree = "<group>";
@@ -528,6 +534,8 @@
 				D95392CE1D025FA100CB4921 /* XCTAsserts.swift in Sources */,
 				D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */,
 				D95F19D51CD8E4C3008618AA /* HighlightTests.swift in Sources */,
+				D48107561D50F99C00D70685 /* SessionNotificationsTests.swift in Sources */,
+				D48107581D51034A00D70685 /* XCTestCase+LDSAnnotations.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

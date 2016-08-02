@@ -82,30 +82,6 @@ class SyncNotebooksTests: XCTestCase {
         XCTAssertEqual(notebooks.first!.name, notebook.name)
     }
     
-    func createSession() -> Session {
-        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountUsername") else {
-            XCTFail("Missing TestAccountUsername")
-            fatalError()
-        }
-        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountPassword") else {
-            XCTFail("Missing TestAccountPassword")
-            fatalError()
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            XCTFail("Missing ClientUsername")
-            fatalError()
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            XCTFail("Missing ClientPassword")
-            fatalError()
-        }
-        
-        let userAgent = "LDSAnnotations unit tests"
-        let clientVersion = "1"
-        
-        return Session(username: username, password: password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
-    }
-    
     func resetNotebooks(annotationStore annotationStore: AnnotationStore, session: Session, inout token: SyncToken?) {
         sync(annotationStore, session: session, token: &token, description: "Initial sync") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 0, "There were existing local notebooks")
@@ -133,22 +109,6 @@ class SyncNotebooksTests: XCTestCase {
             
             XCTAssertEqual(annotationStore.notebookCount() + annotationStore.trashedNotebookCount(), 0)
         }
-    }
-    
-    func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, completion: (uploadCount: Int, downloadCount: Int) -> Void) {
-        let expectation = expectationWithDescription(description)
-        session.sync(annotationStore: annotationStore, token: token) { syncResult in
-            switch syncResult {
-            case let .Success(token: newToken, changes: changes):
-                token = newToken
-                
-                completion(uploadCount: changes.uploadedNotebooks.count, downloadCount: changes.downloadedNotebooks.count)
-            case let .Error(errors: errors):
-                XCTFail("Failed with errors \(errors)")
-            }
-            expectation.fulfill()
-        }
-        waitForExpectationsWithTimeout(300, handler: nil)
     }
     
 }

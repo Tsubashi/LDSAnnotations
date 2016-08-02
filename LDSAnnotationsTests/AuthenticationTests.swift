@@ -51,28 +51,4 @@ class AuthenticationTests: XCTestCase {
         waitForExpectationsWithTimeout(30, handler: nil)
     }
     
-    func createSession(useIncorrectPassword useIncorrectPassword: Bool = false) -> Session {
-        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountUsername") else {
-            XCTFail("Missing TestAccountUsername")
-            fatalError()
-        }
-        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountPassword") else {
-            XCTFail("Missing TestAccountPassword")
-            fatalError()
-        }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
-            XCTFail("Missing ClientUsername")
-            fatalError()
-        }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
-            XCTFail("Missing ClientPassword")
-            fatalError()
-        }
-        
-        let userAgent = "LDSAnnotations unit tests"
-        let clientVersion = "1"
-        
-        return Session(username: username, password: useIncorrectPassword ? "wrong-\(password)" : password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
-    }
-    
 }
