@@ -103,10 +103,21 @@ class SyncAnnotationsOperation: Operation {
         session.put("/ws/annotation/v1.4/Services/rest/sync/annotations-ids?xver=2", payload: payload) { response in
             switch response {
             case .Success(let payload):
-                do {
-                    try self.requestVersionedAnnotations(payload)
-                } catch let error as NSError {
-                    self.finishWithError(error)
+                let errorsJSON = (payload[safe: "syncAnnotationsIds"] as? [String: AnyObject])?[safe: "errors"]
+                if let errorsJSON = errorsJSON as? [[String: AnyObject]] where !errorsJSON.isEmpty {
+                    // Server returned errors, fail
+                    
+                    let errors = errorsJSON.map { Error.errorWithCode(.SyncFailed, failureReason: String(format: "Failed to sync annotation with unique ID \"%@\": %@", $0[safe: "id"] as? String ?? "Unknown", $0[safe: "msg"] as? String ?? "Unknown")) }
+                    self.finish(errors)
+                    
+                } else {
+                    // No errors, sync is good
+                    
+                    do {
+                        try self.requestVersionedAnnotations(payload, onOrBefore: localSyncDate)
+                    } catch let error as NSError {
+                        self.finishWithError(error)
+                    }
                 }
             case .Failure(let payload):
                 self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
@@ -128,7 +139,7 @@ class SyncAnnotationsOperation: Operation {
                 "timestamp": annotation.lastModified.formattedISO8601,
             ]
             
-            if annotation.status != .Deleted {
+            if annotation.status == .Active {
                 result["annotation"] = annotation.jsonObject(annotationStore)
             }
             
@@ -154,7 +165,7 @@ class SyncAnnotationsOperation: Operation {
         return localChanges
     }
     
-    func requestVersionedAnnotations(payload: [String: AnyObject]) throws {
+    func requestVersionedAnnotations(payload: [String: AnyObject], onOrBefore: NSDate) throws {
         guard let syncAnnotations = payload["syncAnnotationsIds"] as? [String: AnyObject] else {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing syncAnnotationsIds")
         }
@@ -173,18 +184,18 @@ class SyncAnnotationsOperation: Operation {
         let docIDsAndVersions = session.docVersionsForDocIDs?(docIDs: docIDs)
         
         let annotationIDsAndVersions = syncIDs.flatMap { syncID -> [String: AnyObject]? in
-            guard let annotationID = syncID["aid"] as? String, docID = syncID["docId"] as? String else { return nil }
+            guard let annotationID = syncID["aid"] as? String else { return nil }
             
-            if let version = docIDsAndVersions?[docID] {
+            if let docID = syncID["docId"] as? String, version = docIDsAndVersions?[docID] {
                 return ["aid": annotationID, "ver": version]
             }
             return ["aid": annotationID]
         }
         
-        executeVersionedAnnotationsRequest(annotationIDsAndVersions)
+        executeVersionedAnnotationsRequest(annotationIDsAndVersions, onOrBefore: onOrBefore)
     }
     
-    func executeVersionedAnnotationsRequest(annotationIDsAndVersions: [[String: AnyObject]]) {
+    func executeVersionedAnnotationsRequest(annotationIDsAndVersions: [[String: AnyObject]], onOrBefore: NSDate) {
         let annotationVersions: [String: AnyObject] = [
             "clientTime": NSDate().formattedISO8601,
             "annoVers": annotationIDsAndVersions
@@ -198,7 +209,7 @@ class SyncAnnotationsOperation: Operation {
             case .Success(let payload):
                 do {
                     try self.annotationStore.inSyncTransaction {
-                        try self.applyServerChanges(payload)
+                        try self.applyServerChanges(payload, onOrBefore: onOrBefore)
                     }
                     self.finish()
                 } catch let error as NSError {
@@ -212,7 +223,7 @@ class SyncAnnotationsOperation: Operation {
         }
     }
     
-    func applyServerChanges(payload: [String: AnyObject]) throws {
+    func applyServerChanges(payload: [String: AnyObject], onOrBefore: NSDate) throws {
         guard let syncAnnotations = payload["syncAnnotations"] as? [String: AnyObject] else {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing syncAnnotations")
         }
@@ -236,7 +247,7 @@ class SyncAnnotationsOperation: Operation {
                 }
                 
                 switch changeType {
-                case .New, .Trash:
+                case .New:
                     let databaseAnnotation: Annotation?
                     if let existingAnnotation = annotationStore.annotationWithUniqueID(uniqueID) {
                         var mergedAnnotation = downloadedAnnotation
@@ -249,26 +260,53 @@ class SyncAnnotationsOperation: Operation {
                     
                     if let annotationID = databaseAnnotation?.id, annotationUniqueID = databaseAnnotation?.uniqueID {
                         
-                        // Note
+                        // MARK: Note
+                        
                         if let note = rawAnnotation["note"] as? [String: AnyObject] {
                             let downloadedNote = try Note(jsonObject: note, annotationID: annotationID)
-                            try annotationStore.addOrUpdateNote(downloadedNote)
+                            if var databaseNote = annotationStore.noteWithAnnotationID(annotationID) {
+                                databaseNote.title = downloadedNote.title
+                                databaseNote.content = downloadedNote.content
+                                try annotationStore.addOrUpdateNote(databaseNote)
+                            } else {
+                                try annotationStore.addOrUpdateNote(downloadedNote)
+                            }
                             downloadNoteCount += 1
+                        } else if let noteID = annotationStore.noteWithAnnotationID(annotationID)?.id {
+                            // The service says that the note has been deleted
+                            
+                            try annotationStore.deleteNoteWithID(noteID)
                         }
                         
-                        // Bookmark
+                        // MARK: Bookmark
+                        
                         if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
                             do {
                                 let downloadedBookmark = try Bookmark(jsonObject: bookmark, annotationID: annotationID)
-                                try annotationStore.addOrUpdateBookmark(downloadedBookmark)
+                                
+                                if var databaseBookmark = annotationStore.bookmarkWithAnnotationID(annotationID) {
+                                    databaseBookmark.name = downloadedBookmark.name
+                                    databaseBookmark.paragraphAID = downloadedBookmark.paragraphAID
+                                    databaseBookmark.displayOrder = downloadedBookmark.displayOrder
+                                    databaseBookmark.offset = downloadedBookmark.offset
+                                    try annotationStore.addOrUpdateBookmark(databaseBookmark)
+                                } else {
+                                    try annotationStore.addOrUpdateBookmark(downloadedBookmark)
+                                }
                                 downloadBookmarkCount += 1
                             } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                 // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
                                 continue
                             }
+                        } else if let bookmarkID = annotationStore.bookmarkWithAnnotationID(annotationID)?.id {
+                            // The service says that the bookmark has been deleted
+                            
+                            try annotationStore.deleteBookmarkWithID(bookmarkID)
                         }
+
+                        // MARK: Notebooks
                         
-                        // Annotation order within notebook
+                        var notebookIDsToDelete = annotationStore.notebooksWithAnnotationID(annotationID).flatMap { $0.id }
                         if let folders = rawAnnotation["folders"] as? [String: [[String: AnyObject]]] {
                             for folder in folders["folder"] ?? [] {
                                 guard let notebookUniqueID = folder["@uri"]?.lastPathComponent else {
@@ -279,19 +317,37 @@ class SyncAnnotationsOperation: Operation {
                                     throw Error.errorWithCode(.Unknown, failureReason: "Cannot find notebook with uniqueID \(notebookUniqueID)")
                                 }
                                 
+                                if let index = notebookIDsToDelete.indexOf(notebookID) {
+                                    // This notebook is still connected to the annotation, so remove it from the list of notebook IDs to delete
+                                    notebookIDsToDelete.removeAtIndex(index)
+                                }
+                                
                                 // Don't fail if we don't get a display order from the syncFolders, just put it at the end
-                                let displayOrder = notebookAnnotationIDs[notebookUniqueID]?.indexOf(annotationUniqueID)?.advancedBy(0) ?? .max
+                                let displayOrder = notebookAnnotationIDs[notebookUniqueID]?.indexOf(annotationUniqueID) ?? .max
 
                                 try annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
                             }
                         }
+                        for notebookID in notebookIDsToDelete {
+                            // Any notebook IDs left in `databaseNotebookIDs` should be deleted because the service says they aren't connected anymore
+                            try annotationStore.deleteAnnotation(annotationID: annotationID, fromNotebook: notebookID)
+                        }
+
+                        // MARK: Highlights
+
+                        // Delete any existing highlights and then we'll just create new ones with what the server gives us
+                        for highlightID in annotationStore.highlightsWithAnnotationID(annotationID).flatMap({ $0.id }) {
+                            try annotationStore.deleteHighlightWithID(highlightID)
+                        }
                         
+                        // Add new highlights
                         if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                             for highlight in highlights["highlight"] ?? [] {
                                 do {
                                     let downloadedHighlight = try Highlight(jsonObject: highlight, annotationID: annotationID)
                                     try annotationStore.addOrUpdateHighlight(downloadedHighlight)
                                     downloadHighlightCount += 1
+                                
                                 } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                     // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
                                     continue
@@ -299,12 +355,21 @@ class SyncAnnotationsOperation: Operation {
                             }
                         }
                         
+                        // MARK: Links
+                        
+                        // Delete any existing links and then we'll just create new ones with what the server gives us
+                        for linkID in annotationStore.linksWithAnnotationID(annotationID).flatMap({ $0.id }) {
+                            // Any link IDs left in `linksIDsToDelete` should be deleted because the service says they are gone
+                            try annotationStore.deleteLinkWithID(linkID)
+                        }
+                        // Add new links now
                         if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                             for link in links["ref"] ?? [] {
                                 do {
                                     let downloadedLink = try Link(jsonObject: link, annotationID: annotationID)
                                     try annotationStore.addOrUpdateLink(downloadedLink)
                                     downloadLinkCount += 1
+                                    
                                 } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                     // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
                                     continue
@@ -312,6 +377,10 @@ class SyncAnnotationsOperation: Operation {
                             }
                         }
                         
+                        
+                        // MARK: Tags
+                        
+                        var tagIDsToDelete = annotationStore.tagsWithAnnotationID(annotationID).flatMap { $0.id }
                         if let tags = rawAnnotation["tags"] as? [String: [String]] {
                             for tagName in tags["tag"] ?? [] {
                                 let downloadedTag = try Tag(name: tagName)
@@ -320,19 +389,36 @@ class SyncAnnotationsOperation: Operation {
                                 
                                 if let tagID = tag.id {
                                     try annotationStore.addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID)
+                                    
+                                    if let index = tagIDsToDelete.indexOf(tagID) {
+                                        tagIDsToDelete.removeAtIndex(index)
+                                    }
                                 }
                             }
                         }
+                        for tagID in tagIDsToDelete {
+                            // Any tag IDs left in `tagIDsToDelete` should be deleted because the service says they aren't connected anymore
+                            try annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID)
+                        }
+                        
                     }
-                    
-                case .Delete:
-                    if let existingAnnotation = annotationStore.annotationWithUniqueID(uniqueID), existingAnnotationID = existingAnnotation.id {
-                        annotationStore.deleteAnnotationWithID(existingAnnotationID)
+                case .Trash, .Delete:
+                    if let existingAnnotationID = annotationStore.annotationWithUniqueID(uniqueID)?.id {
+                        // Don't store trashed or deleted annotations, just delete them from the db
+                        try annotationStore.deleteAnnotationWithID(existingAnnotationID)
                     } else {
                         // If the annotation doesn't exist there's no need to delete it
                     }
                 }
             }
+        }
+        
+        // Cleanup any annotations with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
+        let annotationsToDelete = annotationStore.allAnnotations(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .Active }
+        for notebook in annotationsToDelete {
+            guard let id = notebook.id else { continue }
+            
+            try annotationStore.deleteAnnotationWithID(id)
         }
     }
     

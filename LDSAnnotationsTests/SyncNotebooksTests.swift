@@ -21,7 +21,7 @@
 //
 
 import XCTest
-import LDSAnnotations
+@testable import LDSAnnotations
 
 class SyncNotebooksTests: XCTestCase {
     
@@ -29,7 +29,7 @@ class SyncNotebooksTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         var token: SyncToken?
-        resetNotebooks(annotationStore: annotationStore, session: session, token: &token)
+        resetAnnotations(annotationStore: annotationStore, session: session, token: &token)
         
         // Add a notebook
         let notebook = try! annotationStore.addNotebook(name: "Test Notebook")
@@ -54,12 +54,12 @@ class SyncNotebooksTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetNotebooks(annotationStore: annotationStore1, session: session1, token: &token1)
+        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetNotebooks(annotationStore: annotationStore2, session: session2, token: &token2)
+        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
         
         // Add a notebook to one annotation store
         let notebook = try! annotationStore1.addNotebook(name: "Test Notebook")
@@ -80,35 +80,6 @@ class SyncNotebooksTests: XCTestCase {
         let notebooks = annotationStore2.notebooks()
         XCTAssertEqual(notebooks.count, 1)
         XCTAssertEqual(notebooks.first!.name, notebook.name)
-    }
-    
-    func resetNotebooks(annotationStore annotationStore: AnnotationStore, session: Session, inout token: SyncToken?) {
-        sync(annotationStore, session: session, token: &token, description: "Initial sync") { uploadCount, downloadCount in
-            XCTAssertEqual(uploadCount, 0, "There were existing local notebooks")
-            
-            let notebookCount = annotationStore.notebookCount() + annotationStore.trashedNotebookCount()
-            XCTAssertEqual(downloadCount, notebookCount, "Not all downloaded notebooks were saved locally")
-        }
-        
-        let deleteCount = annotationStore.notebookCount() + annotationStore.trashedNotebookCount()
-        if deleteCount > 0 {
-            try! annotationStore.inTransaction {
-                // Trash all active notebooks
-                let notebooks = annotationStore.notebooks()
-                try annotationStore.trashNotebooks(notebooks)
-                
-                // Delete all trashed notebooks
-                let trashedNotebooks = annotationStore.trashedNotebooks()
-                try annotationStore.deleteNotebooks(trashedNotebooks)
-            }
-            
-            sync(annotationStore, session: session, token: &token, description: "Sync deleted notebooks") { uploadCount, downloadCount in
-                XCTAssertEqual(uploadCount, deleteCount, "Not all local notebooks were deleted")
-                XCTAssertEqual(downloadCount, 0)
-            }
-            
-            XCTAssertEqual(annotationStore.notebookCount() + annotationStore.trashedNotebookCount(), 0)
-        }
     }
     
 }

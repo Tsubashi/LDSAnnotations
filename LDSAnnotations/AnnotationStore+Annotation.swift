@@ -30,9 +30,8 @@ class AnnotationTable {
     static let id = Expression<Int64>("_id")
     static let uniqueID = Expression<String>("unique_id")
     static let iso639_3Code = Expression<String>("iso639_3")
-    static let docID = Expression<String>("doc_id")
-    static let docVersion = Expression<Int>("doc_version")
-    static let type = Expression<AnnotationType>("type")
+    static let docID = Expression<String?>("doc_id")
+    static let docVersion = Expression<Int?>("doc_version")
     static let status = Expression<AnnotationStatus>("status")
     static let created = Expression<NSDate?>("created")
     static let lastModified = Expression<NSDate>("last_modified")
@@ -45,7 +44,6 @@ class AnnotationTable {
             iso639_3Code: row[iso639_3Code],
             docID: row[docID],
             docVersion: row[docVersion],
-            type: row.get(type),
             status: row.get(status),
             created: row[created],
             lastModified: row[lastModified],
@@ -65,7 +63,6 @@ extension AnnotationStore {
             builder.column(AnnotationTable.iso639_3Code)
             builder.column(AnnotationTable.docID)
             builder.column(AnnotationTable.docVersion)
-            builder.column(AnnotationTable.type)
             builder.column(AnnotationTable.status)
             builder.column(AnnotationTable.created)
             builder.column(AnnotationTable.lastModified)
@@ -80,19 +77,18 @@ extension AnnotationStore {
     }
     
     /// Adds a new annotation.
-    func addAnnotation(iso639_3Code iso639_3Code: String, docID: String, docVersion: Int, type: AnnotationType, source: String, device: String) throws -> Annotation {
-        guard !iso639_3Code.isEmpty && !docID.isEmpty && docVersion > 0 else {
+    func addAnnotation(iso639_3Code iso639_3Code: String, docID: String?, docVersion: Int?, source: String, device: String) throws -> Annotation {
+        guard !iso639_3Code.isEmpty else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotation without an iso code, doc ID and doc version.")
         }
         
-        let annotation = Annotation(id: nil, uniqueID: NSUUID().UUIDString, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, type: type, status: .Active, created: NSDate(), lastModified: NSDate(), source: source, device: device)
+        let annotation = Annotation(id: nil, uniqueID: NSUUID().UUIDString, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, status: .Active, created: NSDate(), lastModified: NSDate(), source: source, device: device)
         
         let id = try db.run(AnnotationTable.table.insert(
             AnnotationTable.uniqueID <- annotation.uniqueID,
             AnnotationTable.iso639_3Code <- annotation.iso639_3Code,
             AnnotationTable.docID <- annotation.docID,
             AnnotationTable.docVersion <- annotation.docVersion,
-            AnnotationTable.type <- annotation.type,
             AnnotationTable.status <- annotation.status,
             AnnotationTable.created <- annotation.created,
             AnnotationTable.lastModified <- annotation.lastModified,
@@ -109,7 +105,7 @@ extension AnnotationStore {
     
     /// Saves any changes to `annotation` and updates the `lastModified`.
     public func updateAnnotation(annotation: Annotation) throws -> Annotation {
-        guard !annotation.iso639_3Code.isEmpty && !annotation.docID.isEmpty && annotation.docVersion > 0 else {
+        guard !annotation.iso639_3Code.isEmpty else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotation without an iso code, doc ID and doc version.")
         }
         
@@ -125,7 +121,6 @@ extension AnnotationStore {
             AnnotationTable.iso639_3Code <- modifiedAnnotation.iso639_3Code,
             AnnotationTable.docID <- modifiedAnnotation.docID,
             AnnotationTable.docVersion <- modifiedAnnotation.docVersion,
-            AnnotationTable.type <- modifiedAnnotation.type,
             AnnotationTable.status <- modifiedAnnotation.status,
             AnnotationTable.lastModified <- modifiedAnnotation.lastModified,
             AnnotationTable.source <- modifiedAnnotation.source,
@@ -282,7 +277,6 @@ extension AnnotationStore {
                 AnnotationTable.iso639_3Code <- annotation.iso639_3Code,
                 AnnotationTable.docID <- annotation.docID,
                 AnnotationTable.docVersion <- annotation.docVersion,
-                AnnotationTable.type <- annotation.type,
                 AnnotationTable.status <- annotation.status,
                 AnnotationTable.created <- annotation.created,
                 AnnotationTable.lastModified <- annotation.lastModified,
@@ -300,7 +294,6 @@ extension AnnotationStore {
             AnnotationTable.iso639_3Code <- annotation.iso639_3Code,
             AnnotationTable.docID <- annotation.docID,
             AnnotationTable.docVersion <- annotation.docVersion,
-            AnnotationTable.type <- annotation.type,
             AnnotationTable.status <- annotation.status,
             AnnotationTable.lastModified <- annotation.lastModified,
             AnnotationTable.source <- annotation.source,
@@ -309,7 +302,7 @@ extension AnnotationStore {
         
         notifySyncModifiedAnnotationsWithIDs([id])
         
-        return Annotation(id: id, uniqueID: annotation.uniqueID, iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, type: annotation.type, status: annotation.status, created: annotation.created, lastModified: annotation.lastModified, source: annotation.source, device: annotation.device)
+        return Annotation(id: id, uniqueID: annotation.uniqueID, iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, status: annotation.status, created: annotation.created, lastModified: annotation.lastModified, source: annotation.source, device: annotation.device)
     }
 
     /// Returns a list of active annotations ordered by last modified.
@@ -421,7 +414,7 @@ extension AnnotationStore {
     // Mark annotation as trashed, and delete any related annotation objects
     public func trashAnnotationWithID(id: Int64) throws {
         // In transaction so it will rollback if this fails
-        try db.transaction {
+        try inTransaction {
             try self.updateLastModifiedDate(annotationID: id, status: .Trashed)
             try self.deleteHighlightsWithAnnotationID(id)
             try self.deleteNotesWithAnnotationID(id)
@@ -447,19 +440,22 @@ extension AnnotationStore {
         notifySyncModifiedAnnotationsWithIDs([id])
     }
     
-    func deleteAnnotationWithID(id: Int64) {
-        do {
-            try db.run(AnnotationTable.table.filter(AnnotationTable.id == id).delete())
-            
-            notifySyncModifiedAnnotationsWithIDs([id])
-        } catch {}
+    func deleteAnnotationWithID(id: Int64) throws {
+        // Don't put this in a transaction, becuause it currently only called from within an existing transaction
+        try self.db.run(NoteTable.table.filter(NoteTable.annotationID == id).delete())
+        try self.db.run(BookmarkTable.table.filter(BookmarkTable.annotationID == id).delete())
+        try self.db.run(LinkTable.table.filter(LinkTable.annotationID == id).delete())
+        try self.db.run(HighlightTable.table.filter(HighlightTable.annotationID == id).delete())
+        try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == id).delete())
+        try self.db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == id).delete())
+        try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == id).delete())
     }
     
-    /// Creates a duplicate annotation, and duplicates all related annotation objects except for notebooks 
+    /// Creates a duplicate annotation, and duplicates all related annotation objects except for notebooks
     public func duplicateAnnotation(annotation: Annotation, source: String, device: String) throws -> Annotation {
         guard let annotationID = annotation.id else { throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Annotation to duplicate is missing id") }
         
-        let duplicateAnnotation = try addAnnotation(iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, type: annotation.type, source: source, device: device)
+        let duplicateAnnotation = try addAnnotation(iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, source: source, device: device)
         
         guard let duplicateAnnotationID = duplicateAnnotation.id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Unable to duplicate annotation") }
         

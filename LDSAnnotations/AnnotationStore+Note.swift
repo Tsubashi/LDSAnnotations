@@ -59,8 +59,8 @@ extension AnnotationStore {
     }
     
     /// Adds note and related annotation, and associates it to notebook
-    public func addNote(title title: String?, content: String, source: String, device: String, notebook: Notebook) throws -> Note {
-        guard let notebookID = notebook.id, annotationID = try addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, type: .Journal, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+    public func addNote(title title: String?, content: String, source: String, device: String, notebookID: Int64) throws -> Note {
+        guard let annotationID = try addAnnotation(iso639_3Code: "eng", docID: nil, docVersion: nil, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
         
         let note = try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
         

@@ -66,7 +66,7 @@ extension AnnotationStore {
     /// Returns list of highlights, and creates related annotation
     public func addHighlights(docID docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source: String, device: String) throws -> [Highlight] {
         // First create an annotation for these highlights
-        guard let annotationID = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, type: .Highlight, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+        guard let annotationID = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
         
         var highlights = [Highlight]()
         
@@ -121,10 +121,26 @@ extension AnnotationStore {
         }
     }
     
-    func deleteHighlightWithID(id: Int64) {
+    private func highlightWithID(id: Int64) -> Highlight? {
         do {
-            try db.run(HighlightTable.table.filter(HighlightTable.id == id).delete())
-        } catch {}
+            return try db.prepare(HighlightTable.table.filter(HighlightTable.id == id)).map { HighlightTable.fromRow($0) }.first
+        } catch {
+            return nil
+        }
+    }
+    
+    public func trashHighlightWithID(id: Int64) throws {
+        let annotationID = highlightWithID(id)?.annotationID
+        
+        try deleteHighlightWithID(id)
+        
+        if let annotationID = annotationID {
+            try trashAnnotationIfEmptyWithID(annotationID)
+        }
+    }
+    
+    func deleteHighlightWithID(id: Int64) throws {
+        try db.run(HighlightTable.table.filter(HighlightTable.id == id).delete())
     }
     
     func deleteHighlightsWithAnnotationID(annotationID: Int64) throws {

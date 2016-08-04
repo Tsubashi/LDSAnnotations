@@ -65,7 +65,7 @@ extension AnnotationStore {
     /// Returns a bookmark, and creates related annotation object
     public func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int, docID: String, docVersion: Int, iso639_3Code: String, source: String, device: String) throws -> Bookmark {
         // First, create an annotation for this bookmark
-        guard let annotationID = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, type: .Bookmark, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+        guard let annotationID = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
         
         let bookmark = Bookmark(id: nil, name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID)
         
@@ -128,9 +128,11 @@ extension AnnotationStore {
     
     /// Reorders bookmarks in order passed in
     public func reorderBookmarks(bookmarks: [Bookmark]) throws {
-        for (displayOrder, var bookmark) in bookmarks.enumerate() where bookmark.displayOrder != displayOrder {
-            bookmark.displayOrder = displayOrder
-            try addOrUpdateBookmark(bookmark)
+        try inTransaction {
+            for (displayOrder, var bookmark) in bookmarks.enumerate() where bookmark.displayOrder != displayOrder {
+                bookmark.displayOrder = displayOrder
+                try self.addOrUpdateBookmark(bookmark)
+            }
         }
     }
     
