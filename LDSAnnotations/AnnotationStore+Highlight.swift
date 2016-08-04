@@ -122,7 +122,11 @@ extension AnnotationStore {
     }
     
     private func highlightWithID(id: Int64) -> Highlight? {
-        return db.pluck(HighlightTable.table.filter(HighlightTable.id == id)).map { HighlightTable.fromRow($0) }
+        do {
+            return try db.prepare(HighlightTable.table.filter(HighlightTable.id == id)).map { HighlightTable.fromRow($0) }.first
+        } catch {
+            return nil
+        }
     }
     
     public func trashHighlightWithID(id: Int64) throws {
