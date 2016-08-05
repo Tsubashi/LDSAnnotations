@@ -26,7 +26,7 @@ import Foundation
 public struct Annotation: Equatable {
     
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
     
     /// Annotation Unique ID.
     public let uniqueID: String
@@ -53,7 +53,7 @@ public struct Annotation: Equatable {
     
     public var device: String?
     
-    init(id: Int64?, uniqueID: String, iso639_3Code: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
+    init(id: Int64, uniqueID: String, iso639_3Code: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
         self.iso639_3Code = iso639_3Code
@@ -66,24 +66,7 @@ public struct Annotation: Equatable {
         self.device = device
     }
     
-    init?(jsonObject: [String: AnyObject]) {
-        guard let uniqueID = jsonObject["@id"] as? String, rawLastModified = jsonObject["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else { return nil }
-        
-        self.id = nil
-        self.uniqueID = uniqueID
-        self.lastModified = lastModified
-        self.iso639_3Code = jsonObject["@locale"] as? String ?? "eng"
-        self.source = jsonObject["source"] as? String
-        self.device = jsonObject["device"] as? String
-        self.docID = jsonObject["@docId"] as? String
-        self.docVersion = (jsonObject["@contentVersion"] as? String).flatMap { Int($0) }
-        self.created = (jsonObject["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
-        self.status = (jsonObject["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
-    }
-    
-    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject]? {
-        guard let id = id else { return nil }
-        
+    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
         var result: [String: AnyObject] = [
             "@id": uniqueID,
             "@locale": iso639_3Code,
@@ -153,7 +136,7 @@ public struct Annotation: Equatable {
 extension Annotation: Hashable {
     
     public var hashValue: Int {
-        return id?.hashValue ?? 0 ^ uniqueID.hashValue ^ iso639_3Code.hashValue ^ (docID ?? "").hashValue ^ (docVersion ?? 0).hashValue ^ status.hashValue ^ lastModified.hashValue
+        return id.hashValue ^ uniqueID.hashValue ^ iso639_3Code.hashValue ^ (docID ?? "").hashValue ^ (docVersion ?? 0).hashValue ^ status.hashValue ^ lastModified.hashValue
     }
     
 }

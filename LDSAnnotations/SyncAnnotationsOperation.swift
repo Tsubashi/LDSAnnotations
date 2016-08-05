@@ -139,8 +139,8 @@ class SyncAnnotationsOperation: Operation {
                 "timestamp": annotation.lastModified.formattedISO8601,
             ]
             
-            if annotation.status == .Active, let jsonObject = annotation.jsonObject(annotationStore) {
-                result["annotation"] = jsonObject
+            if annotation.status == .Active {
+                result["annotation"] = annotation.jsonObject(annotationStore)
             }
             
             return result
@@ -242,19 +242,39 @@ class SyncAnnotationsOperation: Operation {
                     throw Error.errorWithCode(.Unknown, failureReason: "Missing annotation")
                 }
                 
-                guard let downloadedAnnotation = Annotation(jsonObject: rawAnnotation) else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize annotation: \(rawAnnotation)")
+                guard let rawLastModified = rawAnnotation["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
+                    throw Error.errorWithCode(.Unknown, failureReason: "Missing last modified date")
+                }
+                
+                guard let source = rawAnnotation["source"] as? String else {
+                    throw Error.errorWithCode(.Unknown, failureReason: "`source` is a required field, the service returned a nil value")
+                }
+                
+                guard let device = rawAnnotation["device"] as? String else {
+                    throw Error.errorWithCode(.Unknown, failureReason: "`device` is a required field, the service returned a nil value")
                 }
                 
                 switch changeType {
                 case .New:
+                    let iso639_3Code = rawAnnotation["@locale"] as? String ?? "eng"
+                    let docID = rawAnnotation["@docId"] as? String
+                    let docVersion = (rawAnnotation["@contentVersion"] as? String).flatMap { Int($0) }
+                    let created = (rawAnnotation["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
+                    let status = (rawAnnotation["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
+                    
                     let databaseAnnotation: Annotation?
-                    if let existingAnnotation = annotationStore.annotationWithUniqueID(uniqueID) {
-                        var mergedAnnotation = downloadedAnnotation
-                        mergedAnnotation.id = existingAnnotation.id
-                        databaseAnnotation = try annotationStore.addOrUpdateAnnotation(mergedAnnotation)
+                    if var existingAnnotation = annotationStore.annotationWithUniqueID(uniqueID) {
+                        existingAnnotation.iso639_3Code = iso639_3Code
+                        existingAnnotation.source = source
+                        existingAnnotation.device = device
+                        existingAnnotation.docID = docID
+                        existingAnnotation.docVersion = docVersion
+                        existingAnnotation.created = created
+                        existingAnnotation.lastModified = lastModified
+                        existingAnnotation.status = status
+                        databaseAnnotation = try annotationStore.updateAnnotation(existingAnnotation, inSync: true)
                     } else {
-                        databaseAnnotation = try annotationStore.addOrUpdateAnnotation(downloadedAnnotation)
+                        databaseAnnotation = try annotationStore.addAnnotation(uniqueID: uniqueID, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, created: created, lastModified: lastModified, source: source, device: device, inSync: true)
                     }
                     downloadAnnotationCount += 1
                     
@@ -415,10 +435,8 @@ class SyncAnnotationsOperation: Operation {
         
         // Cleanup any annotations with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
         let annotationsToDelete = annotationStore.allAnnotations(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .Active }
-        for notebook in annotationsToDelete {
-            guard let id = notebook.id else { continue }
-            
-            try annotationStore.deleteAnnotationWithID(id)
+        for annotation in annotationsToDelete {
+            try annotationStore.deleteAnnotationWithID(annotation.id)
         }
     }
     

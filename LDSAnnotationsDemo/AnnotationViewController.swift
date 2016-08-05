@@ -68,21 +68,21 @@ extension AnnotationViewController {
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let section = Section(rawValue: section), annotationID = annotation.id else { return 0 }
+        guard let section = Section(rawValue: section) else { return 0 }
         
         switch section {
         case .Note:
-            return annotationStore.noteWithAnnotationID(annotationID) != nil ? 1 : 0
+            return annotationStore.noteWithAnnotationID(annotation.id) != nil ? 1 : 0
         case .Bookmark:
-            return annotationStore.bookmarkWithAnnotationID(annotationID) != nil ? 1 : 0
+            return annotationStore.bookmarkWithAnnotationID(annotation.id) != nil ? 1 : 0
         case .Highlights:
-            return annotationStore.highlightsWithAnnotationID(annotationID).count
+            return annotationStore.highlightsWithAnnotationID(annotation.id).count
         case .Tags:
-            return annotationStore.tagsWithAnnotationID(annotationID).count
+            return annotationStore.tagsWithAnnotationID(annotation.id).count
         case .Links:
-            return annotationStore.linksWithAnnotationID(annotationID).count
+            return annotationStore.linksWithAnnotationID(annotation.id).count
         case .Notebooks:
-            return annotationStore.notebooksWithAnnotationID(annotationID).count
+            return annotationStore.notebooksWithAnnotationID(annotation.id).count
         case .Count:
             return 0
         }
@@ -92,32 +92,32 @@ extension AnnotationViewController {
         let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath)
         cell.textLabel?.numberOfLines = 0
         
-        guard let section = Section(rawValue: indexPath.section), annotationID = annotation.id else { return UITableViewCell() }
+        guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
         
         switch section {
         case .Note:
-            if let note = annotationStore.noteWithAnnotationID(annotationID) {
+            if let note = annotationStore.noteWithAnnotationID(annotation.id) {
                 cell.textLabel?.text = note.title ?? note.content
             }
         case .Bookmark:
-            if let bookmark = annotationStore.bookmarkWithAnnotationID(annotationID) {
+            if let bookmark = annotationStore.bookmarkWithAnnotationID(annotation.id) {
                 cell.textLabel?.text = bookmark.name
             }
         case .Highlights:
-            for (index, highlight) in annotationStore.highlightsWithAnnotationID(annotationID).enumerate() where index == indexPath.row {
+            for (index, highlight) in annotationStore.highlightsWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
                 let style = highlight.style == .Underline ? "Underline" : "Highlight"
                 cell.textLabel?.text = "paragraph AID: \(highlight.paragraphRange.paragraphAID)\noffset start: \(highlight.paragraphRange.startWordOffset)\noffset end: \(highlight.paragraphRange.endWordOffset)\ncolor: \(highlight.colorName)\nstyle: \(style)"
             }
         case .Tags:
-            for (index, tag) in annotationStore.tagsWithAnnotationID(annotationID).enumerate() where index == indexPath.row {
+            for (index, tag) in annotationStore.tagsWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
                 cell.textLabel?.text = tag.name
             }
         case .Links:
-            for (index, link) in annotationStore.linksWithAnnotationID(annotationID).enumerate() where index == indexPath.row {
+            for (index, link) in annotationStore.linksWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
                 cell.textLabel?.text = link.name
             }
         case .Notebooks:
-            for (index, notebook) in annotationStore.notebooksWithAnnotationID(annotationID).enumerate() where index == indexPath.row {
+            for (index, notebook) in annotationStore.notebooksWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
                 cell.textLabel?.text = notebook.name
             }
         case .Count:

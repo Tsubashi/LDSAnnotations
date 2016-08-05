@@ -280,7 +280,7 @@ class SyncAnnotationsTests: XCTestCase {
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
-        let shuffledAnnotationIDs = [annotation1.id!, annotation2.id!, annotation3.id!, annotation4.id!].shuffle()
+        let shuffledAnnotationIDs = [annotation1.id, annotation2.id, annotation3.id, annotation4.id].shuffle()
         try! annotationStore1.reorderAnnotationIDs(shuffledAnnotationIDs, notebookID: notebook.id!)
         
         // Upload the changes
@@ -332,7 +332,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
 
         // Delete an annotation, sync the change
-        try! annotationStore1.trashAnnotationWithID(annotation2.id!)
+        try! annotationStore1.trashAnnotationWithID(annotation2.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -429,28 +429,28 @@ class SyncAnnotationsTests: XCTestCase {
         let annotations2 = annotationStore2.annotations().filter { $0.status == .Active }
         XCTAssertEqual(annotations1.count, annotations2.count)
         
-        let annotationHighlights1 = annotations1.map { (uniqueID: $0.uniqueID, highlights: annotationStore1.highlightsWithAnnotationID($0.id!)) }
-        let annotationHighlights2 = annotations2.map { (uniqueID: $0.uniqueID, highlights: annotationStore2.highlightsWithAnnotationID($0.id!)) }
+        let annotationHighlights1 = annotations1.map { (uniqueID: $0.uniqueID, highlights: annotationStore1.highlightsWithAnnotationID($0.id)) }
+        let annotationHighlights2 = annotations2.map { (uniqueID: $0.uniqueID, highlights: annotationStore2.highlightsWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationHighlights1.count, annotationHighlights2.count)
         
-        let annotationLinks1 = annotations1.map { (uniqueID: $0.uniqueID, links: annotationStore1.linksWithAnnotationID($0.id!)) }
-        let annotationLinks2 = annotations2.map { (uniqueID: $0.uniqueID, links: annotationStore2.linksWithAnnotationID($0.id!)) }
+        let annotationLinks1 = annotations1.map { (uniqueID: $0.uniqueID, links: annotationStore1.linksWithAnnotationID($0.id)) }
+        let annotationLinks2 = annotations2.map { (uniqueID: $0.uniqueID, links: annotationStore2.linksWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationLinks1.count, annotationLinks2.count)
         
-        let annotationTags1 = annotations1.map { (uniqueID: $0.uniqueID, tags: annotationStore1.tagsWithAnnotationID($0.id!)) }
-        let annotationTags2 = annotations2.map { (uniqueID: $0.uniqueID, tags: annotationStore2.tagsWithAnnotationID($0.id!)) }
+        let annotationTags1 = annotations1.map { (uniqueID: $0.uniqueID, tags: annotationStore1.tagsWithAnnotationID($0.id)) }
+        let annotationTags2 = annotations2.map { (uniqueID: $0.uniqueID, tags: annotationStore2.tagsWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationTags1.count, annotationTags2.count)
         
-        let annotationNotebooks1 = annotations1.map { (uniqueID: $0.uniqueID, notebooks: annotationStore1.notebooksWithAnnotationID($0.id!)) }
-        let annotationNotebooks2 = annotations2.map { (uniqueID: $0.uniqueID, notebooks: annotationStore2.notebooksWithAnnotationID($0.id!)) }
+        let annotationNotebooks1 = annotations1.map { (uniqueID: $0.uniqueID, notebooks: annotationStore1.notebooksWithAnnotationID($0.id)) }
+        let annotationNotebooks2 = annotations2.map { (uniqueID: $0.uniqueID, notebooks: annotationStore2.notebooksWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationNotebooks1.count, annotationNotebooks2.count)
         
-        let annotationNotes1 = annotations1.map { (uniqueID: $0.uniqueID, note: annotationStore1.noteWithAnnotationID($0.id!)) }
-        let annotationNotes2 = annotations2.map { (uniqueID: $0.uniqueID, note: annotationStore2.noteWithAnnotationID($0.id!)) }
+        let annotationNotes1 = annotations1.map { (uniqueID: $0.uniqueID, note: annotationStore1.noteWithAnnotationID($0.id)) }
+        let annotationNotes2 = annotations2.map { (uniqueID: $0.uniqueID, note: annotationStore2.noteWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationNotes1.count, annotationNotes2.count)
         
-        let annotationBookmarks1 = annotations1.map { (uniqueID: $0.uniqueID, bookmark: annotationStore1.bookmarkWithAnnotationID($0.id!)) }
-        let annotationBookmarks2 = annotations2.map { (uniqueID: $0.uniqueID, bookmark: annotationStore2.bookmarkWithAnnotationID($0.id!)) }
+        let annotationBookmarks1 = annotations1.map { (uniqueID: $0.uniqueID, bookmark: annotationStore1.bookmarkWithAnnotationID($0.id)) }
+        let annotationBookmarks2 = annotations2.map { (uniqueID: $0.uniqueID, bookmark: annotationStore2.bookmarkWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationBookmarks1.count, annotationBookmarks2.count)
         
         let notebooks1 = annotationStore1.notebooks().filter { $0.status == .Active }

@@ -66,9 +66,13 @@ extension AnnotationStore {
     }
     
     // Removes tag from annotation, then marks annotation as trashed if that was the only related annotation object
-    public func deleteTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
+    public func trashTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
         try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
         try trashAnnotationIfEmptyWithID(annotationID)
+    }
+    
+    func deleteTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
+        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
     }
     
     func removeFromTagsAnnotationWithID(annotationID: Int64) throws {

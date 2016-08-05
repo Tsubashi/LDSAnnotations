@@ -77,34 +77,38 @@ extension AnnotationStore {
     }
     
     /// Adds a new annotation.
-    func addAnnotation(iso639_3Code iso639_3Code: String, docID: String?, docVersion: Int?, source: String, device: String) throws -> Annotation {
+    func addAnnotation(uniqueID uniqueID: String? = nil, iso639_3Code: String, docID: String?, docVersion: Int?, status: AnnotationStatus = .Active, created: NSDate? = nil, lastModified: NSDate? = nil, source: String, device: String, inSync: Bool = false) throws -> Annotation {
         guard !iso639_3Code.isEmpty else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotation without an iso code, doc ID and doc version.")
         }
         
-        let annotation = Annotation(id: nil, uniqueID: NSUUID().UUIDString, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, status: .Active, created: NSDate(), lastModified: NSDate(), source: source, device: device)
+        let uniqueID = uniqueID ?? NSUUID().UUIDString
+        let created = created ?? NSDate()
+        let lastModified = lastModified ?? created
         
         let id = try db.run(AnnotationTable.table.insert(
-            AnnotationTable.uniqueID <- annotation.uniqueID,
-            AnnotationTable.iso639_3Code <- annotation.iso639_3Code,
-            AnnotationTable.docID <- annotation.docID,
-            AnnotationTable.docVersion <- annotation.docVersion,
-            AnnotationTable.status <- annotation.status,
-            AnnotationTable.created <- annotation.created,
-            AnnotationTable.lastModified <- annotation.lastModified,
-            AnnotationTable.source <- annotation.source,
-            AnnotationTable.device <- annotation.device
+            AnnotationTable.uniqueID <- uniqueID,
+            AnnotationTable.iso639_3Code <- iso639_3Code,
+            AnnotationTable.docID <- docID,
+            AnnotationTable.docVersion <- docVersion,
+            AnnotationTable.status <- status,
+            AnnotationTable.created <- created,
+            AnnotationTable.lastModified <- lastModified,
+            AnnotationTable.source <- source,
+            AnnotationTable.device <- device
         ))
         
-        notifyModifiedAnnotationsWithIDs([id])
+        if inSync {
+            notifySyncModifiedAnnotationsWithIDs([id])
+        } else {
+            notifyModifiedAnnotationsWithIDs([id])
+        }
         
-        var modifiedAnnotation = annotation
-        modifiedAnnotation.id = id
-        return modifiedAnnotation
+        return Annotation(id: id, uniqueID: uniqueID, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, status: .Active, created: created, lastModified: lastModified, source: source, device: device)
     }
     
     /// Saves any changes to `annotation` and updates the `lastModified`.
-    public func updateAnnotation(annotation: Annotation) throws -> Annotation {
+    func updateAnnotation(annotation: Annotation, inSync: Bool = false) throws -> Annotation {
         guard !annotation.iso639_3Code.isEmpty else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotation without an iso code, doc ID and doc version.")
         }
@@ -112,11 +116,7 @@ extension AnnotationStore {
         var modifiedAnnotation = annotation
         modifiedAnnotation.lastModified = NSDate()
         
-        guard let id = annotation.id else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot update an annotation without an ID.")
-        }
-        
-        try db.run(AnnotationTable.table.filter(AnnotationTable.id == id).update(
+        try db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
             AnnotationTable.uniqueID <- modifiedAnnotation.uniqueID,
             AnnotationTable.iso639_3Code <- modifiedAnnotation.iso639_3Code,
             AnnotationTable.docID <- modifiedAnnotation.docID,
@@ -127,7 +127,11 @@ extension AnnotationStore {
             AnnotationTable.device <- modifiedAnnotation.device
         ))
         
-        notifyModifiedAnnotationsWithIDs([id])
+        if inSync {
+            notifySyncModifiedAnnotationsWithIDs([annotation.id])
+        } else {
+            notifyModifiedAnnotationsWithIDs([annotation.id])
+        }
         
         return modifiedAnnotation
     }
@@ -172,14 +176,12 @@ extension AnnotationStore {
                     throw Error.errorWithCode(.Unknown, failureReason: "Attempted to trash a annotation that is not active and not trashed (i.e. deleted).")
                 }
                 
-                if let id = annotation.id {
-                    try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == id).update(
-                        AnnotationTable.status <- .Trashed,
-                        AnnotationTable.lastModified <- lastModified
-                    ))
-                    
-                    ids.append(id)
-                }
+                try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
+                    AnnotationTable.status <- .Trashed,
+                    AnnotationTable.lastModified <- lastModified
+                ))
+                
+                ids.append(annotation.id)
             }
             
             self.notifyModifiedAnnotationsWithIDs(ids)
@@ -199,14 +201,12 @@ extension AnnotationStore {
                     throw Error.errorWithCode(.Unknown, failureReason: "Attempted to delete a annotation that is not trashed and not deleted.")
                 }
                 
-                if let id = annotation.id {
-                    try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == id).update(
-                        AnnotationTable.status <- .Deleted,
-                        AnnotationTable.lastModified <- lastModified
-                    ))
-                    
-                    ids.append(id)
-                }
+                try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
+                    AnnotationTable.status <- .Deleted,
+                    AnnotationTable.lastModified <- lastModified
+                ))
+                
+                ids.append(annotation.id)
             }
             
             self.notifyModifiedAnnotationsWithIDs(ids)
@@ -222,14 +222,12 @@ extension AnnotationStore {
             
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
-                if let id = annotation.id {
-                    try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == id).update(
-                        AnnotationTable.status <- .Active,
-                        AnnotationTable.lastModified <- lastModified
-                    ))
-                    
-                    ids.append(id)
-                }
+                try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
+                    AnnotationTable.status <- .Active,
+                    AnnotationTable.lastModified <- lastModified
+                ))
+                
+                ids.append(annotation.id)
             }
             
             self.notifyModifiedAnnotationsWithIDs(ids)
@@ -270,41 +268,6 @@ extension AnnotationStore {
         return db.pluck(AnnotationTable.table.filter(AnnotationTable.id == id)).map { AnnotationTable.fromRow($0) }
     }
     
-    public func addOrUpdateAnnotation(annotation: Annotation) throws -> Annotation {
-        if let id = annotation.id {
-            try db.run(AnnotationTable.table.filter(AnnotationTable.id == id).update(
-                AnnotationTable.uniqueID <- annotation.uniqueID,
-                AnnotationTable.iso639_3Code <- annotation.iso639_3Code,
-                AnnotationTable.docID <- annotation.docID,
-                AnnotationTable.docVersion <- annotation.docVersion,
-                AnnotationTable.status <- annotation.status,
-                AnnotationTable.created <- annotation.created,
-                AnnotationTable.lastModified <- annotation.lastModified,
-                AnnotationTable.source <- annotation.source,
-                AnnotationTable.device <- annotation.device
-            ))
-            
-            notifySyncModifiedAnnotationsWithIDs([id])
-            
-            return annotation
-        }
-        
-        let id = try db.run(AnnotationTable.table.insert(
-            AnnotationTable.uniqueID <- annotation.uniqueID,
-            AnnotationTable.iso639_3Code <- annotation.iso639_3Code,
-            AnnotationTable.docID <- annotation.docID,
-            AnnotationTable.docVersion <- annotation.docVersion,
-            AnnotationTable.status <- annotation.status,
-            AnnotationTable.lastModified <- annotation.lastModified,
-            AnnotationTable.source <- annotation.source,
-            AnnotationTable.device <- annotation.device
-        ))
-        
-        notifySyncModifiedAnnotationsWithIDs([id])
-        
-        return Annotation(id: id, uniqueID: annotation.uniqueID, iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, status: annotation.status, created: annotation.created, lastModified: annotation.lastModified, source: annotation.source, device: annotation.device)
-    }
-
     /// Returns a list of active annotations ordered by last modified.
     public func annotations(docID docID: String? = nil, paragraphAIDs: [String]? = nil) -> [Annotation] {
         var query = AnnotationTable.table.select(distinct: AnnotationTable.table[*]).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified.desc)
@@ -437,7 +400,7 @@ extension AnnotationStore {
         
         try updateLastModifiedDate(annotationID: id, status: notEmpty ? nil : .Trashed )
         
-        notifySyncModifiedAnnotationsWithIDs([id])
+        notifyModifiedAnnotationsWithIDs([id])
     }
     
     func deleteAnnotationWithID(id: Int64) throws {
@@ -453,30 +416,26 @@ extension AnnotationStore {
     
     /// Creates a duplicate annotation, and duplicates all related annotation objects except for notebooks
     public func duplicateAnnotation(annotation: Annotation, source: String, device: String) throws -> Annotation {
-        guard let annotationID = annotation.id else { throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Annotation to duplicate is missing id") }
-        
         let duplicateAnnotation = try addAnnotation(iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, source: source, device: device)
         
-        guard let duplicateAnnotationID = duplicateAnnotation.id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Unable to duplicate annotation") }
-        
-        for highlight in highlightsWithAnnotationID(annotationID) {
-            try addOrUpdateHighlight(Highlight(id: nil, paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotationID))
+        for highlight in highlightsWithAnnotationID(annotation.id) {
+            try addOrUpdateHighlight(Highlight(id: nil, paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotation.id))
         }
         
-        for link in linksWithAnnotationID(annotationID) {
-            try addOrUpdateLink(Link(id: nil, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: duplicateAnnotationID))
+        for link in linksWithAnnotationID(annotation.id) {
+            try addOrUpdateLink(Link(id: nil, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: duplicateAnnotation.id))
         }
         
-        if let note = noteWithAnnotationID(annotationID) {
-            try addOrUpdateNote(Note(id: nil, title: note.title, content: note.content, annotationID: duplicateAnnotationID))
+        if let note = noteWithAnnotationID(annotation.id) {
+            try addOrUpdateNote(Note(id: nil, title: note.title, content: note.content, annotationID: duplicateAnnotation.id))
         }
         
-        if let bookmark = bookmarkWithAnnotationID(annotationID) {
-            try addOrUpdateBookmark(Bookmark(id: nil, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotationID))
+        if let bookmark = bookmarkWithAnnotationID(annotation.id) {
+            try addOrUpdateBookmark(Bookmark(id: nil, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotation.id))
         }
         
-        for tagID in tagsWithAnnotationID(annotationID).flatMap({ $0.id }) {
-            try addOrUpdateAnnotationTag(annotationID: duplicateAnnotationID, tagID: tagID)
+        for tagID in tagsWithAnnotationID(annotation.id).flatMap({ $0.id }) {
+            try addOrUpdateAnnotationTag(annotationID: duplicateAnnotation.id, tagID: tagID)
         }
         
         return duplicateAnnotation
@@ -500,7 +459,7 @@ extension AnnotationStore {
             let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> ?? SetBox()
             annotationIDs.set.unionInPlace(ids)
             NSThread.currentThread().threadDictionary[annotationIDsKey] = annotationIDs
-        } else {
+        } else if !ids.isEmpty {
             // Immediately notify about these modified annotations when outside of a transaction
             annotationObservers.notify((source: .Local, annotations: allAnnotations(ids: ids)))
         }
@@ -518,7 +477,7 @@ extension AnnotationStore {
             let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> ?? SetBox()
             annotationIDs.set.unionInPlace(ids)
             NSThread.currentThread().threadDictionary[annotationIDsKey] = annotationIDs
-        } else {
+        } else if !ids.isEmpty {
             // Immediately notify about these modified annotations when outside of a transaction
             annotationObservers.notify((source: .Sync, annotations: allAnnotations(ids: ids)))
         }

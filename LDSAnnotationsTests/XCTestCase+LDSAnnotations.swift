@@ -85,8 +85,7 @@ extension XCTestCase {
                 try! annotationStore.trashNotebookWithID(notebookID)
             }
             for annotation in annotationStore.annotations() {
-                guard let annotationID = annotation.id else { continue }
-                try! annotationStore.trashAnnotationWithID(annotationID)
+                try! annotationStore.trashAnnotationWithID(annotation.id)
             }
             
             sync(annotationStore, session: session, token: &token, description: "Sync deleted annotations") { uploadCount, downloadCount in

@@ -66,12 +66,12 @@ extension AnnotationStore {
     /// Returns list of highlights, and creates related annotation
     public func addHighlights(docID docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source: String, device: String) throws -> [Highlight] {
         // First create an annotation for these highlights
-        guard let annotationID = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+        let annotation = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device)
         
         var highlights = [Highlight]()
         
         for paragraphRange in paragraphRanges {
-            let highlight = Highlight(id: nil, paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID)
+            let highlight = Highlight(id: nil, paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotation.id)
             highlights.append(try addOrUpdateHighlight(highlight))
         }
         

@@ -65,9 +65,9 @@ extension AnnotationStore {
     /// Returns a bookmark, and creates related annotation object
     public func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int, docID: String, docVersion: Int, iso639_3Code: String, source: String, device: String) throws -> Bookmark {
         // First, create an annotation for this bookmark
-        guard let annotationID = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+        let annotation = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device)
         
-        let bookmark = Bookmark(id: nil, name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID)
+        let bookmark = Bookmark(id: nil, name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotation.id)
         
         // Increment display order of bookmarks that come after this one
         try db.run(BookmarkTable.table.filter(BookmarkTable.displayOrder >= displayOrder).update(BookmarkTable.displayOrder += 1))
@@ -76,9 +76,15 @@ extension AnnotationStore {
     }
     
     /// Returns a bookmark after adding or updating it
-    public func addOrUpdateBookmark(bookmark: Bookmark) throws -> Bookmark {
+    public func addOrUpdateBookmark(bookmark: Bookmark, docID: String? = nil) throws -> Bookmark {
         guard bookmark.annotationID != 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a bookmark without an annotation ID.")
+        }
+        
+        if let docID = docID, var annotation = annotationWithID(bookmark.annotationID) where annotation.docID != docID {
+            // Bookmark was moved to a new docID, so update the annotation
+            annotation.docID = docID
+            try updateAnnotation(annotation)
         }
         
         if let id = bookmark.id {

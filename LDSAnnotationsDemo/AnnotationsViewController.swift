@@ -157,28 +157,26 @@ extension AnnotationsViewController: UITableViewDataSource {
     }
     
     private func subtitleFor(annotation annotation: Annotation) -> String {
-        guard let annotationID = annotation.id else { return "" }
-        
         var parts = [String]()
-        if let _ = annotationStore.noteWithAnnotationID(annotationID) {
+        if let _ = annotationStore.noteWithAnnotationID(annotation.id) {
             parts.append("1 note")
         }
-        if let _ = annotationStore.bookmarkWithAnnotationID(annotationID) {
+        if let _ = annotationStore.bookmarkWithAnnotationID(annotation.id) {
             parts.append("1 bookmark")
         }
-        let highlights = annotationStore.highlightsWithAnnotationID(annotationID)
+        let highlights = annotationStore.highlightsWithAnnotationID(annotation.id)
         if !highlights.isEmpty {
             parts.append("\(highlights.count) highlight(s)")
         }
-        let tags = annotationStore.tagsWithAnnotationID(annotationID)
+        let tags = annotationStore.tagsWithAnnotationID(annotation.id)
         if !tags.isEmpty {
             parts.append("\(tags.count) tag(s)")
         }
-        let links = annotationStore.linksWithAnnotationID(annotationID)
+        let links = annotationStore.linksWithAnnotationID(annotation.id)
         if !links.isEmpty {
             parts.append("\(links.count) link(s)")
         }
-        let notebooks = annotationStore.notebooksWithAnnotationID(annotationID)
+        let notebooks = annotationStore.notebooksWithAnnotationID(annotation.id)
         if !notebooks.isEmpty {
             parts.append("\(notebooks.count) notebook(s)")
         }

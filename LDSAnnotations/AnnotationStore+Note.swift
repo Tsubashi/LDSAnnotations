@@ -60,12 +60,12 @@ extension AnnotationStore {
     
     /// Adds note and related annotation, and associates it to notebook
     public func addNote(title title: String?, content: String, source: String, device: String, notebookID: Int64) throws -> Note {
-        guard let annotationID = try addAnnotation(iso639_3Code: "eng", docID: nil, docVersion: nil, source: source, device: device).id else { throw Error.errorWithCode(.SaveAnnotationFailed, failureReason: "Failed to create annotation") }
+        let annotation = try addAnnotation(iso639_3Code: "eng", docID: nil, docVersion: nil, source: source, device: device)
         
-        let note = try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
+        let note = try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotation.id))
         
         let displayOrder = numberOfAnnotations(notebookID: notebookID)
-        try addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
+        try addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebookID, displayOrder: displayOrder)
         
         return note
     }

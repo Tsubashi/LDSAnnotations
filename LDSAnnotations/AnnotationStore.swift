@@ -109,13 +109,13 @@ public class AnnotationStore {
                 
                 // Batch notify about any notebooks modified in this transaction
                 let notebookIDsKey = "notebookIDs:\(unsafeAddressOf(self))"
-                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> {
+                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> where !notebookIDs.set.isEmpty {
                     self.notebookObservers.notify((source: .Local, notebooks: self.allNotebooks(ids: Array(notebookIDs.set))))
                 }
                 
                 // Batch notify about any annotations modified in this transaction
                 let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
-                if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> {
+                if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> where !annotationIDs.set.isEmpty {
                     self.annotationObservers.notify((source: .Local, annotations: self.allAnnotations(ids: Array(annotationIDs.set))))
                 }
             }
@@ -139,13 +139,13 @@ public class AnnotationStore {
                 
                 // Batch notify about any notebooks modified in this transaction
                 let notebookIDsKey = "notebookIDs:\(unsafeAddressOf(self))"
-                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> {
+                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> where !notebookIDs.set.isEmpty {
                     self.notebookObservers.notify((source: .Sync, notebooks: self.allNotebooks(ids: Array(notebookIDs.set))))
                 }
                 
                 // Batch notify about any annotations modified in this transaction
                 let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
-                if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> {
+                if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> where !annotationIDs.set.isEmpty {
                     self.annotationObservers.notify((source: .Sync, annotations: self.allAnnotations(ids: Array(annotationIDs.set))))
                 }
             }
