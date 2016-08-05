@@ -139,8 +139,8 @@ class SyncAnnotationsOperation: Operation {
                 "timestamp": annotation.lastModified.formattedISO8601,
             ]
             
-            if annotation.status == .Active {
-                result["annotation"] = annotation.jsonObject(annotationStore)
+            if annotation.status == .Active, let jsonObject = annotation.jsonObject(annotationStore) {
+                result["annotation"] = jsonObject
             }
             
             return result
