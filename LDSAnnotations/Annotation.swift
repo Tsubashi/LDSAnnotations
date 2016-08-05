@@ -81,7 +81,9 @@ public struct Annotation: Equatable {
         self.status = (jsonObject["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
     }
     
-    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
+    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject]? {
+        guard let id = id else { return nil }
+        
         var result: [String: AnyObject] = [
             "@id": uniqueID,
             "@locale": iso639_3Code,
@@ -107,47 +109,42 @@ public struct Annotation: Equatable {
             result["device"] = device
         }
         
-        if let id = id, note = annotationStore.noteWithAnnotationID(id) {
+        if let note = annotationStore.noteWithAnnotationID(id) {
             result["note"] = note.jsonObject()
         }
 
-        // Derive the annotation type
-        var type: AnnotationType?
+        // Derive the annotation type, this is a required field
+        var type: AnnotationType = .Journal
         
-        if let id = id {
-            if let bookmark = annotationStore.bookmarkWithAnnotationID(id) {
-                // If the annotation has a bookmark, it should never have highlights, tags, links, etc
-                type = .Bookmark
-                result["bookmark"] = bookmark.jsonObject()
-            } else {
-                let notebooks = annotationStore.notebooksWithAnnotationID(id)
-                if !notebooks.isEmpty {
-                    result["folders"] = ["folder": notebooks.map({ $0.annotationNotebookJsonObject() })]
-                    type = .Journal
-                }
-
-                let highlights = annotationStore.highlightsWithAnnotationID(id)
-                if !highlights.isEmpty {
-                    result["highlights"] = ["highlight": highlights.map({ $0.jsonObject() })]
-                    type = .Highlight
-                }
-                
-                let tags = annotationStore.tagsWithAnnotationID(id)
-                if !tags.isEmpty {
-                    result["tags"] = ["tag": tags.map({ $0.jsonObject() })]
-                }
-                
-                let links = annotationStore.linksWithAnnotationID(id)
-                if !links.isEmpty {
-                    result["refs"] = ["ref": links.map({ $0.jsonObject() })]
-                    type = .Link // If there are 1 or more links, it MUST be a .Link type
-                }
+        if let bookmark = annotationStore.bookmarkWithAnnotationID(id) {
+            // If the annotation has a bookmark, it should never have highlights, tags, links, etc
+            type = .Bookmark
+            result["bookmark"] = bookmark.jsonObject()
+        } else {
+            let notebooks = annotationStore.notebooksWithAnnotationID(id)
+            if !notebooks.isEmpty {
+                result["folders"] = ["folder": notebooks.map({ $0.annotationNotebookJsonObject() })]
+            }
+            
+            let highlights = annotationStore.highlightsWithAnnotationID(id)
+            if !highlights.isEmpty {
+                result["highlights"] = ["highlight": highlights.map({ $0.jsonObject() })]
+                type = .Highlight
+            }
+            
+            let tags = annotationStore.tagsWithAnnotationID(id)
+            if !tags.isEmpty {
+                result["tags"] = ["tag": tags.map({ $0.jsonObject() })]
+            }
+            
+            let links = annotationStore.linksWithAnnotationID(id)
+            if !links.isEmpty {
+                result["refs"] = ["ref": links.map({ $0.jsonObject() })]
+                type = .Link // If there are 1 or more links, it MUST be a .Link type
             }
         }
         
-        if let type = type {
-            result["@type"] = type.rawValue
-        }
+        result["@type"] = type.rawValue
         
         return result
     }
