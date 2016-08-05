@@ -20,27 +20,28 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-import Swiftification
+import XCTest
+@testable import LDSAnnotations
 
-public class SessionController {
-    
-    public static let sharedController = SessionController()
-    
-    private var sessionByUsername = [String: Session]()
-    public let sessionAddedObservers = ObserverSet<Session>()
-    
-    public func addSession(session: Session, withUsername username: String) {
-        sessionByUsername[username] = session
-        sessionAddedObservers.notify(session)
-    }
+class SessionControllerNotificationTests: XCTestCase {
 
-    public func removeSessionForUsername(username: String) {
-        sessionByUsername.removeValueForKey(username)
-    }
-    
-    public func sessionForUsername(username: String) -> Session? {
-        return sessionByUsername[username]
+    func testSessionAddedNotification() {
+        let expectation = expectationWithDescription("Notification Received")
+
+        let testSession = createSession()
+
+        let sessionController = SessionController.sharedController
+        let observer = sessionController.sessionAddedObservers.add { session in
+            expectation.fulfill()
+            XCTAssertEqual(session, testSession)
+        }
+        
+        sessionController.addSession(testSession, withUsername: testSession.username)
+        
+        waitForExpectationsWithTimeout(30, handler: nil)
+        
+        sessionController.sessionAddedObservers.remove(observer)
+        sessionController.removeSessionForUsername(testSession.username)
     }
     
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		62D7BDEA8988C62655386B21 /* Pods_LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */; };
 		C0F4661ACDB75A9524871D89 /* Pods_LDSAnnotations_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EA770A28615F5691ADAD66C /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */; };
+		D403E25E1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */; };
 		D40ADDD01D0F0BEE004FA7F5 /* OrderBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */; };
 		D40F0A221C975368002D61EA /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A211C975368002D61EA /* Annotation.swift */; };
 		D40F0A261C976507002D61EA /* Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A251C976507002D61EA /* Highlight.swift */; };
@@ -86,6 +87,7 @@
 		65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		665C48DC0014C1BF3A79EFD5 /* Pods-LDSAnnotations.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.release.xcconfig"; sourceTree = "<group>"; };
 		BFBB32924C908E5E60760FC4 /* Pods-LDSAnnotations.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.debug.xcconfig"; sourceTree = "<group>"; };
+		D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionControllerNotificationTests.swift; sourceTree = "<group>"; };
 		D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderBy.swift; sourceTree = "<group>"; };
 		D40F0A211C975368002D61EA /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		D40F0A251C976507002D61EA /* Highlight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Highlight.swift; sourceTree = "<group>"; };
@@ -211,6 +213,7 @@
 				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
 				D95392CF1D02611200CB4921 /* LinkTests.swift */,
+				D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */,
 				D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */,
 				D4AB10FA1D5134D8001C3C0E /* SyncAnnotationsTests.swift */,
 				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
@@ -527,6 +530,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D95392D01D02611200CB4921 /* LinkTests.swift in Sources */,
+				D403E25E1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift in Sources */,
 				D4AB10FB1D5134D8001C3C0E /* SyncAnnotationsTests.swift in Sources */,
 				D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */,
 				D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */,
