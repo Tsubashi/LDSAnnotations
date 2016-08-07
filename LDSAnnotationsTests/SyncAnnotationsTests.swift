@@ -259,16 +259,16 @@ class SyncAnnotationsTests: XCTestCase {
         
         let notebook = try! annotationStore1.addNotebook(name: "Notebook")
         
-        let note1 = try! annotationStore1.addNote(title: "Title1", content: "Content1", source: "Test", device: "iphone", notebookID: notebook.id!)
+        let note1 = try! annotationStore1.addNote(title: "Title1", content: "Content1", source: "Test", device: "iphone", notebookID: notebook.id)
         let annotation1 = annotationStore1.annotationWithID(note1.annotationID)!
         
-        let note2 = try! annotationStore1.addNote(title: "Title2", content: "Content2", source: "Test", device: "iphone", notebookID: notebook.id!)
+        let note2 = try! annotationStore1.addNote(title: "Title2", content: "Content2", source: "Test", device: "iphone", notebookID: notebook.id)
         let annotation2 = annotationStore1.annotationWithID(note2.annotationID)!
 
-        let note3 = try! annotationStore1.addNote(title: "Title3", content: "Content3", source: "Test", device: "iphone", notebookID: notebook.id!)
+        let note3 = try! annotationStore1.addNote(title: "Title3", content: "Content3", source: "Test", device: "iphone", notebookID: notebook.id)
         let annotation3 = annotationStore1.annotationWithID(note3.annotationID)!
 
-        let note4 = try! annotationStore1.addNote(title: "Title4", content: "Content4", source: "Test", device: "iphone", notebookID: notebook.id!)
+        let note4 = try! annotationStore1.addNote(title: "Title4", content: "Content4", source: "Test", device: "iphone", notebookID: notebook.id)
         let annotation4 = annotationStore1.annotationWithID(note4.annotationID)!
 
         // Upload the changes
@@ -281,7 +281,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         let shuffledAnnotationIDs = [annotation1.id, annotation2.id, annotation3.id, annotation4.id].shuffle()
-        try! annotationStore1.reorderAnnotationIDs(shuffledAnnotationIDs, notebookID: notebook.id!)
+        try! annotationStore1.reorderAnnotationIDs(shuffledAnnotationIDs, notebookID: notebook.id)
         
         // Upload the changes
         sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
@@ -306,9 +306,9 @@ class SyncAnnotationsTests: XCTestCase {
         
         // Add an annotation to one annotation store
         let notebook = try! annotationStore1.addNotebook(name: "Notebook1")
-        let note1 = try! annotationStore1.addNote(title: "NoteTitle1", content: "NoteContent1", source: "Test", device: "iphone", notebookID: notebook.id!)
+        let note1 = try! annotationStore1.addNote(title: "NoteTitle1", content: "NoteContent1", source: "Test", device: "iphone", notebookID: notebook.id)
         
-        let note2 = try! annotationStore1.addNote(title: "NoteTitle2", content: "NoteContent2", source: "Test", device: "iphone", notebookID: notebook.id!)
+        let note2 = try! annotationStore1.addNote(title: "NoteTitle2", content: "NoteContent2", source: "Test", device: "iphone", notebookID: notebook.id)
         let annotation2 = annotationStore1.annotationWithID(note2.annotationID)!
         
         // Upload the changes
@@ -343,7 +343,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a notebook, sync the change
-        try! annotationStore1.trashNoteWithID(notebook.id!)
+        try! annotationStore1.trashNoteWithID(notebook.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -457,8 +457,8 @@ class SyncAnnotationsTests: XCTestCase {
         let notebooks2 = annotationStore1.notebooks().filter { $0.status == .Active }
         XCTAssertEqual(notebooks1.count, notebooks2.count)
         
-        let notebookAnnotations1 = notebooks1.map { (uniqueID: $0.uniqueID, annotations: annotationStore1.annotationsWithNotebookID($0.id!)) }
-        let notebookAnnotations2 = notebooks2.map { (uniqueID: $0.uniqueID, annotations: annotationStore2.annotationsWithNotebookID($0.id!)) }
+        let notebookAnnotations1 = notebooks1.map { (uniqueID: $0.uniqueID, annotations: annotationStore1.annotationsWithNotebookID($0.id)) }
+        let notebookAnnotations2 = notebooks2.map { (uniqueID: $0.uniqueID, annotations: annotationStore2.annotationsWithNotebookID($0.id)) }
         
         for (uniqueID, highlights1) in annotationHighlights1 {
             guard let highlights2 = annotationHighlights2.find({ $0.uniqueID == uniqueID }).map({ $0.highlights }) else {

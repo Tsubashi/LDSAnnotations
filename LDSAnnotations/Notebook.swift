@@ -26,7 +26,7 @@ import Foundation
 public struct Notebook: Equatable {
 
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
     
     /// Display name.
     public var name: String
@@ -42,26 +42,13 @@ public struct Notebook: Equatable {
     
     var description: String?
     
-    init(id: Int64?, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: NSDate) {
+    init(id: Int64, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: NSDate) {
         self.id = id
         self.uniqueID = uniqueID
         self.name = name
         self.description = description
         self.status = status
         self.lastModified = lastModified
-    }
-    
-    init?(jsonObject: [String: AnyObject]) {
-        guard let uniqueID = jsonObject["@guid"] as? String, name = jsonObject["label"] as? String, rawLastModified = jsonObject["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
-            return nil
-        }
-        
-        self.id = nil
-        self.uniqueID = uniqueID
-        self.name = name
-        self.lastModified = lastModified
-        self.description = jsonObject["desc"] as? String
-        self.status = (jsonObject["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
     }
     
     func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
@@ -78,11 +65,9 @@ public struct Notebook: Equatable {
             result["@status"] = status.rawValue
         }
         
-        if let id = id {
-            let annotations = annotationStore.annotationsWithNotebookID(id)
-            if !annotations.isEmpty {
-                result["order"] = ["id": annotations.map { $0.uniqueID }]
-            }
+        let annotations = annotationStore.annotationsWithNotebookID(id)
+        if !annotations.isEmpty {
+            result["order"] = ["id": annotations.map { $0.uniqueID }]
         }
         
         return result

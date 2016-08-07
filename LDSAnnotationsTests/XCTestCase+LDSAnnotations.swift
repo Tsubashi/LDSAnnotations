@@ -81,8 +81,7 @@ extension XCTestCase {
         let deleteCount = annotationStore.annotationCount() + annotationStore.notebookCount()
         if deleteCount > 0 {
             for notebook in annotationStore.notebooks() {
-                guard let notebookID = notebook.id else { continue }
-                try! annotationStore.trashNotebookWithID(notebookID)
+                try! annotationStore.trashNotebookWithID(notebook.id)
             }
             for annotation in annotationStore.annotations() {
                 try! annotationStore.trashAnnotationWithID(annotation.id)

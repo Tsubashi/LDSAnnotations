@@ -142,22 +142,35 @@ class SyncNotebooksOperation: Operation {
                     throw Error.errorWithCode(.Unknown, failureReason: "Missing folderId")
                 }
                 
-                guard let folder = change["folder"] as? [String: AnyObject], downloadedNotebook = Notebook(jsonObject: folder) else {
+                guard let folder = change["folder"] as? [String: AnyObject] else {
                     throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize folder")
                 }
 
                 if let order = folder["order"] as? [String: [String]] {
-                    notebookAnnotationIDs[downloadedNotebook.uniqueID] = order["id"]
+                    notebookAnnotationIDs[uniqueID] = order["id"]
                 }
                 
                 switch changeType {
                 case .New:
-                    if let existingNotebook = annotationStore.notebookWithUniqueID(uniqueID) {
-                        var mergedNotebook = downloadedNotebook
-                        mergedNotebook.id = existingNotebook.id
-                        annotationStore.addOrUpdateNotebook(mergedNotebook)
+                    guard let rawLastModified = folder["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
+                        throw Error.errorWithCode(.Unknown, failureReason: "Missing last modified date")
+                    }
+                    guard let name = folder["label"] as? String else {
+                        throw Error.errorWithCode(.Unknown, failureReason: "Missing name")
+                    }
+                    
+                    let description = folder["desc"] as? String
+                    let status = (folder["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
+                    
+                    let downloadedNotebook: Notebook
+                    if var existingNotebook = annotationStore.notebookWithUniqueID(uniqueID) {
+                        existingNotebook.name = name
+                        existingNotebook.description = description
+                        existingNotebook.status = status
+                        existingNotebook.lastModified = lastModified
+                        downloadedNotebook = try annotationStore.updateNotebook(existingNotebook, inSync: true)
                     } else {
-                        annotationStore.addOrUpdateNotebook(downloadedNotebook)
+                        downloadedNotebook = try annotationStore.addNotebook(uniqueID: uniqueID, name: name, description: description, status: status, lastModified: lastModified, inSync: true)
                     }
                     downloadedNotebooks.append(downloadedNotebook)
                     
@@ -178,9 +191,7 @@ class SyncNotebooksOperation: Operation {
         // Cleanup any notebooks with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
         let notebooksToDelete = annotationStore.allNotebooks(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .Active }
         for notebook in notebooksToDelete {
-            guard let notebookID = notebook.id else { continue }
-            
-            try annotationStore.deleteNotebookWithID(notebookID)
+            try annotationStore.deleteNotebookWithID(notebook.id)
         }
     }
     

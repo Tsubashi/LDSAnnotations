@@ -101,8 +101,7 @@ class AnnotationStoreTests: XCTestCase {
         var date = NSDate()
         var notebooks = [Notebook]()
         for i in 0..<alphabet.count {
-            let notebook = Notebook(id: nil, uniqueID: "\(i)", name: alphabet[i], description: nil, status: .Active, lastModified: date)
-            notebooks.append(annotationStore.addOrUpdateNotebook(notebook)!)
+            notebooks.append(try! annotationStore.addNotebook(uniqueID: "\(i)", name: alphabet[i], description: nil, status: .Active, lastModified: date, inSync: false))
             date = date.dateByAddingTimeInterval(1)
         }
         
@@ -389,11 +388,11 @@ class AnnotationStoreTests: XCTestCase {
         var annotationIDs = [Int64]()
         
         for letter in alphabet {
-            let note = try! annotationStore.addNote(title: nil, content: letter, source: "Test", device: "iphone", notebookID: notebook.id!)
+            let note = try! annotationStore.addNote(title: nil, content: letter, source: "Test", device: "iphone", notebookID: notebook.id)
             annotationIDs.append(note.annotationID)
         }
 
-        XCTAssertEqual(alphabet.count, annotationStore.annotationIDsForNotebookWithID(notebook.id!).count, "Didn't load all annotation IDs")
+        XCTAssertEqual(alphabet.count, annotationStore.annotationIDsForNotebookWithID(notebook.id).count, "Didn't load all annotation IDs")
     }
     
     func testGetAnnotationIDsForTag() {
@@ -467,10 +466,10 @@ class AnnotationStoreTests: XCTestCase {
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id!, displayOrder: displayOrder)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
-        XCTAssertEqual(annotationStore.numberOfAnnotations(notebookID: notebook.id!), annotations.count)
+        XCTAssertEqual(annotationStore.numberOfAnnotations(notebookID: notebook.id), annotations.count)
     }
     
     func testReorderAnnotationIDs() {
@@ -487,13 +486,13 @@ class AnnotationStoreTests: XCTestCase {
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id!, displayOrder: displayOrder)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
         let reversedAnnotationIDs = Array(annotations.map { $0.id }.reverse())
-        try! annotationStore.reorderAnnotationIDs(reversedAnnotationIDs, notebookID: notebook.id!)
+        try! annotationStore.reorderAnnotationIDs(reversedAnnotationIDs, notebookID: notebook.id)
 
-        XCTAssertEqual(reversedAnnotationIDs, annotationStore.annotationIDsForNotebookWithID(notebook.id!))
+        XCTAssertEqual(reversedAnnotationIDs, annotationStore.annotationIDsForNotebookWithID(notebook.id))
     }
     
     func testDeleteAnnotationNotebook() {
@@ -507,16 +506,16 @@ class AnnotationStoreTests: XCTestCase {
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id!, displayOrder: displayOrder)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
         let firstAnnotationID = annotations.first!.id
-        try! annotationStore.deleteAnnotation(annotationID: firstAnnotationID, fromNotebook: notebook.id!)
+        try! annotationStore.deleteAnnotation(annotationID: firstAnnotationID, fromNotebook: notebook.id)
         // Verify annotation has been marked as .Trashed now that its empty
         XCTAssertTrue(annotationStore.annotationWithID(firstAnnotationID)?.status == .Trashed)
 
         let secondAnnotationID = annotations.last!.id
-        try! annotationStore.deleteAnnotation(annotationID: secondAnnotationID, fromNotebook: notebook.id!)
+        try! annotationStore.deleteAnnotation(annotationID: secondAnnotationID, fromNotebook: notebook.id)
         // Verify annotation has been marked as .Trashed now that its empty
         XCTAssertTrue(annotationStore.annotationWithID(secondAnnotationID)?.status == .Trashed)
     }
@@ -576,12 +575,12 @@ class AnnotationStoreTests: XCTestCase {
         
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
-        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id!)
+        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id)
         
         XCTAssertNotEqual(notebook.lastModified, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.lastModified, "Notebook last modified date should have changed")
         XCTAssertEqual(notebook.status.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should not have changed")
 
-        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id!, status: .Trashed)
+        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, status: .Trashed)
         XCTAssertNotEqual(notebook.lastModified, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.lastModified, "Notebook last modified date should have changed")
         XCTAssertEqual(AnnotationStatus.Trashed.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should have been changed to .Trashed")
     }
@@ -597,19 +596,19 @@ class AnnotationStoreTests: XCTestCase {
         ]
         
         for (displayOrder, annotation) in annotations.enumerate() {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id!, displayOrder: displayOrder)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
-        try! annotationStore.trashNotebookWithID(notebook.id!)
+        try! annotationStore.trashNotebookWithID(notebook.id)
         XCTAssertTrue(annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status == .Trashed)
-        XCTAssertEqual(0, annotationStore.annotationsWithNotebookID(notebook.id!).count)
+        XCTAssertEqual(0, annotationStore.annotationsWithNotebookID(notebook.id).count)
     }
 
     func testTrashNotebookWithID() {
         let annotationStore = AnnotationStore()!
         
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
-        try! annotationStore.trashNotebookWithID(notebook.id!)
+        try! annotationStore.trashNotebookWithID(notebook.id)
         XCTAssertTrue(annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status == .Trashed)
     }
 
@@ -618,7 +617,7 @@ class AnnotationStoreTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
-        try! annotationStore.deleteNotebookWithID(notebook.id!)
+        try! annotationStore.deleteNotebookWithID(notebook.id)
         
         XCTAssertNil(annotationStore.notebookWithUniqueID(notebook.uniqueID))
     }
@@ -651,7 +650,7 @@ class AnnotationStoreTests: XCTestCase {
         try! annotationStore.addTag(name: "TestTag", annotationID: annotation.id)
         
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
-        try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id!, displayOrder: 1)
+        try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: 1)
         
         try! annotationStore.trashAnnotationWithID(annotation.id)
      
