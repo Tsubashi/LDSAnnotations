@@ -28,7 +28,7 @@ public struct Bookmark: Equatable {
     static let Offset = -1
     
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
     
     /// The name.
     public var name: String?
@@ -45,27 +45,13 @@ public struct Bookmark: Equatable {
     /// The word offset of this bookmark location.
     var offset: Int
     
-    init(id: Int64?, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int = Bookmark.Offset) {
+    init(id: Int64, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int = Bookmark.Offset) {
         self.id = id
         self.name = name
         self.paragraphAID = paragraphAID
         self.displayOrder = displayOrder
         self.annotationID = annotationID
         self.offset = offset
-    }
-    
-    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
-        if jsonObject["@pid"] == nil && jsonObject["uri"] != nil {
-            // Bookmark has a URI, but no @pid so its invalid. If both ar nil, its a valid chapter-level bookmark
-            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize bookmark, missing PID: \(jsonObject)")
-        }
-        
-        self.id = nil
-        self.name = jsonObject["name"] as? String
-        self.paragraphAID = jsonObject["@pid"] as? String
-        self.displayOrder = jsonObject["sort"] as? Int
-        self.annotationID = annotationID
-        self.offset = jsonObject["@offset"] as? Int ?? Bookmark.Offset
     }
     
     func jsonObject() -> [String: AnyObject] {

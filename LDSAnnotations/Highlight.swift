@@ -26,7 +26,7 @@ import Foundation
 public struct Highlight: Equatable {
     
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
 
     /// Paragraph Range (AID, start & end word offsets)
     public let paragraphRange: ParagraphRange
@@ -40,28 +40,12 @@ public struct Highlight: Equatable {
     /// ID of annotation.
     public var annotationID: Int64
     
-    public init(id: Int64?, paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle?, annotationID: Int64) {
+    public init(id: Int64, paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle?, annotationID: Int64) {
         self.id = id
         self.paragraphRange = paragraphRange
         self.colorName = colorName
         self.style = style ?? .Highlight
         self.annotationID = annotationID
-    }
-    
-    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
-        guard let offsetStartString = jsonObject["@offset-start"] as? String, offsetStart = Int(offsetStartString), offsetEndString = jsonObject["@offset-end"] as? String, offsetEnd = Int(offsetEndString), colorName = jsonObject["@color"] as? String else {
-            throw Error.errorWithCode(.InvalidHighlight, failureReason: "Failed to deserialize highlight: \(jsonObject)")
-        }
-        
-        guard let paragraphAID = jsonObject["@pid"] as? String else {
-            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize highlight, missing PID: \(jsonObject)")
-        }
-        
-        self.id = nil
-        self.paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
-        self.colorName = colorName
-        self.annotationID = annotationID
-        self.style = (jsonObject["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
     }
     
     func jsonObject() -> [String: AnyObject] {

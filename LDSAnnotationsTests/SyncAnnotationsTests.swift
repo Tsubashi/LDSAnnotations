@@ -50,7 +50,7 @@ class SyncAnnotationsTests: XCTestCase {
         // Make changes to note
         note.title = "AfterTitle"
         note.content = "AfterContent"
-        try! annotationStore1.addOrUpdateNote(note)
+        try! annotationStore1.updateNote(note)
         
         // Upload the changes
         sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
@@ -129,7 +129,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
 
         // Delete a highlight, sync the change
-        try! annotationStore1.trashHighlightWithID(highlight1.id!)
+        try! annotationStore1.trashHighlightWithID(highlight1.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -140,7 +140,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
 
         // Delete a highlight, sync the change
-        try! annotationStore1.trashHighlightWithID(highlight2.id!)
+        try! annotationStore1.trashHighlightWithID(highlight2.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -176,7 +176,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a link, sync the change
-        try! annotationStore1.trashLinkWithID(link1.id!)
+        try! annotationStore1.trashLinkWithID(link1.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -187,7 +187,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a link, sync the change
-        try! annotationStore1.trashLinkWithID(link2.id!)
+        try! annotationStore1.trashLinkWithID(link2.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -224,7 +224,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a tag, sync the change
-        try! annotationStore1.trashTagWithID(tag1.id!)
+        try! annotationStore1.trashTagWithID(tag1.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -235,7 +235,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a tag, sync the change
-        try! annotationStore1.trashTagWithID(tag2.id!)
+        try! annotationStore1.trashTagWithID(tag2.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -321,7 +321,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
 
         // Delete a note, sync the change
-        try! annotationStore1.trashNoteWithID(note1.id!)
+        try! annotationStore1.trashNoteWithID(note1.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -378,7 +378,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a highlight, sync the change
-        try! annotationStore1.trashNoteWithID(note.id!)
+        try! annotationStore1.trashNoteWithID(note.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         
@@ -413,7 +413,7 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete bookmark and sync the change
-        try! annotationStore1.trashBookmarkWithID(bookmark.id!)
+        try! annotationStore1.trashBookmarkWithID(bookmark.id)
         
         sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
         

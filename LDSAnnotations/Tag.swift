@@ -26,22 +26,13 @@ import Foundation
 public struct Tag: Equatable {
     
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
     
     /// Tag name
     public var name: String
     
-    init(id: Int64?, name: String) {
+    init(id: Int64, name: String) {
         self.id = id
-        self.name = name
-    }
-    
-    init(name tagName: String?) throws {
-        guard let name = tagName else {
-            throw Error.errorWithCode(.InvalidTag, failureReason: "Failed to deserialize tag: \(tagName)")
-        }
-        
-        self.id = nil
         self.name = name
     }
     

@@ -28,7 +28,7 @@ public struct Note: Equatable {
     public static let MaxLength = 20000
     
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
     
     /// Note title
     public var title: String?
@@ -39,17 +39,10 @@ public struct Note: Equatable {
     /// ID of annotation
     public var annotationID: Int64
     
-    init(id: Int64?, title: String?, content: String, annotationID: Int64) {
+    init(id: Int64, title: String?, content: String, annotationID: Int64) {
         self.id = id
         self.title = title
         self.content = content
-        self.annotationID = annotationID
-    }
-    
-    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
-        self.id = nil
-        self.title = jsonObject["title"] as? String
-        self.content = jsonObject["content"] as? String ?? ""
         self.annotationID = annotationID
     }
     

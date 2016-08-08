@@ -26,7 +26,7 @@ import Foundation
 public struct Link: Equatable {
 
     /// Local ID.
-    public internal(set) var id: Int64?
+    public internal(set) var id: Int64
 
     public var name: String
     
@@ -42,29 +42,12 @@ public struct Link: Equatable {
     /// Destination Paragraph Annotation IDs
     public var paragraphAIDs: [String]
 
-    init(id: Int64?, name: String, docID: String, docVersion: Int, paragraphAIDs: [String], annotationID: Int64) {
+    init(id: Int64, name: String, docID: String, docVersion: Int, paragraphAIDs: [String], annotationID: Int64) {
         self.id = id
         self.name = name
         self.docID = docID
         self.docVersion = docVersion
         self.paragraphAIDs = paragraphAIDs
-        self.annotationID = annotationID
-    }
-    
-    init(jsonObject: [String: AnyObject], annotationID: Int64) throws {
-        guard let name = jsonObject["$"] as? String else {
-            throw Error.errorWithCode(.InvalidLink, failureReason: "Failed to deserialize link: \(jsonObject)")
-        }
-        
-        guard let paragraphAIDs = jsonObject["@pid"] as? String, docID = jsonObject["@docId"] as? String, docVersionString = jsonObject["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
-            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize link, missing PID: \(jsonObject)")
-        }
-        
-        self.id = nil
-        self.name = name
-        self.docID = docID
-        self.docVersion = docVersion
-        self.paragraphAIDs = paragraphAIDs.componentsSeparatedByString(",").map { $0.stringByTrimmingCharactersInSet(.whitespaceCharacterSet()) }
         self.annotationID = annotationID
     }
     

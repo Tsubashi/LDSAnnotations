@@ -51,39 +51,40 @@ extension AnnotationStore {
     
     /// Adds a new tag with `name`.
     public func addTag(name name: String, annotationID: Int64? = nil) throws -> Tag {
-        let tag = try addOrUpdateTag(Tag(name: name))
+        guard !name.isEmpty else {
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
+        }
         
-        if let annotationID = annotationID, tagID = tag.id {
-            try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID)
+        let tag: Tag
+        if let existingTag = try db.prepare(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercaseString).limit(1)).map({ TagTable.fromRow($0) }).first {
+            // Tag already exists with this name
+            tag = existingTag
+        } else {
+            // Insert this new tag
+            let id = try db.run(TagTable.table.insert(
+                TagTable.name <- name
+            ))
+            tag = Tag(id: id, name: name)
+        }
+        
+        if let annotationID = annotationID {
+            try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tag.id)
         }
         
         return tag
     }
     
-    /// Adds or updates tag
-    public func addOrUpdateTag(tag: Tag) throws -> Tag {
+    /// Updates tag
+    public func updateTag(tag: Tag) throws -> Tag {
         guard !tag.name.isEmpty else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
         }
         
-        if let id = tag.id {
-            // Update an existing tag
-            try db.run(TagTable.table.filter(TagTable.id == id).update(
-                TagTable.name <- tag.name
-            ))
-            return tag
-            
-        } else if let tag = db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == tag.name.lowercaseString)).map({ TagTable.fromRow($0) }) {
-            // Tag already exists with this name
-            return tag
-            
-        } else {
-            // Insert this new tag
-            let id = try db.run(TagTable.table.insert(
-                TagTable.name <- tag.name
-            ))
-            return Tag(id: id, name: tag.name)
-        }
+        // Update an existing tag
+        try db.run(TagTable.table.filter(TagTable.id == tag.id).update(
+            TagTable.name <- tag.name
+        ))
+        return tag
     }
     
     /// Returns a list of active tags, order by OrderBy.

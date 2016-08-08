@@ -283,13 +283,14 @@ class SyncAnnotationsOperation: Operation {
                         // MARK: Note
                         
                         if let note = rawAnnotation["note"] as? [String: AnyObject] {
-                            let downloadedNote = try Note(jsonObject: note, annotationID: annotationID)
-                            if var databaseNote = annotationStore.noteWithAnnotationID(annotationID) {
-                                databaseNote.title = downloadedNote.title
-                                databaseNote.content = downloadedNote.content
-                                try annotationStore.addOrUpdateNote(databaseNote)
+                            let title = note["title"] as? String
+                            let content = note["content"] as? String ?? ""
+                            if var existingNote = annotationStore.noteWithAnnotationID(annotationID) {
+                                existingNote.title = title
+                                existingNote.content = content
+                                try annotationStore.updateNote(existingNote)
                             } else {
-                                try annotationStore.addOrUpdateNote(downloadedNote)
+                                try annotationStore.addNote(title: title, content: content, annotationID: annotationID)
                             }
                             downloadNoteCount += 1
                         } else if let noteID = annotationStore.noteWithAnnotationID(annotationID)?.id {
@@ -302,17 +303,27 @@ class SyncAnnotationsOperation: Operation {
                         
                         if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
                             do {
-                                let downloadedBookmark = try Bookmark(jsonObject: bookmark, annotationID: annotationID)
+                                if bookmark["@pid"] == nil && bookmark["uri"] != nil {
+                                    // Bookmark has a URI, but no @pid so its invalid. If both are nil, its a valid chapter-level bookmark
+                                    throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize bookmark, missing PID: \(bookmark)")
+                                }
+                                
+                                let name = bookmark["name"] as? String
+                                let paragraphAID = bookmark["@pid"] as? String
+                                let displayOrder = bookmark["sort"] as? Int ?? .max
+                                let offset = bookmark["@offset"] as? Int ?? Bookmark.Offset
                                 
                                 if var databaseBookmark = annotationStore.bookmarkWithAnnotationID(annotationID) {
-                                    databaseBookmark.name = downloadedBookmark.name
-                                    databaseBookmark.paragraphAID = downloadedBookmark.paragraphAID
-                                    databaseBookmark.displayOrder = downloadedBookmark.displayOrder
-                                    databaseBookmark.offset = downloadedBookmark.offset
-                                    try annotationStore.addOrUpdateBookmark(databaseBookmark)
+                                    databaseBookmark.name = name
+                                    databaseBookmark.paragraphAID = paragraphAID
+                                    databaseBookmark.displayOrder = displayOrder
+                                    databaseBookmark.offset = offset
+                                    
+                                    try annotationStore.updateBookmark(databaseBookmark)
                                 } else {
-                                    try annotationStore.addOrUpdateBookmark(downloadedBookmark)
+                                    try annotationStore.addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID, offset: offset)
                                 }
+                                
                                 downloadBookmarkCount += 1
                             } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
                                 // This will eventually come down from the service correctly once the HTML5 version is available, so just skip it for now
@@ -364,8 +375,18 @@ class SyncAnnotationsOperation: Operation {
                         if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                             for highlight in highlights["highlight"] ?? [] {
                                 do {
-                                    let downloadedHighlight = try Highlight(jsonObject: highlight, annotationID: annotationID)
-                                    try annotationStore.addOrUpdateHighlight(downloadedHighlight)
+                                    guard let offsetStartString = highlight["@offset-start"] as? String, offsetStart = Int(offsetStartString), offsetEndString = highlight["@offset-end"] as? String, offsetEnd = Int(offsetEndString), colorName = highlight["@color"] as? String else {
+                                        throw Error.errorWithCode(.InvalidHighlight, failureReason: "Failed to deserialize highlight: \(highlight)")
+                                    }
+                                    
+                                    guard let paragraphAID = highlight["@pid"] as? String else {
+                                        throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize highlight, missing PID: \(highlight)")
+                                    }
+
+                                    let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
+                                    let style = (highlight["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
+                                    
+                                    try annotationStore.addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID)
                                     downloadHighlightCount += 1
                                 
                                 } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
@@ -386,8 +407,15 @@ class SyncAnnotationsOperation: Operation {
                         if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                             for link in links["ref"] ?? [] {
                                 do {
-                                    let downloadedLink = try Link(jsonObject: link, annotationID: annotationID)
-                                    try annotationStore.addOrUpdateLink(downloadedLink)
+                                    guard let name = link["$"] as? String else {
+                                        throw Error.errorWithCode(.InvalidLink, failureReason: "Failed to deserialize link: \(link)")
+                                    }
+                                    
+                                    guard let paragraphAIDs = link["@pid"] as? String, docID = link["@docId"] as? String, docVersionString = link["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
+                                        throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize link, missing PID: \(link)")
+                                    }
+                                    
+                                    try annotationStore.addLink(name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs.componentsSeparatedByString(",").map { $0.trimmed() }, annotationID: annotationID)
                                     downloadLinkCount += 1
                                     
                                 } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
@@ -397,30 +425,18 @@ class SyncAnnotationsOperation: Operation {
                             }
                         }
                         
-                        
                         // MARK: Tags
                         
-                        var tagIDsToDelete = annotationStore.tagsWithAnnotationID(annotationID).flatMap { $0.id }
-                        if let tags = rawAnnotation["tags"] as? [String: [String]] {
-                            for tagName in tags["tag"] ?? [] {
-                                let downloadedTag = try Tag(name: tagName)
-                                let tag = try annotationStore.addOrUpdateTag(downloadedTag)
-                                downloadTagCount += 1
-                                
-                                if let tagID = tag.id {
-                                    try annotationStore.addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID)
-                                    
-                                    if let index = tagIDsToDelete.indexOf(tagID) {
-                                        tagIDsToDelete.removeAtIndex(index)
-                                    }
-                                }
-                            }
-                        }
-                        for tagID in tagIDsToDelete {
-                            // Any tag IDs left in `tagIDsToDelete` should be deleted because the service says they aren't connected anymore
+                        // Remove any existings tags from the annotation and then we'll re-added what the server sends us
+                        for tagID in annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id }) {
                             try annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID)
                         }
-                        
+                        if let tags = rawAnnotation["tags"] as? [String: [String]] {
+                            for tagName in tags["tag"] ?? [] {
+                                try annotationStore.addTag(name: tagName, annotationID: annotationID)
+                                downloadTagCount += 1
+                            }
+                        }
                     }
                 case .Trash, .Delete:
                     if let existingAnnotationID = annotationStore.annotationWithUniqueID(uniqueID)?.id {

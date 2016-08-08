@@ -419,19 +419,19 @@ extension AnnotationStore {
         let duplicateAnnotation = try addAnnotation(iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, source: source, device: device)
         
         for highlight in highlightsWithAnnotationID(annotation.id) {
-            try addOrUpdateHighlight(Highlight(id: nil, paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotation.id))
+            try addHighlight(paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotation.id)
         }
         
         for link in linksWithAnnotationID(annotation.id) {
-            try addOrUpdateLink(Link(id: nil, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: duplicateAnnotation.id))
+            try addLink(name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: duplicateAnnotation.id)
         }
         
         if let note = noteWithAnnotationID(annotation.id) {
-            try addOrUpdateNote(Note(id: nil, title: note.title, content: note.content, annotationID: duplicateAnnotation.id))
+            try addNote(title: note.title, content: note.content, annotationID: duplicateAnnotation.id)
         }
         
         if let bookmark = bookmarkWithAnnotationID(annotation.id) {
-            try addOrUpdateBookmark(Bookmark(id: nil, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotation.id))
+            try addBookmark(name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotation.id)
         }
         
         for tagID in tagsWithAnnotationID(annotation.id).flatMap({ $0.id }) {

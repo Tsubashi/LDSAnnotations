@@ -27,57 +27,120 @@ import Swiftification
 class HighlightTests: XCTestCase {
     
     func testHighlightMissingPID() {
-        let input = [
+        let highlight = [
             "@offset-start": "3",
             "@offset-end": "7",
             "@color": "yellow",
         ]
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
         do {
-            let _ = try Highlight(jsonObject: input, annotationID: 1)
-            XCTFail("Expected an error")
+            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
         } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+            XCTFail("Don't expect this error to be thrown, the highlight should just have been skipped")
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
+        
+        XCTAssertTrue(annotationStore.highlightsWithAnnotationID(1).isEmpty)
+    }
+    
+    func testHighlightMissingOffset() {
+        let highlight = [
+            "@offset-end": "7",
+            "@color": "yellow",
+            "@pid": "20527924",
+        ]
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
+        do {
+            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidHighlight {
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+        
+        XCTAssertTrue(annotationStore.highlightsWithAnnotationID(1).isEmpty)
     }
     
     func testHighlightWithOffset() {
-        let input = [
+        let highlight = [
             "@offset-start": "2",
             "@offset-end": "6",
             "@pid": "20527924",
             "@color": "yellow",
         ]
-        let expected = Highlight(id: nil, paragraphRange: ParagraphRange(paragraphAID: "20527924", startWordOffset: 2, endWordOffset: 6), colorName: "yellow", style: .Highlight, annotationID: 1)
-        let actual = try! Highlight(jsonObject: input, annotationID: 1)
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
+        do {
+            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+        
+        XCTAssertFalse(annotationStore.highlightsWithAnnotationID(1).isEmpty)
+        
+        let expected = Highlight(id: 1, paragraphRange: ParagraphRange(paragraphAID: "20527924", startWordOffset: 2, endWordOffset: 6), colorName: "yellow", style: .Highlight, annotationID: 1)
+        let actual = annotationStore.highlightsWithAnnotationID(1).first
+        
         XCTAssertEqual(actual, expected)
-        let output = actual.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, expectedOutputFromInput(input))
     }
-    
+
     func testHighlightWithSentinelOffset() {
-        let input = [
+        let highlight = [
             "@offset-start": "-1",
             "@offset-end": "-1",
             "@pid": "20527924",
             "@color": "yellow",
         ]
-        let expected = Highlight(id: nil, paragraphRange: ParagraphRange(paragraphAID: "20527924"), colorName: "yellow", style: .Highlight, annotationID: 1)
-        let actual = try! Highlight(jsonObject: input, annotationID: 1)
-        XCTAssertEqual(actual, expected)
-        let output = actual.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, expectedOutputFromInput(input))
-    }
-    
-    private func expectedOutputFromInput(input: [String: AnyObject]) -> [String: NSObject] {
-        return input.mapValues { key, value in
-            switch key {
-            case "@offset-start", "@offset-end":
-                return Int(value as! String)!
-            default:
-                return value as! NSObject
-            }
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
+        do {
+            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+        } catch {
+            XCTFail("Unexpected error: \(error)")
         }
+        
+        XCTAssertFalse(annotationStore.highlightsWithAnnotationID(1).isEmpty)
+        
+        let expected = Highlight(id: 1, paragraphRange: ParagraphRange(paragraphAID: "20527924"), colorName: "yellow", style: .Highlight, annotationID: 1)
+        let actual = annotationStore.highlightsWithAnnotationID(1).first
+        
+        XCTAssertEqual(actual, expected)
     }
     
+}
+
+func payloadForHighlight(highlight: [String: AnyObject]) -> [String: AnyObject] {
+    let uniqueID = NSUUID().UUIDString
+    let annotation = [
+        "changeType": "new",
+        "timestamp" : "2016-08-04T11:21:38.849-06:00",
+        "annotationId" : uniqueID,
+        "annotation": [
+            "source": "Test",
+            "@type": "highlight",
+            "@docId": "1",
+            "device": "iphone",
+            "@status": "",
+            "timestamp": "2016-08-04T11:26:09.440-06:00",
+            "@id": uniqueID,
+            "@locale": "eng",
+            "highlights": ["highlight": [highlight]]
+        ]
+    ]
+    let annotations = [annotation]
+    return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
 }

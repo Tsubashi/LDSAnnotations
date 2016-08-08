@@ -71,45 +71,46 @@ extension AnnotationStore {
         var highlights = [Highlight]()
         
         for paragraphRange in paragraphRanges {
-            let highlight = Highlight(id: nil, paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotation.id)
-            highlights.append(try addOrUpdateHighlight(highlight))
+            let highlight = try addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotation.id)
+            highlights.append(highlight)
         }
         
         return highlights
     }
     
-    /// Adds or updates highlight
-    public func addOrUpdateHighlight(highlight: Highlight) throws -> Highlight {
+    /// Adds a highlight
+    func addHighlight(paragraphRange paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle, annotationID: Int64) throws -> Highlight {
+        let id = try db.run(HighlightTable.table.insert(
+            HighlightTable.paragraphAID <- paragraphRange.paragraphAID,
+            HighlightTable.offsetStart <- paragraphRange.startWordOffset,
+            HighlightTable.offsetEnd <- paragraphRange.endWordOffset,
+            HighlightTable.colorName <- colorName,
+            HighlightTable.style <- style,
+            HighlightTable.annotationID <- annotationID
+        ))
+        
+        return Highlight(id: id, paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID)
+    }
+    
+    /// Update highlight
+    public func updateHighlight(highlight: Highlight) throws -> Highlight {
         guard highlight.annotationID != 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
-        if let id = highlight.id {
-            try db.run(HighlightTable.table.filter(HighlightTable.id == id).update(
-                HighlightTable.paragraphAID <- highlight.paragraphRange.paragraphAID,
-                HighlightTable.offsetStart <- highlight.paragraphRange.startWordOffset,
-                HighlightTable.offsetEnd <- highlight.paragraphRange.endWordOffset,
-                HighlightTable.colorName <- highlight.colorName,
-                HighlightTable.style <- highlight.style,
-                HighlightTable.annotationID <- highlight.annotationID
-            ))
-            
-            // Mark associated annotation as having been updated
-            try updateLastModifiedDate(annotationID: highlight.annotationID)
-            
-            return highlight
-        } else {
-            let id = try db.run(HighlightTable.table.insert(
-                HighlightTable.paragraphAID <- highlight.paragraphRange.paragraphAID,
-                HighlightTable.offsetStart <- highlight.paragraphRange.startWordOffset,
-                HighlightTable.offsetEnd <- highlight.paragraphRange.endWordOffset,
-                HighlightTable.colorName <- highlight.colorName,
-                HighlightTable.style <- highlight.style,
-                HighlightTable.annotationID <- highlight.annotationID
-            ))
-            
-            return Highlight(id: id, paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: highlight.annotationID)
-        }
+        try db.run(HighlightTable.table.filter(HighlightTable.id == highlight.id).update(
+            HighlightTable.paragraphAID <- highlight.paragraphRange.paragraphAID,
+            HighlightTable.offsetStart <- highlight.paragraphRange.startWordOffset,
+            HighlightTable.offsetEnd <- highlight.paragraphRange.endWordOffset,
+            HighlightTable.colorName <- highlight.colorName,
+            HighlightTable.style <- highlight.style,
+            HighlightTable.annotationID <- highlight.annotationID
+        ))
+        
+        // Mark associated annotation as having been updated
+        try updateLastModifiedDate(annotationID: highlight.annotationID)
+        
+        return highlight
     }
     
     /// Returns list of highlights with annotationID

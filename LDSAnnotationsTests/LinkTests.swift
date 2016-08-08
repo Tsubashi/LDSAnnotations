@@ -26,43 +26,86 @@ import XCTest
 class LinkTests: XCTestCase {
     
     func testLinkMissingPID() {
-        let input = [
-            "$": "name",
-            "@docId": "1",
-            "@contentVersion": "1",
+        let link = [
+            "$" : "name",
+            "@docId" : "19158224",
+            "@contentVersion" : "1",
         ]
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
         do {
-            let _ = try Link(jsonObject: input, annotationID: 1)
-            XCTFail("Expected an error")
+            try syncAnnotationsOperation.applyServerChanges(payloadForLink(link), onOrBefore: NSDate())
         } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+            XCTFail("The link shouldn't fail if the @pid is mising, it should just be skipped")
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
+        
+        XCTAssertTrue(annotationStore.linksWithAnnotationID(1).isEmpty)
     }
     
+    
     func testLink() {
-        let input = [
+        let link = [
             "$": "name",
             "@docId": "1",
             "@contentVersion": "1",
             "@pid": "20527924",
         ]
-        let expected = Link(id: nil, name: "name", docID: "1", docVersion: 1, paragraphAIDs: ["20527924"], annotationID: 1)
-        let actual = try! Link(jsonObject: input, annotationID: 1)
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
+        do {
+            try syncAnnotationsOperation.applyServerChanges(payloadForLink(link), onOrBefore: NSDate())
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+        
+        XCTAssertFalse(annotationStore.linksWithAnnotationID(1).isEmpty)
+        
+        let expected = Link(id: 1, name: "name", docID: "1", docVersion: 1, paragraphAIDs: ["20527924"], annotationID: 1)
+        let actual = annotationStore.linksWithAnnotationID(1).first
+        
         XCTAssertEqual(actual, expected)
-        let output = actual.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, expectedOutputFromInput(input))
     }
     
-    private func expectedOutputFromInput(input: [String: AnyObject]) -> [String: NSObject] {
-        return input.mapValues { key, value in
-            switch key {
-            case "@contentVersion":
-                return Int(value as! String)!
-            default:
-                return value as! NSObject
-            }
-        }
+    func payloadForLink(link: [String: AnyObject]) -> [String: AnyObject] {
+        let uniqueID = NSUUID().UUIDString
+        let annotation = [
+            "changeType": "new",
+            "timestamp" : "2016-08-04T11:21:38.849-06:00",
+            "annotationId" : uniqueID,
+            "annotation": [
+                "source": "Test",
+                "@type": "reference",
+                "@docId": "1",
+                "device": "iphone",
+                "@status": "",
+                "timestamp": "2016-08-04T11:26:09.440-06:00",
+                "@id": uniqueID,
+                "@locale": "eng",
+                "highlights": [
+                    "highlight": [
+                        [
+                            "@color" : "yellow",
+                            "@pid" : "19155093",
+                            "@offset-start" : "3",
+                            "@offset-end" : "3"
+                        ]
+                    ]
+                ],
+                "refs" : [
+                    "ref" : [link]
+                ]
+            ]
+        ]
+        let annotations = [annotation]
+        return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
     }
     
 }

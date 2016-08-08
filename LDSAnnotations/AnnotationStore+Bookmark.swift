@@ -67,16 +67,30 @@ extension AnnotationStore {
         // First, create an annotation for this bookmark
         let annotation = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device)
         
-        let bookmark = Bookmark(id: nil, name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotation.id)
-        
         // Increment display order of bookmarks that come after this one
         try db.run(BookmarkTable.table.filter(BookmarkTable.displayOrder >= displayOrder).update(BookmarkTable.displayOrder += 1))
         
-        return try addOrUpdateBookmark(bookmark)
+        return try addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotation.id)
     }
     
     /// Returns a bookmark after adding or updating it
-    public func addOrUpdateBookmark(bookmark: Bookmark, docID: String? = nil) throws -> Bookmark {
+    func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int = Bookmark.Offset) throws -> Bookmark {
+        guard annotationID != 0 else {
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a bookmark without an annotation ID.")
+        }
+        
+        let id = try db.run(BookmarkTable.table.insert(
+            BookmarkTable.name <- name,
+            BookmarkTable.paragraphAID <- paragraphAID,
+            BookmarkTable.displayOrder <- displayOrder,
+            BookmarkTable.annotationID <- annotationID,
+            BookmarkTable.offset <- offset
+        ))
+        
+        return Bookmark(id: id, name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID, offset: offset)
+    }
+    
+    public func updateBookmark(bookmark: Bookmark, docID: String? = nil) throws -> Bookmark {
         guard bookmark.annotationID != 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a bookmark without an annotation ID.")
         }
@@ -87,30 +101,18 @@ extension AnnotationStore {
             try updateAnnotation(annotation)
         }
         
-        if let id = bookmark.id {
-            try db.run(BookmarkTable.table.filter(BookmarkTable.id == id).update(
-                BookmarkTable.name <- bookmark.name,
-                BookmarkTable.paragraphAID <- bookmark.paragraphAID,
-                BookmarkTable.displayOrder <- bookmark.displayOrder,
-                BookmarkTable.annotationID <- bookmark.annotationID,
-                BookmarkTable.offset <- bookmark.offset
-            ))
-            
-            // Mark associated annotation as having been updated
-            try updateLastModifiedDate(annotationID: bookmark.annotationID)
-            
-            return bookmark
-        } else {
-            let id = try db.run(BookmarkTable.table.insert(
-                BookmarkTable.name <- bookmark.name,
-                BookmarkTable.paragraphAID <- bookmark.paragraphAID,
-                BookmarkTable.displayOrder <- bookmark.displayOrder,
-                BookmarkTable.annotationID <- bookmark.annotationID,
-                BookmarkTable.offset <- bookmark.offset
-            ))
-            
-            return Bookmark(id: id, name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: bookmark.annotationID, offset: bookmark.offset)
-        }
+        try db.run(BookmarkTable.table.filter(BookmarkTable.id == bookmark.id).update(
+            BookmarkTable.name <- bookmark.name,
+            BookmarkTable.paragraphAID <- bookmark.paragraphAID,
+            BookmarkTable.displayOrder <- bookmark.displayOrder,
+            BookmarkTable.annotationID <- bookmark.annotationID,
+            BookmarkTable.offset <- bookmark.offset
+        ))
+        
+        // Mark associated annotation as having been updated
+        try updateLastModifiedDate(annotationID: bookmark.annotationID)
+        
+        return bookmark
     }
     
     /// Returns a bookmarks with docID, and/or paragraphAID
@@ -137,7 +139,7 @@ extension AnnotationStore {
         try inTransaction {
             for (displayOrder, var bookmark) in bookmarks.enumerate() where bookmark.displayOrder != displayOrder {
                 bookmark.displayOrder = displayOrder
-                try self.addOrUpdateBookmark(bookmark)
+                try self.updateBookmark(bookmark)
             }
         }
     }

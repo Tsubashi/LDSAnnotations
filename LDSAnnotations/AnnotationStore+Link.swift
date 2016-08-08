@@ -64,7 +64,7 @@ extension AnnotationStore {
     
     /// Creates a link and adds it to annotation with ID
     public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], annotationID: Int64) throws -> Link {
-        return try addOrUpdateLink(Link(id: nil, name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID))
+        return try addLink(name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID)
     }
     
     /// Creates a link and adds related annotation and highlights
@@ -75,39 +75,44 @@ extension AnnotationStore {
         
         guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
         
-        return try addOrUpdateLink(Link(id: nil, name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID))
+        return try addLink(name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID)
     }
     
-    /// Adds or updates link
-    public func addOrUpdateLink(link: Link) throws -> Link {
+    /// Adds link
+    func addLink(name name: String, docID: String, docVersion: Int, paragraphAIDs: [String], annotationID: Int64) throws -> Link {
+        guard !name.isEmpty && !docID.isEmpty && docVersion > 0 && !paragraphAIDs.isEmpty && annotationID != 0 else {
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
+        }
+        
+        let id = try db.run(LinkTable.table.insert(
+            LinkTable.name <- name,
+            LinkTable.docID <- docID,
+            LinkTable.docVersion <- docVersion,
+            LinkTable.paragraphAIDs <- paragraphAIDs.joinWithSeparator(","),
+            LinkTable.annotationID <- annotationID
+        ))
+        
+        return Link(id: id, name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs, annotationID: annotationID)
+    }
+    
+    /// Updates link
+    public func updateLink(link: Link) throws -> Link {
         guard !link.name.isEmpty && !link.docID.isEmpty && link.docVersion > 0 && !link.paragraphAIDs.isEmpty && link.annotationID != 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
-        if let id = link.id {
-            try db.run(LinkTable.table.filter(LinkTable.id == id).update(
-                LinkTable.name <- link.name,
-                LinkTable.docID <- link.docID,
-                LinkTable.docVersion <- link.docVersion,
-                LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
-                LinkTable.annotationID <- link.annotationID
-            ))
-            
-            // Mark associated annotation as having been updated
-            try updateLastModifiedDate(annotationID: link.annotationID)
-            
-            return link
-        } else {
-            let id = try db.run(LinkTable.table.insert(
-                LinkTable.name <- link.name,
-                LinkTable.docID <- link.docID,
-                LinkTable.docVersion <- link.docVersion,
-                LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
-                LinkTable.annotationID <- link.annotationID
-            ))
-            
-            return Link(id: id, name: link.name, docID: link.docID, docVersion: link.docVersion, paragraphAIDs: link.paragraphAIDs, annotationID: link.annotationID)
-        }
+        try db.run(LinkTable.table.filter(LinkTable.id == link.id).update(
+            LinkTable.name <- link.name,
+            LinkTable.docID <- link.docID,
+            LinkTable.docVersion <- link.docVersion,
+            LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
+            LinkTable.annotationID <- link.annotationID
+        ))
+        
+        // Mark associated annotation as having been updated
+        try updateLastModifiedDate(annotationID: link.annotationID)
+        
+        return link
     }
     
     /// Returns list of links with annotation ID

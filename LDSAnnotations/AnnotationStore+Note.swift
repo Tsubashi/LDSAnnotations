@@ -55,14 +55,20 @@ extension AnnotationStore {
     
     /// Adds note and links it to annotation
     public func addNote(title title: String?, content: String, annotationID: Int64) throws -> Note {
-        return try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
+        let id = try db.run(NoteTable.table.insert(
+            NoteTable.title <- title,
+            NoteTable.content <- content,
+            NoteTable.annotationID <- annotationID
+        ))
+        
+        return Note(id: id, title: title, content: content, annotationID: annotationID)
     }
     
     /// Adds note and related annotation, and associates it to notebook
     public func addNote(title title: String?, content: String, source: String, device: String, notebookID: Int64) throws -> Note {
         let annotation = try addAnnotation(iso639_3Code: "eng", docID: nil, docVersion: nil, source: source, device: device)
         
-        let note = try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotation.id))
+        let note = try addNote(title: title, content: content, annotationID: annotation.id)
         
         let displayOrder = numberOfAnnotations(notebookID: notebookID)
         try addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebookID, displayOrder: displayOrder)
@@ -77,35 +83,25 @@ extension AnnotationStore {
         
         guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
         
-        return try addOrUpdateNote(Note(id: nil, title: title, content: content, annotationID: annotationID))
+        return try addNote(title: title, content: content, annotationID: annotationID)
     }
     
     /// Adds a new note with `content`.
-    public func addOrUpdateNote(note: Note) throws -> Note {
+    public func updateNote(note: Note) throws -> Note {
         guard note.annotationID != 0 || ((note.title == nil || note.title?.isEmpty == true) && note.content.isEmpty) else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a note without content and an annotation ID.")
         }
         
-        if let id = note.id {
-            try db.run(NoteTable.table.filter(NoteTable.id == id).update(
-                NoteTable.title <- note.title,
-                NoteTable.content <- note.content,
-                NoteTable.annotationID <- note.annotationID
-            ))
-            
-            // Mark associated annotation as having been updated
-            try updateLastModifiedDate(annotationID: note.annotationID)
-            
-            return note
-        } else {
-            let id = try db.run(NoteTable.table.insert(
-                NoteTable.title <- note.title,
-                NoteTable.content <- note.content,
-                NoteTable.annotationID <- note.annotationID
-            ))
-            
-            return Note(id: id, title: note.title, content: note.content, annotationID: note.annotationID)
-        }
+        try db.run(NoteTable.table.filter(NoteTable.id == note.id).update(
+            NoteTable.title <- note.title,
+            NoteTable.content <- note.content,
+            NoteTable.annotationID <- note.annotationID
+        ))
+        
+        // Mark associated annotation as having been updated
+        try updateLastModifiedDate(annotationID: note.annotationID)
+        
+        return note
     }
     
     /// Returns note with ID

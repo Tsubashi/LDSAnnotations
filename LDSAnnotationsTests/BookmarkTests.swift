@@ -26,41 +26,94 @@ import XCTest
 class BookmarkTests: XCTestCase {
     
     func testBookmarkMissingPID() {
-        let input = [
-            "@offset": 3,
-            "uri": "/scriptures/bofm/1-ne/1",
+        let bookmark = [
+            "name": "BookmarkName",
+            "sort": "1",
+            "uri": "/scriptures/bofm/1-ne/1"
         ]
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
         do {
-            let _ = try Bookmark(jsonObject: input, annotationID: 1)
-            XCTFail("Expected an error")
+            try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
         } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
+            XCTFail("We don't expect this error to be thrown, we expect this bookmark to just be skipped")
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
+        
+        XCTAssertTrue(annotationStore.bookmarks().isEmpty)
     }
     
     func testBookmarkWithOffset() {
-        let input = [
-            "@offset": 2,
+        let bookmark = [
+            "name": "BookmarkName",
             "@pid": "20527924",
+            "sort": 1,
+            "@offset": "2"
         ]
-        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: 2)
-        let actual = try! Bookmark(jsonObject: input, annotationID: 1)
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
+        do {
+            try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+        
+        let expected = Bookmark(id: 1, name: "BookmarkName", paragraphAID: "20527924", displayOrder: 1, annotationID: 1)
+        let actual = annotationStore.bookmarks().first
+        
         XCTAssertEqual(actual, expected)
-        let output = actual.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, input)
     }
     
     func testBookmarkWithSentinelOffset() {
-        let input = [
-            "@offset": -1,
+        let bookmark = [
+            "name": "BookmarkName",
             "@pid": "20527924",
+            "sort": 1,
+            "@offset": "-1"
         ]
-        let expected = Bookmark(id: nil, name: nil, paragraphAID: "20527924", displayOrder: nil, annotationID: 1, offset: -1)
-        let actual = try! Bookmark(jsonObject: input, annotationID: 1)
+        
+        let annotationStore = AnnotationStore()!
+        let session = createSession()
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        
+        do {
+            try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
+        } catch {
+            XCTFail("Unexpected error: \(error)")
+        }
+
+        let expected = Bookmark(id: 1, name: "BookmarkName", paragraphAID: "20527924", displayOrder: 1, annotationID: 1, offset: -1)
+        let actual = annotationStore.bookmarks().first
         XCTAssertEqual(actual, expected)
-        let output = actual.jsonObject() as! [String: NSObject]
-        XCTAssertEqual(output, input)
     }
 
+    func payloadForBookmark(bookmark: [String: AnyObject]) -> [String: AnyObject] {
+        let uniqueID = NSUUID().UUIDString
+        let annotation = [
+            "changeType": "new",
+            "timestamp" : "2016-08-04T11:21:38.849-06:00",
+            "annotationId" : uniqueID,
+            "annotation": [
+                "source": "Test",
+                "@type": "bookmark",
+                "@docId": "1",
+                "device": "iphone",
+                "@status": "",
+                "timestamp": "2016-08-04T11:26:09.440-06:00",
+                "@id": uniqueID,
+                "@locale": "eng",
+                "bookmark": bookmark
+            ]
+        ]
+        let annotations = [annotation]
+        return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
+    }
+    
 }
