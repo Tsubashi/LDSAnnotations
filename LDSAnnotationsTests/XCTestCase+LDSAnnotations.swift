@@ -53,7 +53,7 @@ extension XCTestCase {
         let expectation = expectationWithDescription(description)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             switch syncResult {
-            case let .Success(token: newToken, changes: changes):
+            case let .Success(token: newToken, changes: changes, deserializationErrors: _):
                 token = newToken
                 
                 completion?(uploadCount: changes.uploadedNotebooks.count + changes.uploadAnnotationCount, downloadCount: changes.downloadedNotebooks.count + changes.downloadAnnotationCount)

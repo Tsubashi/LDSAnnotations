@@ -231,40 +231,33 @@ class SyncAnnotationsOperation: Operation {
         
         if let remoteChanges = syncAnnotations["changes"] as? [[String: AnyObject]] {
             for change in remoteChanges {
-                guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Missing changeType")
-                }
-                
-                guard let uniqueID = change["annotationId"] as? String else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Missing annotationId")
-                }
-                
-                guard let rawAnnotation = change["annotation"] as? [String: AnyObject] else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Missing annotation")
-                }
-                
-                guard let rawLastModified = rawAnnotation["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Missing last modified date")
-                }
-                
-                guard let source = rawAnnotation["source"] as? String else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "`source` is a required field, the service returned a nil value")
-                }
-                
-                guard let device = rawAnnotation["device"] as? String else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "`device` is a required field, the service returned a nil value")
-                }
-
-                switch changeType {
-                case .New:
-                    let iso639_3Code = rawAnnotation["@locale"] as? String ?? "eng"
-                    let docID = rawAnnotation["@docId"] as? String
-                    let docVersion = (rawAnnotation["@contentVersion"] as? String).flatMap { Int($0) }
-                    let created = (rawAnnotation["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
-                    let status = (rawAnnotation["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
-                    
-                    do {
-                        try annotationStore.db.savepoint {
+                do {
+                    try annotationStore.db.savepoint {
+                        guard let uniqueID = change["annotationId"] as? String else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Missing annotationId")
+                        }
+                        guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing changeType")
+                        }
+                        guard let rawAnnotation = change["annotation"] as? [String: AnyObject] else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing annotation")
+                        }
+                        guard let rawLastModified = rawAnnotation["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing last modified date")
+                        }
+                        guard let source = rawAnnotation["source"] as? String else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing source")
+                        }
+                        
+                        switch changeType {
+                        case .New:
+                            let iso639_3Code = rawAnnotation["@locale"] as? String ?? "eng"
+                            let docID = rawAnnotation["@docId"] as? String
+                            let docVersion = (rawAnnotation["@contentVersion"] as? String).flatMap { Int($0) }
+                            let created = (rawAnnotation["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
+                            let status = (rawAnnotation["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
+                            let device = rawAnnotation["device"] as? String ?? "iphone"
+                            
                             let databaseAnnotation: Annotation?
                             if var existingAnnotation = self.annotationStore.annotationWithUniqueID(uniqueID) {
                                 existingAnnotation.iso639_3Code = iso639_3Code
@@ -279,12 +272,10 @@ class SyncAnnotationsOperation: Operation {
                             } else {
                                 databaseAnnotation = try self.annotationStore.addAnnotation(uniqueID: uniqueID, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, created: created, lastModified: lastModified, source: source, device: device, inSync: true)
                             }
-                            self.downloadAnnotationCount += 1
                             
                             if let annotationID = databaseAnnotation?.id, annotationUniqueID = databaseAnnotation?.uniqueID {
                                 
                                 // MARK: Note
-                                
                                 if let note = rawAnnotation["note"] as? [String: AnyObject] {
                                     let title = note["title"] as? String
                                     let content = note["content"] as? String ?? ""
@@ -303,11 +294,10 @@ class SyncAnnotationsOperation: Operation {
                                 }
                                 
                                 // MARK: Bookmark
-                                
                                 if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
                                     if bookmark["@pid"] == nil && bookmark["uri"] != nil {
                                         // Bookmark has a URI, but no @pid so its invalid. If both are nil, its a valid chapter-level bookmark
-                                        throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize bookmark, missing PID: \(bookmark)")
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Bookmark with annotation uniqueID '\(annotationUniqueID)' is missing paragraphAID")
                                     }
                                     
                                     let name = bookmark["name"] as? String
@@ -339,11 +329,11 @@ class SyncAnnotationsOperation: Operation {
                                 if let folders = rawAnnotation["folders"] as? [String: [[String: AnyObject]]] {
                                     for folder in folders["folder"] ?? [] {
                                         guard let notebookUniqueID = folder["@uri"]?.lastPathComponent else {
-                                            throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize notebook: \(folder)")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook is missing uniqueID: \(folder)")
                                         }
                                         
                                         guard let notebookID = self.annotationStore.notebookWithUniqueID(notebookUniqueID)?.id else {
-                                            throw Error.errorWithCode(.Unknown, failureReason: "Cannot find notebook with uniqueID \(notebookUniqueID)")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Cannot associate annotation with uniqueID '\(annotationUniqueID)' to notebook with uniqueID '\(notebookUniqueID)'")
                                         }
                                         
                                         if let index = notebookIDsToDelete.indexOf(notebookID) {
@@ -372,12 +362,17 @@ class SyncAnnotationsOperation: Operation {
                                 // Add new highlights
                                 if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                                     for highlight in highlights["highlight"] ?? [] {
-                                        guard let offsetStartString = highlight["@offset-start"] as? String, offsetStart = Int(offsetStartString), offsetEndString = highlight["@offset-end"] as? String, offsetEnd = Int(offsetEndString), colorName = highlight["@color"] as? String else {
-                                            throw Error.errorWithCode(.InvalidHighlight, failureReason: "Failed to deserialize highlight: \(highlight)")
+                                        guard let offsetStartString = highlight["@offset-start"] as? String, offsetStart = Int(offsetStartString) else {
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing offset-start")
                                         }
-                                        
+                                        guard let offsetEndString = highlight["@offset-end"] as? String, offsetEnd = Int(offsetEndString) else {
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing offset-end")
+                                        }
+                                        guard let colorName = highlight["@color"] as? String else {
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing color")
+                                        }
                                         guard let paragraphAID = highlight["@pid"] as? String else {
-                                            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize highlight, missing PID: \(highlight)")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing paragraphAID")
                                         }
                                         
                                         let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
@@ -399,11 +394,16 @@ class SyncAnnotationsOperation: Operation {
                                 if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                                     for link in links["ref"] ?? [] {
                                         guard let name = link["$"] as? String else {
-                                            throw Error.errorWithCode(.InvalidLink, failureReason: "Failed to deserialize link: \(link)")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing name")
                                         }
-                                        
-                                        guard let paragraphAIDs = link["@pid"] as? String, docID = link["@docId"] as? String, docVersionString = link["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
-                                            throw Error.errorWithCode(.InvalidParagraphAID, failureReason: "Failed to deserialize link, missing PID: \(link)")
+                                        guard let paragraphAIDs = link["@pid"] as? String else {
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing paragraphAIDs")
+                                        }
+                                        guard let docID = link["@docId"] as? String else {
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing docId")
+                                        }
+                                        guard let docVersionString = link["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing docVersion")
                                         }
                                         
                                         try self.annotationStore.addLink(name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs.componentsSeparatedByString(",").map { $0.trimmed() }, annotationID: annotationID)
@@ -424,23 +424,20 @@ class SyncAnnotationsOperation: Operation {
                                     }
                                 }
                             }
+                            
+                            self.downloadAnnotationCount += 1
+                        case .Trash, .Delete:
+                            if let existingAnnotationID = self.annotationStore.annotationWithUniqueID(uniqueID)?.id {
+                                // Don't store trashed or deleted annotations, just delete them from the db
+                                try self.annotationStore.deleteAnnotationWithID(existingAnnotationID)
+                            } else {
+                                // If the annotation doesn't exist there's no need to delete it
+                            }
                         }
-                    } catch {
-                        // Failed to deserialize this annotation, instead of failing the entire sync, just skip this annotation, and keep track of the error in case the client wants to do something with the errors
                         
-                        let annotationData = try? NSJSONSerialization.dataWithJSONObject(rawAnnotation, options: .PrettyPrinted)
-                        let annotationString = annotationData.flatMap { String(data: $0, encoding: NSUTF8StringEncoding) }
-                        
-                        let error = Error.errorWithCode(.SyncDeserializationFailed, failureReason: String(format: "Unable to deserialize annotation: %@", annotationString ?? rawAnnotation))
-                        deserializationErrors.append(error)
                     }
-                case .Trash, .Delete:
-                    if let existingAnnotationID = annotationStore.annotationWithUniqueID(uniqueID)?.id {
-                        // Don't store trashed or deleted annotations, just delete them from the db
-                        try annotationStore.deleteAnnotationWithID(existingAnnotationID)
-                    } else {
-                        // If the annotation doesn't exist there's no need to delete it
-                    }
+                } catch let error as NSError where Error.Code(rawValue: error.code) == .SyncDeserializationFailed {
+                    deserializationErrors.append(error)
                 }
             }
         }

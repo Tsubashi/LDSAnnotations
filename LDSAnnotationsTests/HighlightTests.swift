@@ -39,8 +39,6 @@ class HighlightTests: XCTestCase {
         
         do {
             try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
-        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
-            XCTFail("Don't expect this error to be thrown, the highlight should just have been skipped")
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -61,7 +59,6 @@ class HighlightTests: XCTestCase {
         
         do {
             try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
-        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidHighlight {
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

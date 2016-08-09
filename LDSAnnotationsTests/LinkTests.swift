@@ -38,8 +38,6 @@ class LinkTests: XCTestCase {
         
         do {
             try syncAnnotationsOperation.applyServerChanges(payloadForLink(link), onOrBefore: NSDate())
-        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
-            XCTFail("The link shouldn't fail if the @pid is mising, it should just be skipped")
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
