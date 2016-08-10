@@ -337,14 +337,19 @@ extension AnnotationStore {
     }
     
     /// Returns a the number of active annotations in notebook with ID
-    public func numberOfAnnotations(notebookID notebookID: Int64? = nil) -> Int {
-        var query = AnnotationTable.table.filter(AnnotationTable.status == .Active)
-        if let notebookID = notebookID {
-            query = query.join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID)
+    public func numberOfAnnotations(notebookID notebookID: Int64) -> Int {
+        return db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Active).join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID).count)
+    }
+
+    /// Returns a the number of unsynced annotations since date
+    public func numberOfUnsyncedAnnotations(lastModifiedAfter lastModifiedAfter: NSDate? = nil) -> Int {
+        var query = AnnotationTable.table
+        if let lastModifiedAfter = lastModifiedAfter {
+            query = query.filter(AnnotationTable.lastModified > lastModifiedAfter)
         }
         return db.scalar(query.count)
     }
-    
+
     /// Returns a list of active annotations with tagID, ordered by last modified descending
     public func annotationsWithTagID(id: Int64) -> [Annotation] {
         do {

@@ -232,10 +232,6 @@ extension AnnotationStore {
         }
     }
     
-    public func numberOfNotebooks() -> Int {
-        return db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).count)
-    }
-    
     /// Returns a list of active notebooks order by number of annotations in notebook descending.
     private func notebooksOrderedByCount(ids ids: [Int64]? = nil) -> [Notebook] {
         let inClause: String = {
@@ -255,6 +251,15 @@ extension AnnotationStore {
         } catch {
             return []
         }
+    }
+    
+    /// Returns the number of notebooks modified after lastModifiedAfter date with status
+    public func numberOfUnsyncedNotebooks(lastModifiedAfter lastModifiedAfter: NSDate? = nil) -> Int {
+        var query = NotebookTable.table
+        if let lastModifiedAfter = lastModifiedAfter {
+            query = query.filter(NotebookTable.lastModified > lastModifiedAfter)
+        }
+        return db.scalar(query.count)
     }
     
     public func allNotebooks(ids ids: [Int64]? = nil, lastModifiedAfter: NSDate? = nil, lastModifiedOnOrBefore: NSDate? = nil) -> [Notebook] {
