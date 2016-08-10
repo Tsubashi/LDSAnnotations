@@ -254,11 +254,8 @@ extension AnnotationStore {
     }
     
     /// Returns the number of notebooks modified after lastModifiedAfter date with status
-    public func numberOfNotebooks(lastModifiedAfter lastModifiedAfter: NSDate? = nil, status: AnnotationStatus? = .Active) -> Int {
+    public func numberOfUnsyncedNotebooks(lastModifiedAfter lastModifiedAfter: NSDate? = nil) -> Int {
         var query = NotebookTable.table
-        if let status = status {
-            query.filter(NotebookTable.status == status)
-        }
         if let lastModifiedAfter = lastModifiedAfter {
             query = query.filter(NotebookTable.lastModified > lastModifiedAfter)
         }

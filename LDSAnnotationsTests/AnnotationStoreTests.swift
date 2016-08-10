@@ -730,9 +730,9 @@ class AnnotationStoreTests: XCTestCase {
             try! annotationStore.updateAnnotation(trashed)
         }
         
-        XCTAssertEqual(annotationStore.numberOfAnnotations(), annotations.count)
-        XCTAssertEqual(annotationStore.numberOfAnnotations(lastModifiedAfter: before), annotations.count)
-        XCTAssertEqual(annotationStore.numberOfAnnotations(lastModifiedAfter: NSDate()), 0)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(), annotations.count)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(lastModifiedAfter: before), annotations.count)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(lastModifiedAfter: NSDate()), 0)
     }
     
     func testNumberOfNotebooks() {
@@ -753,9 +753,9 @@ class AnnotationStoreTests: XCTestCase {
             try! annotationStore.updateNotebook(trashed)
         }
         
-        XCTAssertEqual(annotationStore.numberOfNotebooks(), notebooks.count)
-        XCTAssertEqual(annotationStore.numberOfNotebooks(lastModifiedAfter: before), notebooks.count)
-        XCTAssertEqual(annotationStore.numberOfNotebooks(lastModifiedAfter: NSDate()), 0)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(), notebooks.count)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(lastModifiedAfter: before), notebooks.count)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(lastModifiedAfter: NSDate()), 0)
     }
     
 }
