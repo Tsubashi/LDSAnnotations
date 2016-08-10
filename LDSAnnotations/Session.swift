@@ -114,10 +114,10 @@ public class Session: NSObject {
         
         let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, localSyncNotebooksDate: token?.localSyncNotebooksDate, serverSyncNotebooksDate: token?.serverSyncNotebooksDate) { syncNotebooksResult in
             switch syncNotebooksResult {
-            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: syncNotebooksChanges):
+            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: syncNotebooksChanges, deserializationErrors: syncNotebooksDeserializationErrors):
                 let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, notebookAnnotationIDs: syncNotebooksChanges.notebookAnnotationIDs, localSyncAnnotationsDate: token?.localSyncAnnotationsDate, serverSyncAnnotationsDate: token?.serverSyncAnnotationsDate) { syncAnnotationsResult in
                     switch syncAnnotationsResult {
-                    case let .Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: syncAnnotationsChanges):
+                    case let .Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: syncAnnotationsChanges, deserializationErrors: syncAnnotationsDeserializationErrors):
                         let token = SyncToken(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate)
                         let changes = SyncChanges(
                             uploadedNotebooks: syncNotebooksChanges.uploadedNotebooks,
@@ -135,7 +135,7 @@ public class Session: NSObject {
                             downloadTagCount: syncAnnotationsChanges.downloadTagCount,
                             downloadLinkCount: syncAnnotationsChanges.downloadLinkCount)
                         self.status = .SyncSuccessful
-                        completion(SyncResult.Success(token: token, changes: changes))
+                        completion(SyncResult.Success(token: token, changes: changes, deserializationErrors: (syncNotebooksDeserializationErrors + syncAnnotationsDeserializationErrors)))
                     case let .Error(errors: errors):
                         self.status = .SyncFailed
                         completion(SyncResult.Error(errors: errors))

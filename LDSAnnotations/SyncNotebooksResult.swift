@@ -24,7 +24,7 @@ import Foundation
 
 enum SyncNotebooksResult {
 
-    case Success(localSyncNotebooksDate: NSDate, serverSyncNotebooksDate: NSDate, changes: SyncNotebooksChanges)
+    case Success(localSyncNotebooksDate: NSDate, serverSyncNotebooksDate: NSDate, changes: SyncNotebooksChanges, deserializationErrors: [NSError])
     case Error(errors: [NSError])
 
 }

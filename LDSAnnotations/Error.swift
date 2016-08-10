@@ -31,16 +31,11 @@ public struct Error {
         case AuthenticationFailed = -1001
         case LockedOut = -1002
         case PasswordExpired = -1003
-        case InvalidParagraphAID = -2000
-        case InvalidHighlight = -2001
-        case InvalidLink = -2002
-        case InvalidBookmark = -2003
-        case InvalidNote = -2004
-        case InvalidTag = -2005
         case SaveAnnotationFailed = -3000
         case SaveHighlightFailed = -3001
         case RequiredFieldMissing = -3008
         case SyncFailed = -4000
+        case SyncDeserializationFailed = -4001
     }
     
     static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {

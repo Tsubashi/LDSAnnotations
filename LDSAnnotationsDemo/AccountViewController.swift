@@ -145,7 +145,7 @@ class AccountViewController: UIViewController {
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             dispatch_sync(dispatch_get_main_queue()) {
                 switch syncResult {
-                case let .Success(token: token, changes: changes):
+                case let .Success(token: token, changes: changes, deserializationErrors: deserializationErrors):
                     let uploaded = [
                         "\(changes.uploadedNotebooks.count) notebooks",
                         "\(changes.uploadAnnotationCount) annotations",
@@ -166,6 +166,8 @@ class AccountViewController: UIViewController {
                     ]
                     
                     NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joinWithSeparator(", "), downloaded.joinWithSeparator(", "))
+                    
+                    deserializationErrors.forEach { NSLog("%@", $0) }
                     
                     AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
                 case let .Error(errors: errors):

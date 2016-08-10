@@ -38,8 +38,6 @@ class BookmarkTests: XCTestCase {
         
         do {
             try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
-        } catch let error as NSError where Error.Code(rawValue: error.code) == .InvalidParagraphAID {
-            XCTFail("We don't expect this error to be thrown, we expect this bookmark to just be skipped")
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

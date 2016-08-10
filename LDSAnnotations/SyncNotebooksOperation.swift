@@ -37,6 +37,7 @@ class SyncNotebooksOperation: Operation {
     var downloadedNotebooks = [Notebook]()
     
     var notebookAnnotationIDs = [String: [String]]()
+    var deserializationErrors = [NSError]()
     
     init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, completion: (SyncNotebooksResult) -> Void) {
         self.session = session
@@ -50,7 +51,7 @@ class SyncNotebooksOperation: Operation {
         addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
             if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
                 let changes = SyncNotebooksChanges(notebookAnnotationIDs: self.notebookAnnotationIDs, uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks)
-                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes))
+                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes, deserializationErrors: self.deserializationErrors))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -134,53 +135,56 @@ class SyncNotebooksOperation: Operation {
             var downloadedNotebooks = [Notebook]()
             
             for change in remoteChanges {
-                guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Missing changeType")
-                }
-                
-                guard let uniqueID = change["folderId"] as? String else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Missing folderId")
-                }
-                
-                guard let folder = change["folder"] as? [String: AnyObject] else {
-                    throw Error.errorWithCode(.Unknown, failureReason: "Failed to deserialize folder")
-                }
-
-                if let order = folder["order"] as? [String: [String]] {
-                    notebookAnnotationIDs[uniqueID] = order["id"]
-                }
-                
-                switch changeType {
-                case .New:
-                    guard let rawLastModified = folder["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
-                        throw Error.errorWithCode(.Unknown, failureReason: "Missing last modified date")
+                do {
+                    try annotationStore.db.savepoint {
+                        guard let uniqueID = change["folderId"] as? String else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook is missing missing folderId")
+                        }
+                        guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing changeType")
+                        }
+                        guard let rawNotebook = change["folder"] as? [String: AnyObject] else {
+                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing folder")
+                        }
+                        
+                        if let order = rawNotebook["order"] as? [String: [String]] {
+                            notebookAnnotationIDs[uniqueID] = order["id"]
+                        }
+                        
+                        switch changeType {
+                        case .New:
+                            guard let rawLastModified = rawNotebook["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
+                                throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing last modified date")
+                            }
+                            guard let name = rawNotebook["label"] as? String else {
+                                throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing name")
+                            }
+                            
+                            let description = rawNotebook["desc"] as? String
+                            let status = (rawNotebook["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
+                            
+                            let downloadedNotebook: Notebook
+                            if var existingNotebook = self.annotationStore.notebookWithUniqueID(uniqueID) {
+                                existingNotebook.name = name
+                                existingNotebook.description = description
+                                existingNotebook.status = status
+                                existingNotebook.lastModified = lastModified
+                                downloadedNotebook = try self.annotationStore.updateNotebook(existingNotebook, inSync: true)
+                            } else {
+                                downloadedNotebook = try self.annotationStore.addNotebook(uniqueID: uniqueID, name: name, description: description, status: status, lastModified: lastModified, inSync: true)
+                            }
+                            downloadedNotebooks.append(downloadedNotebook)
+                        case .Trash, .Delete:
+                            if let existingNotebookID = self.annotationStore.notebookWithUniqueID(uniqueID)?.id {
+                                // Don't store trashed or deleted notebooks, just delete them from the db
+                                try self.annotationStore.deleteNotebookWithID(existingNotebookID)
+                            } else {
+                                // If the notebook doesn't exist there's no need to delete it
+                            }
+                        }
                     }
-                    guard let name = folder["label"] as? String else {
-                        throw Error.errorWithCode(.Unknown, failureReason: "Missing name")
-                    }
-                    
-                    let description = folder["desc"] as? String
-                    let status = (folder["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
-                    
-                    let downloadedNotebook: Notebook
-                    if var existingNotebook = annotationStore.notebookWithUniqueID(uniqueID) {
-                        existingNotebook.name = name
-                        existingNotebook.description = description
-                        existingNotebook.status = status
-                        existingNotebook.lastModified = lastModified
-                        downloadedNotebook = try annotationStore.updateNotebook(existingNotebook, inSync: true)
-                    } else {
-                        downloadedNotebook = try annotationStore.addNotebook(uniqueID: uniqueID, name: name, description: description, status: status, lastModified: lastModified, inSync: true)
-                    }
-                    downloadedNotebooks.append(downloadedNotebook)
-                    
-                case .Trash, .Delete:
-                    if let existingNotebookID = annotationStore.notebookWithUniqueID(uniqueID)?.id {
-                        // Don't store trashed or deleted notebooks, just delete them from the db
-                        try annotationStore.deleteNotebookWithID(existingNotebookID)
-                    } else {
-                        // If the notebook doesn't exist there's no need to delete it
-                    }
+                } catch let error as NSError where Error.Code(rawValue: error.code) == .SyncDeserializationFailed {
+                    deserializationErrors.append(error)
                 }
             }
             
