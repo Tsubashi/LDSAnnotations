@@ -712,6 +712,52 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual([tag], annotationStore.tagsWithAnnotationID(duplicatedAnnotation.id))
     }
     
+    func testNumberOfAnnotations() {
+        let annotationStore = AnnotationStore()!
+        
+        // One second ago, just to be safe
+        let before = NSDate(timeIntervalSinceNow: -1)
+        
+        let annotations = [
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone"),
+            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
+        ]
+        
+        if var trashed = annotations.first {
+            // Make sure it includes trashed annotations
+            trashed.status = .Trashed
+            try! annotationStore.updateAnnotation(trashed)
+        }
+        
+        XCTAssertEqual(annotationStore.numberOfAnnotations(), annotations.count)
+        XCTAssertEqual(annotationStore.numberOfAnnotations(lastModifiedAfter: before), annotations.count)
+        XCTAssertEqual(annotationStore.numberOfAnnotations(lastModifiedAfter: NSDate()), 0)
+    }
+    
+    func testNumberOfNotebooks() {
+        let annotationStore = AnnotationStore()!
+        
+        // One second ago, just to be safe
+        let before = NSDate(timeIntervalSinceNow: -1)
+        
+        let notebooks = [
+            try! annotationStore.addNotebook(name: "Notebook1"),
+            try! annotationStore.addNotebook(name: "Notebook2"),
+            try! annotationStore.addNotebook(name: "Notebook3")
+        ]
+        
+        if var trashed = notebooks.first {
+            // Make sure it includes trashed notebooks
+            trashed.status = .Trashed
+            try! annotationStore.updateNotebook(trashed)
+        }
+        
+        XCTAssertEqual(annotationStore.numberOfNotebooks(), notebooks.count)
+        XCTAssertEqual(annotationStore.numberOfNotebooks(lastModifiedAfter: before), notebooks.count)
+        XCTAssertEqual(annotationStore.numberOfNotebooks(lastModifiedAfter: NSDate()), 0)
+    }
+    
 }
 
 extension String {

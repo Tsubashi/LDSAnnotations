@@ -336,11 +336,17 @@ extension AnnotationStore {
         }
     }
     
-    /// Returns a the number of active annotations in notebook with ID
-    public func numberOfAnnotations(notebookID notebookID: Int64? = nil) -> Int {
-        var query = AnnotationTable.table.filter(AnnotationTable.status == .Active)
+    /// Returns a the number of active annotations in notebook with ID or after last modified date with status
+    public func numberOfAnnotations(notebookID notebookID: Int64? = nil, lastModifiedAfter: NSDate? = nil, status: AnnotationStatus? = .Active) -> Int {
+        var query = AnnotationTable.table
+        if let status = status {
+            query.filter(AnnotationTable.status == status)
+        }
         if let notebookID = notebookID {
             query = query.join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID)
+        }
+        if let lastModifiedAfter = lastModifiedAfter {
+            query = query.filter(AnnotationTable.lastModified > lastModifiedAfter)
         }
         return db.scalar(query.count)
     }
