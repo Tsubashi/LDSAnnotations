@@ -337,8 +337,12 @@ extension AnnotationStore {
     }
     
     /// Returns a the number of active annotations in notebook with ID
-    public func numberOfAnnotationsInNotebook(notebookID: Int64) -> Int {
-        return db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Active).join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID).count)
+    public func numberOfAnnotations(notebookID notebookID: Int64? = nil) -> Int {
+        var query = AnnotationTable.table.filter(AnnotationTable.status == .Active)
+        if let notebookID = notebookID {
+            query = query.join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID)
+        }
+        return db.scalar(query.count)
     }
 
     /// Returns a the number of unsynced annotations since date

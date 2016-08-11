@@ -70,7 +70,7 @@ extension AnnotationStore {
         
         let note = try addNote(title: title, content: content, annotationID: annotation.id)
         
-        let displayOrder = numberOfAnnotationsInNotebook(notebookID)
+        let displayOrder = numberOfAnnotations(notebookID: notebookID)
         try addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebookID, displayOrder: displayOrder)
         
         return note
