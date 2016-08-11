@@ -66,7 +66,7 @@ extension AnnotationStore {
     
     /// Adds note and related annotation, and associates it to notebook
     public func addNote(title title: String?, content: String, source: String, device: String, notebookID: Int64) throws -> Note {
-        let annotation = try addAnnotation(iso639_3Code: "eng", docID: nil, docVersion: nil, source: source, device: device)
+        let annotation = try addAnnotation(docID: nil, docVersion: nil, source: source, device: device)
         
         let note = try addNote(title: title, content: content, annotationID: annotation.id)
         
@@ -77,9 +77,9 @@ extension AnnotationStore {
     }
     
     /// Adds note, related annotation & highlights
-    public func addNote(title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source:
+    public func addNote(title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, source:
         String, device: String) throws -> Note {
-        let highlights = try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, iso639_3Code: iso639_3Code, source: source, device: device)
+        let highlights = try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, source: source, device: device)
         
         guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
         

@@ -50,12 +50,11 @@ extension XCTestCase {
     }
     
     func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, allowSyncFailure: Bool = false, completion: ((uploadCount: Int, downloadCount: Int) -> Void)? = nil) {
-        let expectation = expectationWithDescription(description)
+        let semaphore = dispatch_semaphore_create(0)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             switch syncResult {
             case let .Success(token: newToken, changes: changes, deserializationErrors: _):
                 token = newToken
-                
                 completion?(uploadCount: changes.uploadedNotebooks.count + changes.uploadAnnotationCount, downloadCount: changes.downloadedNotebooks.count + changes.downloadAnnotationCount)
             case let .Error(errors: errors):
                 if allowSyncFailure {
@@ -64,9 +63,10 @@ extension XCTestCase {
                     XCTFail("Failed with errors \(errors)")
                 }
             }
-            expectation.fulfill()
+            NSThread.sleepForTimeInterval(1)
+            dispatch_semaphore_signal(semaphore)
         }
-        waitForExpectationsWithTimeout(300, handler: nil)
+        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(300 * Double(NSEC_PER_SEC))))
     }
     
     func resetAnnotations(annotationStore annotationStore: AnnotationStore, session: Session, inout token: SyncToken?) {

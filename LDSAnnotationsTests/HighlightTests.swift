@@ -129,12 +129,11 @@ func payloadForHighlight(highlight: [String: AnyObject]) -> [String: AnyObject] 
         "annotation": [
             "source": "Test",
             "@type": "highlight",
-            "@docId": "1",
+            "@docId": "20056057",
             "device": "iphone",
             "@status": "",
             "timestamp": "2016-08-04T11:26:09.440-06:00",
             "@id": uniqueID,
-            "@locale": "eng",
             "highlights": ["highlight": [highlight]]
         ]
     ]

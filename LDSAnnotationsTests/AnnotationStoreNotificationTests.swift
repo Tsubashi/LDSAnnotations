@@ -67,7 +67,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
                 XCTFail()
             }
         }
-        let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, source: "Test", device: "iphone")
         annotationStore.annotationObservers.remove(addObserver)
         
         let updateExpectation = expectationWithDescription("Annotation updated")
@@ -96,7 +96,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
             }
         }
         try! annotationStore.inTransaction {
-            try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, source: "Test", device: "iphone")
         }
         annotationStore.annotationObservers.remove(addObserver)
         
@@ -130,7 +130,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
         }
         
         try! annotationStore.inTransaction {
-            let annotation = try! annotationStore.addAnnotation(iso639_3Code: "eng", docID: "1", docVersion: 1, source: "Test", device: "iphone")
+            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, source: "Test", device: "iphone")
             try! annotationStore.updateAnnotation(annotation)
         }
         

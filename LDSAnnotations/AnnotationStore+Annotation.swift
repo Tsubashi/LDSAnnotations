@@ -29,7 +29,6 @@ class AnnotationTable {
     static let table = Table("annotation")
     static let id = Expression<Int64>("_id")
     static let uniqueID = Expression<String>("unique_id")
-    static let iso639_3Code = Expression<String>("iso639_3")
     static let docID = Expression<String?>("doc_id")
     static let docVersion = Expression<Int?>("doc_version")
     static let status = Expression<AnnotationStatus>("status")
@@ -41,7 +40,6 @@ class AnnotationTable {
     static func fromRow(row: Row) -> Annotation {
         return Annotation(id: row[id],
             uniqueID: row[uniqueID],
-            iso639_3Code: row[iso639_3Code],
             docID: row[docID],
             docVersion: row[docVersion],
             status: row.get(status),
@@ -60,7 +58,6 @@ extension AnnotationStore {
         try self.db.run(AnnotationTable.table.create(ifNotExists: true) { builder in
             builder.column(AnnotationTable.id, primaryKey: true)
             builder.column(AnnotationTable.uniqueID)
-            builder.column(AnnotationTable.iso639_3Code)
             builder.column(AnnotationTable.docID)
             builder.column(AnnotationTable.docVersion)
             builder.column(AnnotationTable.status)
@@ -77,18 +74,13 @@ extension AnnotationStore {
     }
     
     /// Adds a new annotation.
-    func addAnnotation(uniqueID uniqueID: String? = nil, iso639_3Code: String, docID: String?, docVersion: Int?, status: AnnotationStatus = .Active, created: NSDate? = nil, lastModified: NSDate? = nil, source: String, device: String, inSync: Bool = false) throws -> Annotation {
-        guard !iso639_3Code.isEmpty else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotation without an iso code, doc ID and doc version.")
-        }
-        
+    func addAnnotation(uniqueID uniqueID: String? = nil, docID: String?, docVersion: Int?, status: AnnotationStatus = .Active, created: NSDate? = nil, lastModified: NSDate? = nil, source: String, device: String, inSync: Bool = false) throws -> Annotation {
         let uniqueID = uniqueID ?? NSUUID().UUIDString
         let created = created ?? NSDate()
         let lastModified = lastModified ?? created
         
         let id = try db.run(AnnotationTable.table.insert(
             AnnotationTable.uniqueID <- uniqueID,
-            AnnotationTable.iso639_3Code <- iso639_3Code,
             AnnotationTable.docID <- docID,
             AnnotationTable.docVersion <- docVersion,
             AnnotationTable.status <- status,
@@ -104,21 +96,16 @@ extension AnnotationStore {
             notifyModifiedAnnotationsWithIDs([id])
         }
         
-        return Annotation(id: id, uniqueID: uniqueID, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, status: .Active, created: created, lastModified: lastModified, source: source, device: device)
+        return Annotation(id: id, uniqueID: uniqueID, docID: docID, docVersion: docVersion, status: .Active, created: created, lastModified: lastModified, source: source, device: device)
     }
     
     /// Saves any changes to `annotation` and updates the `lastModified`.
     func updateAnnotation(annotation: Annotation, inSync: Bool = false) throws -> Annotation {
-        guard !annotation.iso639_3Code.isEmpty else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotation without an iso code, doc ID and doc version.")
-        }
-        
         var modifiedAnnotation = annotation
         modifiedAnnotation.lastModified = NSDate()
         
         try db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
             AnnotationTable.uniqueID <- modifiedAnnotation.uniqueID,
-            AnnotationTable.iso639_3Code <- modifiedAnnotation.iso639_3Code,
             AnnotationTable.docID <- modifiedAnnotation.docID,
             AnnotationTable.docVersion <- modifiedAnnotation.docVersion,
             AnnotationTable.status <- modifiedAnnotation.status,
@@ -425,7 +412,7 @@ extension AnnotationStore {
     
     /// Creates a duplicate annotation, and duplicates all related annotation objects except for notebooks
     public func duplicateAnnotation(annotation: Annotation, source: String, device: String) throws -> Annotation {
-        let duplicateAnnotation = try addAnnotation(iso639_3Code: annotation.iso639_3Code, docID: annotation.docID, docVersion: annotation.docVersion, source: source, device: device)
+        let duplicateAnnotation = try addAnnotation(docID: annotation.docID, docVersion: annotation.docVersion, source: source, device: device)
         
         for highlight in highlightsWithAnnotationID(annotation.id) {
             try addHighlight(paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotation.id)

@@ -251,7 +251,6 @@ class SyncAnnotationsOperation: Operation {
                         
                         switch changeType {
                         case .New:
-                            let iso639_3Code = rawAnnotation["@locale"] as? String ?? "eng"
                             let docID = rawAnnotation["@docId"] as? String
                             let docVersion = (rawAnnotation["@contentVersion"] as? String).flatMap { Int($0) }
                             let created = (rawAnnotation["created"] as? String).flatMap { NSDate.parseFormattedISO8601($0) }
@@ -260,7 +259,6 @@ class SyncAnnotationsOperation: Operation {
                             
                             let databaseAnnotation: Annotation?
                             if var existingAnnotation = self.annotationStore.annotationWithUniqueID(uniqueID) {
-                                existingAnnotation.iso639_3Code = iso639_3Code
                                 existingAnnotation.source = source
                                 existingAnnotation.device = device
                                 existingAnnotation.docID = docID
@@ -270,10 +268,10 @@ class SyncAnnotationsOperation: Operation {
                                 existingAnnotation.status = status
                                 databaseAnnotation = try self.annotationStore.updateAnnotation(existingAnnotation, inSync: true)
                             } else {
-                                databaseAnnotation = try self.annotationStore.addAnnotation(uniqueID: uniqueID, iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, created: created, lastModified: lastModified, source: source, device: device, inSync: true)
+                                databaseAnnotation = try self.annotationStore.addAnnotation(uniqueID: uniqueID, docID: docID, docVersion: docVersion, created: created, lastModified: lastModified, source: source, device: device, inSync: true)
                             }
                             
-                            if let annotationID = databaseAnnotation?.id, annotationUniqueID = databaseAnnotation?.uniqueID {
+                            if let annotationID = databaseAnnotation?.id {
                                 
                                 // MARK: Note
                                 if let note = rawAnnotation["note"] as? [String: AnyObject] {
@@ -297,7 +295,7 @@ class SyncAnnotationsOperation: Operation {
                                 if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
                                     if bookmark["@pid"] == nil && bookmark["uri"] != nil {
                                         // Bookmark has a URI, but no @pid so its invalid. If both are nil, its a valid chapter-level bookmark
-                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Bookmark with annotation uniqueID '\(annotationUniqueID)' is missing paragraphAID")
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Bookmark with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
                                     }
                                     
                                     let name = bookmark["name"] as? String
@@ -333,7 +331,7 @@ class SyncAnnotationsOperation: Operation {
                                         }
                                         
                                         guard let notebookID = self.annotationStore.notebookWithUniqueID(notebookUniqueID)?.id else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Cannot associate annotation with uniqueID '\(annotationUniqueID)' to notebook with uniqueID '\(notebookUniqueID)'")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Cannot associate annotation with uniqueID '\(uniqueID)' to notebook with uniqueID '\(notebookUniqueID)'")
                                         }
                                         
                                         if let index = notebookIDsToDelete.indexOf(notebookID) {
@@ -342,7 +340,7 @@ class SyncAnnotationsOperation: Operation {
                                         }
                                         
                                         // Don't fail if we don't get a display order from the syncFolders, just put it at the end
-                                        let displayOrder = self.notebookAnnotationIDs[notebookUniqueID]?.indexOf(annotationUniqueID) ?? .max
+                                        let displayOrder = self.notebookAnnotationIDs[notebookUniqueID]?.indexOf(uniqueID) ?? .max
                                         
                                         try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
                                     }
@@ -363,16 +361,16 @@ class SyncAnnotationsOperation: Operation {
                                 if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
                                     for highlight in highlights["highlight"] ?? [] {
                                         guard let offsetStartString = highlight["@offset-start"] as? String, offsetStart = Int(offsetStartString) else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing offset-start")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-start")
                                         }
                                         guard let offsetEndString = highlight["@offset-end"] as? String, offsetEnd = Int(offsetEndString) else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing offset-end")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-end")
                                         }
                                         guard let colorName = highlight["@color"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing color")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing color")
                                         }
                                         guard let paragraphAID = highlight["@pid"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(annotationUniqueID)' is missing paragraphAID")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
                                         }
                                         
                                         let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
@@ -394,16 +392,16 @@ class SyncAnnotationsOperation: Operation {
                                 if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
                                     for link in links["ref"] ?? [] {
                                         guard let name = link["$"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing name")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing name")
                                         }
                                         guard let paragraphAIDs = link["@pid"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing paragraphAIDs")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing paragraphAIDs")
                                         }
                                         guard let docID = link["@docId"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing docId")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docId")
                                         }
                                         guard let docVersionString = link["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(annotationUniqueID)' is missing docVersion")
+                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docVersion")
                                         }
                                         
                                         try self.annotationStore.addLink(name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs.componentsSeparatedByString(",").map { $0.trimmed() }, annotationID: annotationID)
@@ -441,6 +439,7 @@ class SyncAnnotationsOperation: Operation {
                 }
             }
         }
+        
         
         // Cleanup any annotations with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
         let annotationsToDelete = annotationStore.allAnnotations(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .Active }

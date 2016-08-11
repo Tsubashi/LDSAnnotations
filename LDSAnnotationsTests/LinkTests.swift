@@ -49,7 +49,7 @@ class LinkTests: XCTestCase {
     func testLink() {
         let link = [
             "$": "name",
-            "@docId": "1",
+            "@docId": "13859831",
             "@contentVersion": "1",
             "@pid": "20527924",
         ]
@@ -66,7 +66,7 @@ class LinkTests: XCTestCase {
         
         XCTAssertFalse(annotationStore.linksWithAnnotationID(1).isEmpty)
         
-        let expected = Link(id: 1, name: "name", docID: "1", docVersion: 1, paragraphAIDs: ["20527924"], annotationID: 1)
+        let expected = Link(id: 1, name: "name", docID: "13859831", docVersion: 1, paragraphAIDs: ["20527924"], annotationID: 1)
         let actual = annotationStore.linksWithAnnotationID(1).first
         
         XCTAssertEqual(actual, expected)
@@ -81,12 +81,11 @@ class LinkTests: XCTestCase {
             "annotation": [
                 "source": "Test",
                 "@type": "reference",
-                "@docId": "1",
+                "@docId": "20056057",
                 "device": "iphone",
                 "@status": "",
                 "timestamp": "2016-08-04T11:26:09.440-06:00",
                 "@id": uniqueID,
-                "@locale": "eng",
                 "highlights": [
                     "highlight": [
                         [

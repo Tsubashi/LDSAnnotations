@@ -37,9 +37,6 @@ public struct Annotation: Equatable {
     /// Document version.
     public var docVersion: Int?
 
-    /// ISO639-3 Language Code.
-    public var iso639_3Code: String
-
     /// Whether the annotation is active, trashed, or deleted.
     public internal(set) var status: AnnotationStatus
     
@@ -53,10 +50,9 @@ public struct Annotation: Equatable {
     
     public var device: String?
     
-    init(id: Int64, uniqueID: String, iso639_3Code: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
+    init(id: Int64, uniqueID: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
-        self.iso639_3Code = iso639_3Code
         self.docID = docID
         self.docVersion = docVersion
         self.status = status
@@ -69,7 +65,6 @@ public struct Annotation: Equatable {
     func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
         var result: [String: AnyObject] = [
             "@id": uniqueID,
-            "@locale": iso639_3Code,
             "timestamp": lastModified.formattedISO8601
         ]
         
@@ -136,7 +131,7 @@ public struct Annotation: Equatable {
 extension Annotation: Hashable {
     
     public var hashValue: Int {
-        return id.hashValue ^ uniqueID.hashValue ^ iso639_3Code.hashValue ^ (docID ?? "").hashValue ^ (docVersion ?? 0).hashValue ^ status.hashValue ^ lastModified.hashValue
+        return id.hashValue ^ uniqueID.hashValue ^ (docID ?? "").hashValue ^ (docVersion ?? 0).hashValue ^ status.hashValue ^ lastModified.hashValue
     }
     
 }
@@ -144,7 +139,6 @@ extension Annotation: Hashable {
 public func == (lhs: Annotation, rhs: Annotation) -> Bool {
     return lhs.id == rhs.id
         && lhs.uniqueID == rhs.uniqueID
-        && lhs.iso639_3Code == rhs.iso639_3Code
         && lhs.docID == rhs.docID
         && lhs.docVersion == rhs.docVersion
         && lhs.status == rhs.status

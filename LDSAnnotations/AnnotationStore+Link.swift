@@ -68,10 +68,10 @@ extension AnnotationStore {
     }
     
     /// Creates a link and adds related annotation and highlights
-    public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source:
+    public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, source:
         String, device: String) throws -> Link {
         // Create annotation and highlights for this link
-        let highlights = try addHighlights(docID: fromDocID, docVersion: fromDocVersion, paragraphRanges: fromParagraphRanges, colorName: colorName, style: style, iso639_3Code: iso639_3Code, source: source, device: device)
+        let highlights = try addHighlights(docID: fromDocID, docVersion: fromDocVersion, paragraphRanges: fromParagraphRanges, colorName: colorName, style: style, source: source, device: device)
         
         guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
         

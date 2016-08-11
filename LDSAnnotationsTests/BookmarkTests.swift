@@ -101,12 +101,11 @@ class BookmarkTests: XCTestCase {
             "annotation": [
                 "source": "Test",
                 "@type": "bookmark",
-                "@docId": "1",
+                "@docId": "20056057",
                 "device": "iphone",
                 "@status": "",
                 "timestamp": "2016-08-04T11:26:09.440-06:00",
                 "@id": uniqueID,
-                "@locale": "eng",
                 "bookmark": bookmark
             ]
         ]

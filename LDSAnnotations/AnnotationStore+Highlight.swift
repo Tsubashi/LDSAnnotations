@@ -64,9 +64,9 @@ extension AnnotationStore {
     }
     
     /// Returns list of highlights, and creates related annotation
-    public func addHighlights(docID docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, iso639_3Code: String, source: String, device: String) throws -> [Highlight] {
+    public func addHighlights(docID docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, source: String, device: String) throws -> [Highlight] {
         // First create an annotation for these highlights
-        let annotation = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device)
+        let annotation = try addAnnotation(docID: docID, docVersion: docVersion, source: source, device: device)
         
         var highlights = [Highlight]()
         

@@ -63,9 +63,9 @@ extension AnnotationStore {
     }
     
     /// Returns a bookmark, and creates related annotation object
-    public func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int, docID: String, docVersion: Int, iso639_3Code: String, source: String, device: String) throws -> Bookmark {
+    public func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int, docID: String, docVersion: Int, source: String, device: String) throws -> Bookmark {
         // First, create an annotation for this bookmark
-        let annotation = try addAnnotation(iso639_3Code: iso639_3Code, docID: docID, docVersion: docVersion, source: source, device: device)
+        let annotation = try addAnnotation(docID: docID, docVersion: docVersion, source: source, device: device)
         
         // Increment display order of bookmarks that come after this one
         try db.run(BookmarkTable.table.filter(BookmarkTable.displayOrder >= displayOrder).update(BookmarkTable.displayOrder += 1))
