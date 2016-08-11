@@ -21,6 +21,7 @@
 //
 
 import Foundation
+import Swiftification
 
 /// Token which is returned from a successful sync and should be used for the next sync.
 public struct SyncToken {
@@ -85,6 +86,11 @@ public struct SyncToken {
     /// An encoded value which can be persisted.
     public var rawValue: String {
         return "1:\(localSyncNotebooksDate.timeIntervalSince1970):\(serverSyncNotebooksDate.timeIntervalSince1970):\(localSyncAnnotationsDate.timeIntervalSince1970):\(serverSyncAnnotationsDate.timeIntervalSince1970)"
+    }
+    
+    /// Last sync date
+    public var lastLocalSyncDate: NSDate {
+        return localSyncNotebooksDate > localSyncAnnotationsDate ? localSyncNotebooksDate : localSyncAnnotationsDate
     }
     
 }
