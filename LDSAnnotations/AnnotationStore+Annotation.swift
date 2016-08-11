@@ -337,7 +337,7 @@ extension AnnotationStore {
     }
     
     /// Returns a the number of active annotations in notebook with ID
-    public func numberOfAnnotations(notebookID notebookID: Int64) -> Int {
+    public func numberOfAnnotationsInNotebook(notebookID: Int64) -> Int {
         return db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Active).join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID).count)
     }
 

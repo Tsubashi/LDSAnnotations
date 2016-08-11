@@ -465,7 +465,7 @@ class AnnotationStoreTests: XCTestCase {
             try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
-        XCTAssertEqual(annotationStore.numberOfAnnotations(notebookID: notebook.id), annotations.count)
+        XCTAssertEqual(annotationStore.numberOfAnnotationsInNotebook(notebook.id), annotations.count)
     }
     
     func testReorderAnnotationIDs() {
