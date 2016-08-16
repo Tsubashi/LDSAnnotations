@@ -81,10 +81,10 @@ extension XCTestCase {
         let deleteCount = annotationStore.annotationCount() + annotationStore.notebookCount()
         if deleteCount > 0 {
             for notebook in annotationStore.notebooks() {
-                try! annotationStore.trashNotebookWithID(notebook.id)
+                try! annotationStore.trashNotebookWithID(notebook.id, source: .Local)
             }
             for annotation in annotationStore.annotations() {
-                try! annotationStore.trashAnnotationWithID(annotation.id)
+                try! annotationStore.trashAnnotationWithID(annotation.id, source: .Local)
             }
             
             sync(annotationStore, session: session, token: &token, description: "Sync deleted annotations") { uploadCount, downloadCount in
@@ -92,8 +92,8 @@ extension XCTestCase {
                 XCTAssertEqual(downloadCount, 0)
             }
             
-            try! annotationStore.deleteNotebooks(annotationStore.trashedNotebooks())
-            try! annotationStore.deleteAnnotations(annotationStore.trashedAnnotations())
+            try! annotationStore.deleteNotebooks(annotationStore.trashedNotebooks(), source: .Local)
+            try! annotationStore.deleteAnnotations(annotationStore.trashedAnnotations(), source: .Local)
             
             let count = annotationStore.annotationCount() + annotationStore.notebookCount()
             XCTAssertEqual(count, 0)

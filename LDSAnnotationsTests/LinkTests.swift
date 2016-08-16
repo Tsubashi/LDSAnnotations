@@ -37,7 +37,9 @@ class LinkTests: XCTestCase {
         let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try syncAnnotationsOperation.applyServerChanges(payloadForLink(link), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try syncAnnotationsOperation.applyServerChanges(self.payloadForLink(link), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -59,7 +61,9 @@ class LinkTests: XCTestCase {
         let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try syncAnnotationsOperation.applyServerChanges(payloadForLink(link), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try syncAnnotationsOperation.applyServerChanges(self.payloadForLink(link), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }

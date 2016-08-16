@@ -31,14 +31,16 @@ class HighlightTests: XCTestCase {
             "@offset-start": "3",
             "@offset-end": "7",
             "@color": "yellow",
-        ]
+            ]
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -51,14 +53,16 @@ class HighlightTests: XCTestCase {
             "@offset-end": "7",
             "@color": "yellow",
             "@pid": "20527924",
-        ]
+            ]
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -72,14 +76,16 @@ class HighlightTests: XCTestCase {
             "@offset-end": "6",
             "@pid": "20527924",
             "@color": "yellow",
-        ]
+            ]
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -91,21 +97,23 @@ class HighlightTests: XCTestCase {
         
         XCTAssertEqual(actual, expected)
     }
-
+    
     func testHighlightWithSentinelOffset() {
         let highlight = [
             "@offset-start": "-1",
             "@offset-end": "-1",
             "@pid": "20527924",
             "@color": "yellow",
-        ]
+            ]
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -118,25 +126,25 @@ class HighlightTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
     
-}
-
-func payloadForHighlight(highlight: [String: AnyObject]) -> [String: AnyObject] {
-    let uniqueID = NSUUID().UUIDString
-    let annotation = [
-        "changeType": "new",
-        "timestamp" : "2016-08-04T11:21:38.849-06:00",
-        "annotationId" : uniqueID,
-        "annotation": [
-            "source": "Test",
-            "@type": "highlight",
-            "@docId": "20056057",
-            "device": "iphone",
-            "@status": "",
-            "timestamp": "2016-08-04T11:26:09.440-06:00",
-            "@id": uniqueID,
-            "highlights": ["highlight": [highlight]]
+    func payloadForHighlight(highlight: [String: AnyObject]) -> [String: AnyObject] {
+        let uniqueID = NSUUID().UUIDString
+        let annotation = [
+            "changeType": "new",
+            "timestamp" : "2016-08-04T11:21:38.849-06:00",
+            "annotationId" : uniqueID,
+            "annotation": [
+                "source": "Test",
+                "@type": "highlight",
+                "@docId": "20056057",
+                "device": "iphone",
+                "@status": "",
+                "timestamp": "2016-08-04T11:26:09.440-06:00",
+                "@id": uniqueID,
+                "highlights": ["highlight": [highlight]]
+            ]
         ]
-    ]
-    let annotations = [annotation]
-    return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
+        let annotations = [annotation]
+        return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
+    }
+    
 }

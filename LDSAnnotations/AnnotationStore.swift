@@ -33,9 +33,17 @@ class SetBox<T where T: Hashable>: NSObject {
 /// A local annotation store backed by a SQLite database.
 public class AnnotationStore {
     
+    private static let currentVersion = 1
+    
     let db: Connection
     
-    private static let currentVersion = 1
+    lazy var inSyncTransactionKey: String = {
+        return "sync-txn:\(unsafeAddressOf(self))"
+    }()
+    
+    lazy var inLocalTransactionKey: String = {
+        return "local-txn:\(unsafeAddressOf(self))"
+    }()
     
     /// Constructs a local annotation store at `path`; if `path` is `nil` or empty, the annotation store is held in memory.
     ///
@@ -84,72 +92,61 @@ public class AnnotationStore {
     }
     
     /// Registration point for notifications when notebooks are added, updated, trashed, and deleted.
-    public let notebookObservers = ObserverSet<(source: NotificationSource, notebooks: [Notebook])>()
+    public let notebookObservers = ObserverSet<(source: NotificationSource, notebookIDs: Set<Int64>)>()
 
     /// Registration point for notifications when notebooks are added, updated, trashed, and deleted.
-    public let annotationObservers = ObserverSet<(source: NotificationSource, annotations: [Annotation])>()
+    public let annotationObservers = ObserverSet<(source: NotificationSource, annotationIDs: Set<Int64>)>()
     
     /// Makes multiple queries or modifications in a single transaction.
     ///
     /// This method is reentrant.
-    public func inTransaction(closure: () throws -> Void) throws {
-        let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
-        guard NSThread.currentThread().threadDictionary[inSyncTransactionKey] == nil else {
-            fatalError("A local transaction cannot be started in a sync transaction")
+    func inTransaction<T>(source: NotificationSource, closure: (() throws -> T)) throws -> T {
+        let inTransactionKey: String
+        
+        switch source {
+        case .Local:
+            inTransactionKey = inLocalTransactionKey
+            guard NSThread.currentThread().threadDictionary[inSyncTransactionKey] == nil else {
+                throw Error.errorWithCode(.TransactionError, failureReason: "A local transaction cannot be started in a sync transaction")
+            }
+        case .Sync:
+            inTransactionKey = inSyncTransactionKey
+            guard NSThread.currentThread().threadDictionary[inLocalTransactionKey] == nil else {
+                throw Error.errorWithCode(.TransactionError, failureReason: "A sync transaction cannot be started in a local transaction")
+            }
         }
         
-        let inTransactionKey = "txn:\(unsafeAddressOf(self))"
+        var element: T?
         if NSThread.currentThread().threadDictionary[inTransactionKey] != nil {
-            try closure()
+            element = try closure()
         } else {
             NSThread.currentThread().threadDictionary[inTransactionKey] = true
-            defer { NSThread.currentThread().threadDictionary.removeObjectForKey(inTransactionKey) }
+            defer {
+                NSThread.currentThread().threadDictionary.removeObjectForKey(inTransactionKey)
+            }
+            
             try db.transaction {
-                try closure()
+                element = try closure()
                 
                 // Batch notify about any notebooks modified in this transaction
                 let notebookIDsKey = "notebookIDs:\(unsafeAddressOf(self))"
                 if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> where !notebookIDs.set.isEmpty {
-                    self.notebookObservers.notify((source: .Local, notebooks: self.allNotebooks(ids: Array(notebookIDs.set))))
+                    self.notebookObservers.notify((source: source, notebookIDs: notebookIDs.set))
                 }
                 
                 // Batch notify about any annotations modified in this transaction
                 let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
                 if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> where !annotationIDs.set.isEmpty {
-                    self.annotationObservers.notify((source: .Local, annotations: self.allAnnotations(ids: Array(annotationIDs.set))))
+                    self.annotationObservers.notify((source: source, annotationIDs: annotationIDs.set))
                 }
             }
-        }
-    }
-    
-    func inSyncTransaction(closure: () throws -> Void) throws {
-        let inTransactionKey = "txn:\(unsafeAddressOf(self))"
-        guard NSThread.currentThread().threadDictionary[inTransactionKey] == nil else {
-            fatalError("A sync transaction cannot be started in a local transaction")
         }
         
-        let inSyncTransactionKey = "sync-txn:\(unsafeAddressOf(self))"
-        if NSThread.currentThread().threadDictionary[inSyncTransactionKey] != nil {
-            try closure()
-        } else {
-            NSThread.currentThread().threadDictionary[inSyncTransactionKey] = true
-            defer { NSThread.currentThread().threadDictionary[inSyncTransactionKey] = false }
-            try db.transaction {
-                try closure()
-                
-                // Batch notify about any notebooks modified in this transaction
-                let notebookIDsKey = "notebookIDs:\(unsafeAddressOf(self))"
-                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> where !notebookIDs.set.isEmpty {
-                    self.notebookObservers.notify((source: .Sync, notebooks: self.allNotebooks(ids: Array(notebookIDs.set))))
-                }
-                
-                // Batch notify about any annotations modified in this transaction
-                let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
-                if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> where !annotationIDs.set.isEmpty {
-                    self.annotationObservers.notify((source: .Sync, annotations: self.allAnnotations(ids: Array(annotationIDs.set))))
-                }
-            }
+        if let element = element {
+            return element
         }
+        
+        throw Error.errorWithCode(.TransactionError, failureReason: "inTransaction has incorrect return type")
     }
     
 }

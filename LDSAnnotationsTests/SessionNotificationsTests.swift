@@ -96,7 +96,7 @@ class SessionNotificationsTests: XCTestCase {
         statuses.removeAll()
         
         // Add a notebook
-        let notebook = try! annotationStore.addNotebook(name: "Test Notebook")
+        let notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .Local)
         sync(annotationStore, session: session, token: &token, description: "Sync new folder") { uploadCount, downloadCount in
             XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncSuccessful])
         }
@@ -107,7 +107,7 @@ class SessionNotificationsTests: XCTestCase {
         // Update the notebook
         var modifiedNotebook = notebook
         modifiedNotebook.name = "Renamed"
-        try! annotationStore.updateNotebook(modifiedNotebook)
+        try! annotationStore.updateNotebook(modifiedNotebook, source: .Local)
         
         sync(annotationStore, session: session, token: &token, description: "Sync updated folder") { uploadCount, downloadCount in
             XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncSuccessful])

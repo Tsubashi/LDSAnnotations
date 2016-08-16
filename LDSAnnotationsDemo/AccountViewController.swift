@@ -122,7 +122,7 @@ class AccountViewController: UIViewController {
         trashedAnnotationCount = annotationStore.trashedAnnotationCount()
     }
     
-    func notebooksDidChange(source: NotificationSource, notebooks: [Notebook]) {
+    func notebooksDidChange(source: NotificationSource, notebookIDs: Set<Int64>) {
         reloadData()
         tableView.reloadData()
         
@@ -131,7 +131,7 @@ class AccountViewController: UIViewController {
         }
     }
     
-    func annotationsDidChange(source: NotificationSource, annotations: [Annotation]) {
+    func annotationsDidChange(source: NotificationSource, annotationIDs: Set<Int64>) {
         reloadData()
         tableView.reloadData()
         
