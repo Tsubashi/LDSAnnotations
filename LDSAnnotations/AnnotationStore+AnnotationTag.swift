@@ -38,7 +38,23 @@ class AnnotationTagTable {
     
 }
 
-// MARK: AnnotationStore
+// MARK: Internal
+
+public extension AnnotationStore {
+
+    /// Adds a new annotation tag with 'annotationID' and 'tagID'.
+    public func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64) throws -> AnnotationTag {
+        return try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID, source: .Local)
+    }
+    
+    // Removes tag from annotation, then marks annotation as trashed if that was the only related annotation object
+    public func removeTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
+        return try removeTag(tagID: tagID, fromAnnotation: annotationID, source: .Local)
+    }
+    
+}
+
+// MARK: Internal
 
 extension AnnotationStore {
     
@@ -51,32 +67,40 @@ extension AnnotationStore {
         })
     }
     
-    /// Adds a new annotation tag with 'annotationID' and 'tagID'.
-    public func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64) throws -> AnnotationTag {
+    func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64, source: NotificationSource) throws -> AnnotationTag {
         guard annotationID > 0 && tagID > 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotationID or tagID that is == 0")
         }
         
-        try db.run(AnnotationTagTable.table.insert(or: .Replace,
-            AnnotationTagTable.annotationID <- annotationID,
-            AnnotationTagTable.tagID <- tagID
-        ))
-        
-        return AnnotationTag(annotationID: annotationID, tagID: tagID)
+        return try inTransaction(source) {
+            try self.db.run(AnnotationTagTable.table.insert(or: .Replace,
+                AnnotationTagTable.annotationID <- annotationID,
+                AnnotationTagTable.tagID <- tagID
+            ))
+            
+            try self.updateLastModifiedDate(annotationID: annotationID, source: source)
+            
+            return AnnotationTag(annotationID: annotationID, tagID: tagID)
+        }
     }
     
-    // Removes tag from annotation, then marks annotation as trashed if that was the only related annotation object
-    public func trashTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
-        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
-        try trashAnnotationIfEmptyWithID(annotationID)
+    func removeTag(tagID tagID: Int64, fromAnnotation annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(source) {
+            try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
+            try self.trashAnnotationIfEmptyWithID(annotationID, source: source)
+        }
     }
     
-    func deleteTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
-        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
+    func deleteTag(tagID tagID: Int64, fromAnnotation annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(source) {
+            try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
+        }
     }
     
-    func removeFromTagsAnnotationWithID(annotationID: Int64) throws {
-        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID).delete())
+    func removeFromTagsAnnotationWithID(annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(source) {
+            try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID).delete())
+        }
     }
     
 }

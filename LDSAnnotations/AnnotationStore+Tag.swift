@@ -38,53 +38,18 @@ class TagTable {
     
 }
 
-// MARK: AnnotationStore
+// MARK: Internal
 
-extension AnnotationStore {
-    
-    func createTagTable() throws {
-        try db.run(TagTable.table.create(ifNotExists: true) { builder in
-            builder.column(TagTable.id, primaryKey: true)
-            builder.column(TagTable.name, unique: true)
-        })
-    }
-    
+public extension AnnotationStore {
+
     /// Adds a new tag with `name`.
     public func addTag(name name: String, annotationID: Int64? = nil) throws -> Tag {
-        guard !name.isEmpty else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
-        }
-        
-        let tag: Tag
-        if let existingTag = try db.prepare(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercaseString).limit(1)).map({ TagTable.fromRow($0) }).first {
-            // Tag already exists with this name
-            tag = existingTag
-        } else {
-            // Insert this new tag
-            let id = try db.run(TagTable.table.insert(
-                TagTable.name <- name
-            ))
-            tag = Tag(id: id, name: name)
-        }
-        
-        if let annotationID = annotationID {
-            try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tag.id)
-        }
-        
-        return tag
+        return try addTag(name: name, annotationID: annotationID, source: .Local)
     }
     
     /// Updates tag
     public func updateTag(tag: Tag) throws -> Tag {
-        guard !tag.name.isEmpty else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
-        }
-        
-        // Update an existing tag
-        try db.run(TagTable.table.filter(TagTable.id == tag.id).update(
-            TagTable.name <- tag.name
-        ))
-        return tag
+        return try updateTag(tag, source: .Local)
     }
     
     /// Returns a list of active tags, order by OrderBy.
@@ -127,7 +92,7 @@ extension AnnotationStore {
     
     /// Selects the date of the most recent annotation associated with tagID
     public func dateOfMostRecentAnnotationWithTagID(tagID: Int64) -> NSDate? {
-        return db.pluck(AnnotationTable.table.select(AnnotationTable.lastModified).join(AnnotationTagTable.table.join(TagTable.table.select(TagTable.id).filter(TagTable.id == tagID), on: AnnotationTagTable.tagID == TagTable.id), on: AnnotationTable.id == AnnotationTagTable.annotationID).order(AnnotationTable.lastModified.desc)).map { $0[AnnotationTable.lastModified] }
+        return db.pluck(AnnotationTable.table.select(AnnotationTable.lastModified).join(AnnotationTagTable.table.join(TagTable.table, on: AnnotationTagTable.tagID == TagTable.table[TagTable.id]), on: AnnotationTable.id == AnnotationTagTable.annotationID).filter(TagTable.table[TagTable.id] == tagID).order(AnnotationTable.lastModified.desc)).map { $0[AnnotationTable.lastModified] }
     }
     
     /// Returns a tag with name (case insensitive)
@@ -135,6 +100,7 @@ extension AnnotationStore {
         return db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercaseString)).map { TagTable.fromRow($0) }
     }
     
+    // Returns any tags that contain strings
     public func tagsContainingString(string: String) -> [Tag] {
         do {
             let likeClause = String(format: "%%%@%%", string.lowercaseString)
@@ -144,27 +110,87 @@ extension AnnotationStore {
         }
     }
     
+    /// Trash tag with ID
+    func trashTagWithID(id: Int64) throws {
+        try trashTagWithID(id, source: .Local)
+    }
+
+}
+
+// MARK: Internal
+
+extension AnnotationStore {
+    
+    func createTagTable() throws {
+        try db.run(TagTable.table.create(ifNotExists: true) { builder in
+            builder.column(TagTable.id, primaryKey: true)
+            builder.column(TagTable.name, unique: true)
+        })
+    }
+    
+    func addTag(name name: String, annotationID: Int64? = nil, source: NotificationSource) throws -> Tag {
+        guard !name.isEmpty else {
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
+        }
+        
+        return try inTransaction(source) {
+            let tag: Tag
+            if let existingTag = try self.db.prepare(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercaseString).limit(1)).map({ TagTable.fromRow($0) }).first {
+                // Tag already exists with this name
+                tag = existingTag
+            } else {
+                // Insert this new tag
+                let id = try self.db.run(TagTable.table.insert(
+                    TagTable.name <- name
+                ))
+                tag = Tag(id: id, name: name)
+            }
+            
+            if let annotationID = annotationID {
+                try self.addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tag.id, source: source)
+            }
+            
+            return tag
+        }
+    }
+    
+    func updateTag(tag: Tag, source: NotificationSource) throws -> Tag {
+        guard !tag.name.isEmpty else {
+            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a tag without a name.")
+        }
+        
+        return try inTransaction(source) {
+            // Update an existing tag
+            try self.db.run(TagTable.table.filter(TagTable.id == tag.id).update(
+                TagTable.name <- tag.name
+            ))
+            return tag
+        }
+    }
+    
     func tagWithID(id: Int64) -> Tag? {
         return db.pluck(TagTable.table.filter(TagTable.id == id)).map { TagTable.fromRow($0) }
     }
     
-    func trashTagWithID(id: Int64) throws {
+    func trashTagWithID(id: Int64, source: NotificationSource) throws {
         let annotationIDs = try db.prepare(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id)).map { $0[AnnotationTagTable.annotationID] }
         
-        try deleteTagWithID(id)
-        
-        try annotationIDs.forEach { try trashAnnotationIfEmptyWithID($0) }
+        try inTransaction(source) {
+            try self.deleteTagWithID(id, source: source)
+            try annotationIDs.forEach { try self.trashAnnotationIfEmptyWithID($0, source: source) }
+        }
     }
     
-    /// Deletes tag and annotation tags with ID
-    public func deleteTagWithID(id: Int64) throws {
+    func deleteTagWithID(id: Int64, source: NotificationSource) throws {
         let annotationIDs = try db.prepare(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id)).map { $0[AnnotationTagTable.annotationID] }
         
-        try db.run(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id).delete())
-        try db.run(TagTable.table.filter(TagTable.id == id).delete())
+        try inTransaction(source) {
+            try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == id).delete())
+            try self.db.run(TagTable.table.filter(TagTable.id == id).delete())
         
-        // Mark any annotations that were associated with this tag as changed
-        try annotationIDs.forEach { try updateLastModifiedDate(annotationID: $0) }
+            // Mark any annotations that were associated with this tag as changed
+            try annotationIDs.forEach { try self.updateLastModifiedDate(annotationID: $0, source: source) }
+        }
     }
     
 }

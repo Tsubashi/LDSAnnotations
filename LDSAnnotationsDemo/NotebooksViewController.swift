@@ -112,7 +112,7 @@ class NotebooksViewController: UIViewController {
         }
     }
     
-    func notebooksDidChange(source: NotificationSource, notebooks: [Notebook]) {
+    func notebooksDidChange(source: NotificationSource, notebookIDs: Set<Int64>) {
         assert(NSThread.isMainThread())
         
         reloadData()

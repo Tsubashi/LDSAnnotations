@@ -46,11 +46,11 @@ public struct Annotation: Equatable {
     /// When the annotation was last modified in local time.
     public internal(set) var lastModified: NSDate
 
-    public var source: String?
+    public var appSource: String?
     
     public var device: String?
     
-    init(id: Int64, uniqueID: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, source: String?, device: String?) {
+    init(id: Int64, uniqueID: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, appSource: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
         self.docID = docID
@@ -58,7 +58,7 @@ public struct Annotation: Equatable {
         self.status = status
         self.created = created
         self.lastModified = lastModified
-        self.source = source
+        self.appSource = appSource
         self.device = device
     }
     
@@ -80,8 +80,8 @@ public struct Annotation: Equatable {
         if let created = created {
             result["created"] = created.formattedISO8601
         }
-        if let source = source {
-            result["source"] = source
+        if let appSource = appSource {
+            result["source"] = appSource
         }
         if let device = device {
             result["device"] = device
@@ -144,7 +144,7 @@ public func == (lhs: Annotation, rhs: Annotation) -> Bool {
         && lhs.status == rhs.status
         && lhs.created == rhs.created
         && lhs.lastModified == rhs.lastModified
-        && lhs.source == rhs.source
+        && lhs.appSource == rhs.appSource
         && lhs.device == rhs.device
 }
 

@@ -38,7 +38,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
                 XCTFail()
             }
         }
-        var notebook = try! annotationStore.addNotebook(name: "Test Notebook")
+        var notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .Local)
         annotationStore.notebookObservers.remove(addObserver)
         
         let updateExpectation = expectationWithDescription("Notebook updated")
@@ -67,7 +67,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
                 XCTFail()
             }
         }
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, source: "Test", device: "iphone")
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
         annotationStore.annotationObservers.remove(addObserver)
         
         let updateExpectation = expectationWithDescription("Annotation updated")
@@ -78,7 +78,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
                 XCTFail()
             }
         }
-        try! annotationStore.updateAnnotation(annotation)
+        try! annotationStore.updateAnnotation(annotation, source: .Local)
         annotationStore.annotationObservers.remove(updateObserver)
         
         waitForExpectationsWithTimeout(2, handler: nil)
@@ -95,8 +95,8 @@ class AnnotationStoreNotificationTests: XCTestCase {
                 XCTFail()
             }
         }
-        try! annotationStore.inTransaction {
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, source: "Test", device: "iphone")
+        try! annotationStore.inTransaction(.Local) {
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
         }
         annotationStore.annotationObservers.remove(addObserver)
         
@@ -108,9 +108,9 @@ class AnnotationStoreNotificationTests: XCTestCase {
                 XCTFail()
             }
         }
-        try! annotationStore.inTransaction {
+        try! annotationStore.inTransaction(.Local) {
             let annotation = annotationStore.annotationWithID(1)!
-            try! annotationStore.updateAnnotation(annotation)
+            try! annotationStore.updateAnnotation(annotation, source: .Local)
         }
         annotationStore.annotationObservers.remove(updateObserver)
         
@@ -129,9 +129,9 @@ class AnnotationStoreNotificationTests: XCTestCase {
             }
         }
         
-        try! annotationStore.inTransaction {
-            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, source: "Test", device: "iphone")
-            try! annotationStore.updateAnnotation(annotation)
+        try! annotationStore.inTransaction(.Local) {
+            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            try! annotationStore.updateAnnotation(annotation, source: .Local)
         }
         
         annotationStore.annotationObservers.remove(observer)

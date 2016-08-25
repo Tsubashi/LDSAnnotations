@@ -110,7 +110,7 @@ class AnnotationsViewController: UIViewController {
         }
     }
     
-    func annotationsDidChange(source: NotificationSource, annotations: [Annotation]) {
+    func annotationsDidChange(source: NotificationSource, annotationIDs: Set<Int64>) {
         assert(NSThread.isMainThread())
         
         reloadData()

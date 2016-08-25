@@ -39,7 +39,28 @@ class AnnotationNotebookTable {
     
 }
 
-// MARK: AnnotationStore
+// MARK: Public
+
+public extension AnnotationStore {
+    
+    /// Adds a new annotation notebook with 'annotationID', 'notebookID' and 'displayOrder'
+    public func addOrUpdateAnnotationNotebook(annotationID annotationID: Int64, notebookID: Int64, displayOrder: Int) throws -> AnnotationNotebook {
+        return try addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder, source: .Local)
+    }
+    
+    /// Reorder annotations within a notebook
+    public func reorderAnnotationIDs(annotationIDs: [Int64], notebookID: Int64) throws {
+        try reorderAnnotationIDs(annotationIDs, notebookID: notebookID, source: .Local)
+    }
+
+    /// Remove annotation from notebook and mark as trashed if it has no other related annotation objects (note, tag, link, etc)
+    public func removeAnnotation(annotationID annotationID: Int64, fromNotebook notebookID: Int64) throws {
+        try removeAnnotation(annotationID: annotationID, fromNotebook: notebookID, source: .Local)
+    }
+    
+}
+
+// MARK: Internal
 
 extension AnnotationStore {
     
@@ -52,41 +73,45 @@ extension AnnotationStore {
         })
     }
     
-    /// Adds a new annotation notebook with 'annotationID', 'notebookID' and 'displayOrder'
-    public func addOrUpdateAnnotationNotebook(annotationID annotationID: Int64, notebookID: Int64, displayOrder: Int) throws -> AnnotationNotebook {
+    func addOrUpdateAnnotationNotebook(annotationID annotationID: Int64, notebookID: Int64, displayOrder: Int, source: NotificationSource) throws -> AnnotationNotebook {
         guard annotationID > 0 && notebookID > 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotationID or notebookID that is == 0")
         }
         
-        try db.run(AnnotationNotebookTable.table.insert(or: .Replace,
-            AnnotationNotebookTable.annotationID <- annotationID,
-            AnnotationNotebookTable.notebookID <- notebookID,
-            AnnotationNotebookTable.displayOrder <- displayOrder
-        ))
-        
-        return AnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
-    }
-    
-    /// Reorder annotations within a notebook
-    public func reorderAnnotationIDs(annotationIDs: [Int64], notebookID: Int64) throws {
-        try inTransaction {
-            for (displayOrder, annotationID) in annotationIDs.enumerate() {
-                try self.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
-                // The last modified date needs to be updated on both the notebook and the annotation for the order to sync correctly
-                try self.updateLastModifiedDate(notebookID: notebookID)
-                try self.updateLastModifiedDate(annotationID: annotationID)
-            }
+        return try inTransaction(source) {
+            try self.db.run(AnnotationNotebookTable.table.insert(or: .Replace,
+                AnnotationNotebookTable.annotationID <- annotationID,
+                AnnotationNotebookTable.notebookID <- notebookID,
+                AnnotationNotebookTable.displayOrder <- displayOrder
+            ))
+            
+            try self.updateLastModifiedDate(notebookID: notebookID, source: source)
+            try self.updateLastModifiedDate(annotationID: annotationID, source: source)
+            
+            return AnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder)
         }
     }
     
-    /// Remove annotation from notebook and mark as trashed if it has no other related annotation objects (note, tag, link, etc)
-    public func deleteAnnotation(annotationID annotationID: Int64, fromNotebook notebookID: Int64) throws {
-        try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID && AnnotationNotebookTable.notebookID == notebookID).delete())
-        try trashAnnotationIfEmptyWithID(annotationID)
+    public func reorderAnnotationIDs(annotationIDs: [Int64], notebookID: Int64, source: NotificationSource) throws {
+        try inTransaction(source) {
+            for (displayOrder, annotationID) in annotationIDs.enumerate() {
+                try self.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder, source: source)
+            }
+        }
+
     }
     
-    func removeFromNotebooksAnnotationWithID(annotationID: Int64) throws {
-        try db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID).delete())
+    func removeAnnotation(annotationID annotationID: Int64, fromNotebook notebookID: Int64, source: NotificationSource) throws {
+        try inTransaction(source) {
+            try self.db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID && AnnotationNotebookTable.notebookID == notebookID).delete())
+            try self.trashAnnotationIfEmptyWithID(annotationID, source: source)
+        }
+    }
+    
+    func removeFromNotebooksAnnotationWithID(annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(source) {
+            try self.db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID).delete())
+        }
     }
     
 }

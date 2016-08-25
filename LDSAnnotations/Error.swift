@@ -36,6 +36,7 @@ public struct Error {
         case RequiredFieldMissing = -3008
         case SyncFailed = -4000
         case SyncDeserializationFailed = -4001
+        case TransactionError = -5000
     }
     
     static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {

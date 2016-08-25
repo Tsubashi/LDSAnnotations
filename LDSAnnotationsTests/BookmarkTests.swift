@@ -37,7 +37,9 @@ class BookmarkTests: XCTestCase {
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -58,7 +60,9 @@ class BookmarkTests: XCTestCase {
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
@@ -82,7 +86,9 @@ class BookmarkTests: XCTestCase {
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
         
         do {
-            try operation.applyServerChanges(payloadForBookmark(bookmark), onOrBefore: NSDate())
+            try annotationStore.inTransaction(.Sync) {
+                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: NSDate())
+            }
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
