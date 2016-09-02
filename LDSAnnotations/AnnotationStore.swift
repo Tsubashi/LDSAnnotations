@@ -51,7 +51,11 @@ public class AnnotationStore {
     public init?(path: String? = nil) {
         do {
             db = try Connection(path ?? "")
-            
+            db.busyHandler { _ in
+                // Keep retrying if database is locked
+                return true
+            }
+
             if databaseVersion < self.dynamicType.currentVersion {
                 upgradeDatabaseFromVersion(databaseVersion)
             }
