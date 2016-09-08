@@ -390,10 +390,7 @@ extension AnnotationStore {
         }
 
         if NSThread.currentThread().threadDictionary[inTransactionKey] != nil {
-            let notebookIDsKey = "notebookIDs:\(unsafeAddressOf(self))"
-            let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> ?? SetBox()
-            notebookIDs.set.unionInPlace(ids)
-            NSThread.currentThread().threadDictionary[notebookIDsKey] = notebookIDs
+            changedNotebookIDs.unionInPlace(ids)
         } else {
             // Immediately notify about these modified notebooks when outside of a transaction
             notebookObservers.notify((source: source, notebookIDs: Set(ids)))

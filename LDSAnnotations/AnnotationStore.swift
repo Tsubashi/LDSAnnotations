@@ -45,6 +45,46 @@ public class AnnotationStore {
         return "local-txn:\(unsafeAddressOf(self))"
     }()
     
+    private var changedAnnotationIDSetBox: SetBox<Int64> {
+        set {
+            NSThread.currentThread().threadDictionary["annotation-ids:\(unsafeAddressOf(self))"] = newValue
+        }
+        get {
+            return NSThread.currentThread().threadDictionary["annotation-ids:\(unsafeAddressOf(self))"] as? SetBox<Int64> ?? SetBox()
+        }
+    }
+    
+    private var changedNotebookIDSetBox: SetBox<Int64> {
+        set {
+            NSThread.currentThread().threadDictionary["notebook-ids:\(unsafeAddressOf(self))"] = newValue
+        }
+        get {
+            return NSThread.currentThread().threadDictionary["notebook-ids:\(unsafeAddressOf(self))"] as? SetBox<Int64> ?? SetBox()
+        }
+    }
+    
+    var changedNotebookIDs: Set<Int64> {
+        set {
+            let setBox = changedNotebookIDSetBox
+            setBox.set.unionInPlace(newValue)
+            changedNotebookIDSetBox = setBox
+        }
+        get {
+            return changedNotebookIDSetBox.set
+        }
+    }
+    
+    var changedAnnotationIDs: Set<Int64> {
+        set {
+            let setBox = changedAnnotationIDSetBox
+            setBox.set.unionInPlace(newValue)
+            changedAnnotationIDSetBox = setBox
+        }
+        get {
+            return changedAnnotationIDSetBox.set
+        }
+    }
+    
     /// Constructs a local annotation store at `path`; if `path` is `nil` or empty, the annotation store is held in memory.
     ///
     /// Returns `nil` if a database connection to the annotation store cannot be opened.
@@ -133,15 +173,13 @@ public class AnnotationStore {
                 element = try closure()
                 
                 // Batch notify about any notebooks modified in this transaction
-                let notebookIDsKey = "notebookIDs:\(unsafeAddressOf(self))"
-                if let notebookIDs = NSThread.currentThread().threadDictionary[notebookIDsKey] as? SetBox<Int64> where !notebookIDs.set.isEmpty {
-                    self.notebookObservers.notify((source: source, notebookIDs: notebookIDs.set))
+                if !self.changedNotebookIDs.isEmpty {
+                    self.notebookObservers.notify((source: source, notebookIDs: self.changedNotebookIDs))
                 }
                 
                 // Batch notify about any annotations modified in this transaction
-                let annotationIDsKey = "annotationIDs:\(unsafeAddressOf(self))"
-                if let annotationIDs = NSThread.currentThread().threadDictionary[annotationIDsKey] as? SetBox<Int64> where !annotationIDs.set.isEmpty {
-                    self.annotationObservers.notify((source: source, annotationIDs: annotationIDs.set))
+                if !self.changedAnnotationIDs.isEmpty {
+                    self.annotationObservers.notify((source: source, annotationIDs: self.changedAnnotationIDs))
                 }
             }
         }
