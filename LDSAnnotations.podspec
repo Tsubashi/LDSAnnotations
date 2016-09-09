@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.source_files = 'LDSAnnotations/*.swift'
   s.requires_arc = true
   
-  s.dependency 'PSOperations'
+  s.dependency 'Operations'
   s.dependency 'SQLite.swift'
   s.dependency 'Swiftification'
   s.dependency 'Locksmith'
