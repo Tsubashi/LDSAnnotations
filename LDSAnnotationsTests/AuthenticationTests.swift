@@ -43,8 +43,9 @@ class AuthenticationTests: XCTestCase {
         let session = createSession(useIncorrectPassword: true)
         session.authenticate { error in
             XCTAssertNotNil(error)
-            XCTAssertEqual(error!.domain, Error.Domain)
-            XCTAssertEqual(error!.code, Error.Code.AuthenticationFailed.rawValue)
+            let localError = error as! NSError
+            XCTAssertEqual(localError.domain, Error.Domain)
+            XCTAssertEqual(localError.code, Error.Code.AuthenticationFailed.rawValue)
             expectation.fulfill()
         }
         

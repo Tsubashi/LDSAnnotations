@@ -64,8 +64,9 @@ class SessionNotificationsTests: XCTestCase {
         
         session.authenticate { error in
             XCTAssertNotNil(error)
-            XCTAssertEqual(error!.domain, Error.Domain)
-            XCTAssertEqual(error!.code, Error.Code.AuthenticationFailed.rawValue)
+            let localError = error as! NSError
+            XCTAssertEqual(localError.domain, Error.Domain)
+            XCTAssertEqual(localError.code, Error.Code.AuthenticationFailed.rawValue)
 
             XCTAssertEqual(session.status, Session.Status.AuthenticationFailed)
             expectation.fulfill()

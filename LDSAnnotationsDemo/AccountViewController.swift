@@ -167,11 +167,11 @@ class AccountViewController: UIViewController {
                     
                     NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joinWithSeparator(", "), downloaded.joinWithSeparator(", "))
                     
-                    deserializationErrors.forEach { NSLog("%@", $0) }
+                    deserializationErrors.forEach { NSLog("\($0)") }
                     
                     AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
                 case let .Error(errors: errors):
-                    NSLog("Sync failed: %@", errors)
+                    NSLog("Sync failed: \(errors)")
                 }
             }
         }

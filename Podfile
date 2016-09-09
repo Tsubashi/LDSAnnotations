@@ -8,7 +8,7 @@ workspace 'LDSAnnotations'
 target 'LDSAnnotations' do
     project 'LDSAnnotations.xcodeproj'
     
-    pod 'PSOperations'
+    pod 'Operations'
     pod 'SQLite.swift'
     pod 'Swiftification'
     pod 'Locksmith'

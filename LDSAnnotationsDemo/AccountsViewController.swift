@@ -147,7 +147,7 @@ extension AccountsViewController {
         let session = SessionController.sharedController.sessionForUsername(username) ?? Session(username: username, password: password)
         session.authenticate { error in
             if let error = error {
-                NSLog("Failed to authenticate account: %@", error)
+                NSLog("Failed to authenticate account: \(error)")
                 
                 dispatch_async(dispatch_get_main_queue()) {
                     let alertController = UIAlertController(title: "Unable to Add Account", message: "Failed to sign in with the given username and password.", preferredStyle: .Alert)

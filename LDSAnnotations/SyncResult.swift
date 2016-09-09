@@ -28,9 +28,9 @@ public enum SyncResult {
     /// Result when sync is successful.
     ///
     /// The `token` should be used for the next sync.
-    case Success(token: SyncToken, changes: SyncChanges, deserializationErrors: [NSError])
+    case Success(token: SyncToken, changes: SyncChanges, deserializationErrors: [ErrorType])
     
     /// Result when a sync fails.
-    case Error(errors: [NSError])
+    case Error(errors: [ErrorType])
     
 }

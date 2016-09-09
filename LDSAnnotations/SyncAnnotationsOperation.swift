@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 
 class SyncAnnotationsOperation: Operation {
     
@@ -61,7 +61,7 @@ class SyncAnnotationsOperation: Operation {
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
-        addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
+        addObserver(BlockObserver(didFinish: { operation, errors in
             if errors.isEmpty, let localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate {
                 let changes = SyncAnnotationsChanges(uploadAnnotationCount: self.uploadAnnotationCount,
                     uploadNoteCount: self.uploadNoteCount,
@@ -119,13 +119,13 @@ class SyncAnnotationsOperation: Operation {
                     do {
                         try self.requestVersionedAnnotations(payload, onOrBefore: localSyncDate)
                     } catch let error as NSError {
-                        self.finishWithError(error)
+                        self.finish(error)
                     }
                 }
             case .Failure(let payload):
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
             case .Error(let error):
-                self.finishWithError(error)
+                self.finish(error)
             }
         }
     }
@@ -216,12 +216,12 @@ class SyncAnnotationsOperation: Operation {
                     }
                     self.finish()
                 } catch let error as NSError {
-                    self.finishWithError(error)
+                    self.finish(error)
                 }
             case .Failure(let payload):
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
             case .Error(let error):
-                self.finishWithError(error)
+                self.finish(error)
             }
         }
     }

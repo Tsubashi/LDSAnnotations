@@ -21,27 +21,25 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 
-struct AuthenticateCondition: OperationCondition {
-    
-    static let name = "Authenticate"
-    
-    static let isMutuallyExclusive = false
+class AuthenticateCondition: Condition {
     
     let session: Session
     
-    func dependencyForOperation(operation: Operation) -> NSOperation? {
-        return AuthenticateOperation(session: session)
+    init(session: Session) {
+        self.session = session
+        super.init()
+        name = "Authenticate"
+        mutuallyExclusive = true
+        addDependency(AuthenticateOperation(session: session))
     }
     
-    func evaluateForOperation(operation: Operation, completion: OperationConditionResult -> Void) {
+    override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
         if session.authenticated {
             completion(.Satisfied)
         } else {
-            completion(.Failed(NSError(code: .ConditionFailed, userInfo: [
-                OperationConditionKey: self.dynamicType.name
-            ])))
+            completion(.Failed(Error.errorWithCode(.Unknown, failureReason: "Not authenticated")))
         }
     }
     

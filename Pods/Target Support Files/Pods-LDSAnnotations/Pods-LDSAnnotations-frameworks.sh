@@ -85,13 +85,13 @@ strip_invalid_archs() {
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "$BUILT_PRODUCTS_DIR/Locksmith/Locksmith.framework"
-  install_framework "$BUILT_PRODUCTS_DIR/PSOperations/PSOperations.framework"
+  install_framework "$BUILT_PRODUCTS_DIR/Operations/Operations.framework"
   install_framework "$BUILT_PRODUCTS_DIR/SQLite.swift/SQLite.framework"
   install_framework "$BUILT_PRODUCTS_DIR/Swiftification/Swiftification.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "$BUILT_PRODUCTS_DIR/Locksmith/Locksmith.framework"
-  install_framework "$BUILT_PRODUCTS_DIR/PSOperations/PSOperations.framework"
+  install_framework "$BUILT_PRODUCTS_DIR/Operations/Operations.framework"
   install_framework "$BUILT_PRODUCTS_DIR/SQLite.swift/SQLite.framework"
   install_framework "$BUILT_PRODUCTS_DIR/Swiftification/Swiftification.framework"
 fi

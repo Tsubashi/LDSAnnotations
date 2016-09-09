@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 
 class AuthenticateOperation: Operation {
     
@@ -42,7 +42,7 @@ class AuthenticateOperation: Operation {
         }
         
         guard let url = session.authenticationURL else {
-            finishWithError(Error.errorWithCode(.Unknown, failureReason: "Missing authentication URL"))
+            finish(Error.errorWithCode(.Unknown, failureReason: "Missing authentication URL"))
             return
         }
         
@@ -55,7 +55,7 @@ class AuthenticateOperation: Operation {
             NSHTTPCookiePath : "/login.html",
             NSHTTPCookieExpires: NSDate(timeIntervalSinceNow: 60 * 60),
         ]) else {
-            finishWithError(Error.errorWithCode(.Unknown, failureReason: "Malformed authentication domain"))
+            finish(Error.errorWithCode(.Unknown, failureReason: "Malformed authentication domain"))
             return
         }
         request.allHTTPHeaderFields = NSHTTPCookie.requestHeaderFieldsWithCookies([cookie])
@@ -70,7 +70,7 @@ class AuthenticateOperation: Operation {
         ].map({ key, value in
             return "\(key)=\(value.stringByAddingPercentEscapesForQueryValue()!)"
         }).joinWithSeparator("&").dataUsingEncoding(NSUTF8StringEncoding) else {
-            finishWithError(Error.errorWithCode(.Unknown, failureReason: "Malformed parameter"))
+            finish(Error.errorWithCode(.Unknown, failureReason: "Malformed parameter"))
             return
         }
         
@@ -81,12 +81,12 @@ class AuthenticateOperation: Operation {
         
         let task = session.urlSession.dataTaskWithRequest(request) { data, response, error in
             if let error = error {
-                self.finishWithError(error)
+                self.finish(error)
                 return
             }
             
             guard let httpResponse = response as? NSHTTPURLResponse, responseHeaderFields = httpResponse.allHeaderFields as? [String: String], responseURL = httpResponse.URL else {
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Unexpected response"))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Unexpected response"))
                 return
             }
             
@@ -106,13 +106,13 @@ class AuthenticateOperation: Operation {
             
             switch errorKey {
             case "authfailed":
-                self.finishWithError(Error.errorWithCode(.AuthenticationFailed, failureReason: "Incorrect username and/or password."))
+                self.finish(Error.errorWithCode(.AuthenticationFailed, failureReason: "Incorrect username and/or password."))
             case "lockout":
-                self.finishWithError(Error.errorWithCode(.LockedOut, failureReason: "Account is locked."))
+                self.finish(Error.errorWithCode(.LockedOut, failureReason: "Account is locked."))
             case "pwdexpired":
-                self.finishWithError(Error.errorWithCode(.PasswordExpired, failureReason: "Password is expired."))
+                self.finish(Error.errorWithCode(.PasswordExpired, failureReason: "Password is expired."))
             default:
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Authentication for an unknown reason."))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Authentication for an unknown reason."))
             }
         }
         task.resume()

@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 
 class SyncNotebooksOperation: Operation {
     
@@ -50,7 +50,7 @@ class SyncNotebooksOperation: Operation {
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
-        addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
+        addObserver(BlockObserver(didFinish: { operation, errors in
             if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
                 let changes = SyncNotebooksChanges(notebookAnnotationIDs: self.notebookAnnotationIDs, uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks)
                 completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes, deserializationErrors: self.deserializationErrors))
@@ -90,12 +90,12 @@ class SyncNotebooksOperation: Operation {
                     }
                     self.finish()
                 } catch let error as NSError {
-                    self.finishWithError(error)
+                    self.finish(error)
                 }
             case .Failure(let payload):
-                self.finishWithError(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
+                self.finish(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
             case .Error(let error):
-                self.finishWithError(error)
+                self.finish(error)
             }
         }
     }

@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import PSOperations
+import Operations
 import Swiftification
 
 /// Communicates with the annotation service.
@@ -96,10 +96,10 @@ public class Session: NSObject {
     }
     
     /// Authenticates against the server.
-    public func authenticate(completion: (NSError?) -> Void) {
+    public func authenticate(completion: (ErrorType?) -> Void) {
         status = .AuthenticationInProgress
         let operation = AuthenticateOperation(session: self)
-        operation.addObserver(BlockObserver(startHandler: nil, produceHandler: nil, finishHandler: { operation, errors in
+        operation.addObserver(BlockObserver(didFinish: { operation, errors in
             self.status = errors.isEmpty ? .AuthenticationSuccessful : .AuthenticationFailed
             completion(errors.first)
         }))
