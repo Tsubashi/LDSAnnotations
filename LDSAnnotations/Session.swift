@@ -79,7 +79,7 @@ public class Session: NSObject {
     }
     
     lazy var urlSession: NSURLSession = {
-        return NSURLSession(configuration: NSURLSessionConfiguration.ephemeralSessionConfiguration(), delegate: self, delegateQueue: nil)
+        return NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration(), delegate: self, delegateQueue: nil)
     }()
     
     let operationQueue = OperationQueue()
