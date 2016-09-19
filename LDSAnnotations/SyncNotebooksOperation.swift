@@ -37,7 +37,7 @@ class SyncNotebooksOperation: Operation {
     var downloadedNotebooks = [Notebook]()
     
     var notebookAnnotationIDs = [String: [String]]()
-    var deserializationErrors = [NSError]()
+    var deserializationErrors = [ErrorType]()
     
     private let source: NotificationSource = .Sync
     

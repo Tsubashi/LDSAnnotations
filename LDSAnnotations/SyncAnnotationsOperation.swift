@@ -47,7 +47,7 @@ class SyncAnnotationsOperation: Operation {
     var downloadNoteCount = 0
     var downloadLinkCount = 0
     var downloadTagCount = 0
-    var deserializationErrors = [NSError]()
+    var deserializationErrors = [ErrorType]()
     
     private let source: NotificationSource = .Sync
     
