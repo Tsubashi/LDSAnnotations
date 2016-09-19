@@ -95,7 +95,6 @@ public class AnnotationStore {
                 // Keep retrying if database is locked
                 return true
             }
-
             if databaseVersion < self.dynamicType.currentVersion {
                 upgradeDatabaseFromVersion(databaseVersion)
             }

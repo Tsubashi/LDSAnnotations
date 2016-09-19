@@ -221,7 +221,7 @@ public extension AnnotationStore {
             }
             
             if let bookmark = self.bookmarkWithAnnotationID(annotation.id) {
-                try self.addBookmark(name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotation.id, source: source)
+                try self.addBookmark(name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: duplicateAnnotation.id, offset: bookmark.offset, source: source)
             }
             
             for tagID in self.tagsWithAnnotationID(annotation.id).flatMap({ $0.id }) {

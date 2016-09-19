@@ -302,8 +302,8 @@ class SyncAnnotationsOperation: Operation {
                                     
                                     let name = bookmark["name"] as? String
                                     let paragraphAID = bookmark["@pid"] as? String
-                                    let displayOrder = bookmark["sort"] as? Int ?? .max
-                                    let offset = bookmark["@offset"] as? Int ?? Bookmark.Offset
+                                    let displayOrder = bookmark["sort"] as? Int
+                                    let offset = (bookmark["@offset"] as? String).flatMap { Int($0) } ?? Bookmark.Offset
                                     
                                     if var databaseBookmark = self.annotationStore.bookmarkWithAnnotationID(annotationID) {
                                         databaseBookmark.name = name
@@ -435,7 +435,6 @@ class SyncAnnotationsOperation: Operation {
                                 // If the annotation doesn't exist there's no need to delete it
                             }
                         }
-                        
                     }
                 } catch let error as NSError where Error.Code(rawValue: error.code) == .SyncDeserializationFailed {
                     deserializationErrors.append(error)

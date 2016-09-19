@@ -137,7 +137,6 @@ class SyncNotebooksOperation: Operation {
         
         if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
             var downloadedNotebooks = [Notebook]()
-            
             for change in remoteChanges {
                 do {
                     try annotationStore.db.savepoint {
@@ -151,9 +150,9 @@ class SyncNotebooksOperation: Operation {
                             throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing folder")
                         }
                         
-                        if let order = rawNotebook["order"] as? [String: [String]] {
-                            notebookAnnotationIDs[uniqueID] = order["id"]
-                        }
+                        let displayOrders = rawNotebook["order"] as? [String: [String]]
+                        let annotationUniqueIDs = displayOrders?["id"]
+                        notebookAnnotationIDs[uniqueID] = annotationUniqueIDs ?? []
                         
                         switch changeType {
                         case .New:
@@ -178,6 +177,14 @@ class SyncNotebooksOperation: Operation {
                                 downloadedNotebook = try self.annotationStore.addNotebook(uniqueID: uniqueID, name: name, description: description, status: status, lastModified: lastModified, source: self.source)
                             }
                             downloadedNotebooks.append(downloadedNotebook)
+                            
+                            // If the annotations have been reordered, but nothing else within the annotation has changed, we'll only get the order change here in the notebooks sync, so store the order
+                            for annotationUniqueID in annotationUniqueIDs ?? [] {
+                                guard let annotation = self.annotationStore.annotationWithUniqueID(annotationUniqueID) else { continue }
+                                
+                                let displayOrder = annotationUniqueIDs?.indexOf(annotationUniqueID) ?? .max
+                                try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: downloadedNotebook.id, displayOrder: displayOrder, source: self.source)
+                            }
                         case .Trash, .Delete:
                             if let existingNotebookID = self.annotationStore.notebookWithUniqueID(uniqueID)?.id {
                                 // Don't store trashed or deleted notebooks, just delete them from the db

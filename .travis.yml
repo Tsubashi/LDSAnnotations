@@ -1,9 +1,8 @@
 sudo: false
 language: objective-c
 osx_image: xcode7.3
-xcode_workspace: LDSAnnotations.xcworkspace
-xcode_scheme: LDSAnnotations
-xcode_sdk: iphonesimulator9.3
+script:
+- xcodebuild clean build test -workspace LDSAnnotations.xcworkspace -scheme LDSAnnotations -sdk iphonesimulator -destination "OS=9.3,name=iPhone 5,platform=iOS Simulator"
 env:
   global:
     secure: GUxhmS88u1JsU1iZy0JhWuQAmxuwrxcHr+AsOksiIjhofcyzzMoxQPVqB9qtGy0kyRA5ODdp+LCEtxUMb//IS9NUAoeKDFr4FUXcbavZUBt62hpsuFcTrf6oCK/AiXPAQkGdiR9XBQ+XGFmLXKPSVkFfVeyLPvYw3t7MnAQQnCL/+h90+fw02Bm0BcQDxgDE7Jq1HvGCCsrWVbyqtdsb8hKGtBAP26vLTkAbbU1VCeIVrINmlChJwybtCWetSLPpB5QhgSdQ10NB2PTvjMTvf2OBlFV9O6q5uoruVmhBvoCJlGey7JZQeQPRFaqMHLMaMWtyN/GsN5REvHiFRTkgprhiuQmd2DO7yNhw7i8YCcwQpO4ihTypSCcynUFtDFttC2fGo3UGcIVyPPF/5uzKMpzA7JE+5VMA68CkXNiy6O8guCYRC3vAHX/HzUq9fSuWtWivYlsqQBHbXYgjTMzVYY+Ez6rPzmfecGdPpouVv2q4/pHqYIVc+wcTurv3CKApX4pPzLGdONYOJ3sUrGqxRakHOb/4s7AOavRuoaOKqXcjs4hsL2C6fSfEkrTtHKFU1VT3FRbgsRlKKLnNfMbJ9mjr6iJqjnMecovcDdUqJFLuewm97QkCF01iZHKdHFOW9GiaSTf72ezzmLuH06E9Z4ZyMNaJXY0XCpq9vh9Oq+M=

@@ -45,7 +45,7 @@ public struct Bookmark: Equatable {
     /// The word offset of this bookmark location.
     var offset: Int
     
-    init(id: Int64, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int = Bookmark.Offset) {
+    init(id: Int64, name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int) {
         self.id = id
         self.name = name
         self.paragraphAID = paragraphAID

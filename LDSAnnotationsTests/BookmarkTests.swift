@@ -67,7 +67,7 @@ class BookmarkTests: XCTestCase {
             XCTFail("Unexpected error: \(error)")
         }
         
-        let expected = Bookmark(id: 1, name: "BookmarkName", paragraphAID: "20527924", displayOrder: 1, annotationID: 1)
+        let expected = Bookmark(id: 1, name: "BookmarkName", paragraphAID: "20527924", displayOrder: 1, annotationID: 1, offset: 2)
         let actual = annotationStore.bookmarks().first
         
         XCTAssertEqual(actual, expected)

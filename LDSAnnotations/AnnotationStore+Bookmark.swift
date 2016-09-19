@@ -64,7 +64,7 @@ public extension AnnotationStore {
     /// Returns a bookmarks with docID, and/or paragraphAID
     public func bookmarks(docID docID: String? = nil, paragraphAID: String? = nil) -> [Bookmark] {
         do {
-            var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active).order(BookmarkTable.displayOrder)
+            var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active).order(BookmarkTable.displayOrder ?? Int.max)
             
             if let docID = docID {
                 query = query.filter(AnnotationTable.docID == docID)
@@ -132,11 +132,11 @@ extension AnnotationStore {
             // Mark all the annotations that were updated as changed
             try annotationIDs.forEach { try self.updateLastModifiedDate(annotationID: $0, source: source) }
             
-            return try self.addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotation.id, source: source)
+            return try self.addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotation.id, offset: Bookmark.Offset, source: source)
         }
     }
     
-    func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int = Bookmark.Offset, source: NotificationSource) throws -> Bookmark {
+    func addBookmark(name name: String?, paragraphAID: String?, displayOrder: Int?, annotationID: Int64, offset: Int, source: NotificationSource) throws -> Bookmark {
         guard annotationID != 0 else {
             throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a bookmark without an annotation ID.")
         }
