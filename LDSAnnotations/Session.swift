@@ -83,8 +83,11 @@ public class Session: NSObject {
     }()
     
     let operationQueue = OperationQueue()
+    private let dataQueue = dispatch_queue_create("LDSAnnotations.session.syncqueue", DISPATCH_QUEUE_SERIAL)
     
     var lastSuccessfulAuthenticationDate: NSDate?
+    
+    private var syncQueued = false
     
     var authenticated: Bool {
         let gracePeriod: NSTimeInterval = 15 * 60
@@ -110,44 +113,42 @@ public class Session: NSObject {
     ///
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
     public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
-        status = .SyncInProgress
-        
-        let syncNotebooksOperation = SyncNotebooksOperation(session: self, annotationStore: annotationStore, localSyncNotebooksDate: token?.localSyncNotebooksDate, serverSyncNotebooksDate: token?.serverSyncNotebooksDate) { syncNotebooksResult in
-            switch syncNotebooksResult {
-            case let .Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: syncNotebooksChanges, deserializationErrors: syncNotebooksDeserializationErrors):
-                let syncAnnotationsOperation = SyncAnnotationsOperation(session: self, annotationStore: annotationStore, notebookAnnotationIDs: syncNotebooksChanges.notebookAnnotationIDs, localSyncAnnotationsDate: token?.localSyncAnnotationsDate, serverSyncAnnotationsDate: token?.serverSyncAnnotationsDate) { syncAnnotationsResult in
-                    switch syncAnnotationsResult {
-                    case let .Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: syncAnnotationsChanges, deserializationErrors: syncAnnotationsDeserializationErrors):
-                        let token = SyncToken(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate)
-                        let changes = SyncChanges(
-                            uploadedNotebooks: syncNotebooksChanges.uploadedNotebooks,
-                            uploadAnnotationCount: syncAnnotationsChanges.uploadAnnotationCount,
-                            uploadNoteCount: syncAnnotationsChanges.uploadNoteCount,
-                            uploadBookmarkCount: syncAnnotationsChanges.uploadBookmarkCount,
-                            uploadHighlightCount: syncAnnotationsChanges.uploadHighlightCount,
-                            uploadTagCount: syncAnnotationsChanges.uploadTagCount,
-                            uploadLinkCount: syncAnnotationsChanges.uploadLinkCount,
-                            downloadedNotebooks: syncNotebooksChanges.downloadedNotebooks,
-                            downloadAnnotationCount: syncAnnotationsChanges.downloadAnnotationCount,
-                            downloadNoteCount: syncAnnotationsChanges.downloadNoteCount,
-                            downloadBookmarkCount: syncAnnotationsChanges.downloadBookmarkCount,
-                            downloadHighlightCount: syncAnnotationsChanges.downloadHighlightCount,
-                            downloadTagCount: syncAnnotationsChanges.downloadTagCount,
-                            downloadLinkCount: syncAnnotationsChanges.downloadLinkCount)
+        dispatch_async(dataQueue) {
+            guard !self.syncQueued else {
+                // Next sync already queued, just return
+                return
+            }
+            
+            switch self.status {
+            case .AuthenticationInProgress, .AuthenticationSuccessful, .SyncInProgress:
+                self.syncQueued = true
+            case .AuthenticationFailed, .SyncSuccessful, .SyncFailed, .Unauthenticated:
+                break
+            }
+            
+            self.status = .SyncInProgress
+            
+            let syncOperation = SyncOperation(session: self, annotationStore: annotationStore, token: token) { result in
+                dispatch_async(self.dataQueue) {
+                    switch result {
+                    case .Success:
                         self.status = .SyncSuccessful
-                        completion(SyncResult.Success(token: token, changes: changes, deserializationErrors: (syncNotebooksDeserializationErrors + syncAnnotationsDeserializationErrors)))
-                    case let .Error(errors: errors):
+                    case .Error:
                         self.status = .SyncFailed
-                        completion(SyncResult.Error(errors: errors))
+                    }
+                    
+                    completion(result)
+                    
+                    // Trigger next sync if one is queued
+                    if self.syncQueued {
+                        self.syncQueued = false
+                        self.sync(annotationStore: annotationStore, token: token, completion: completion)
                     }
                 }
-                self.operationQueue.addOperation(syncAnnotationsOperation)
-            case let .Error(errors: errors):
-                self.status = .SyncFailed
-                completion(SyncResult.Error(errors: errors))
             }
+            
+            self.operationQueue.addOperation(syncOperation)
         }
-        operationQueue.addOperation(syncNotebooksOperation)
     }
 
 }

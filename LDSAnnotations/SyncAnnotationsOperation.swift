@@ -23,11 +23,16 @@
 import Foundation
 import Operations
 
-class SyncAnnotationsOperation: Operation {
+enum SyncAnnotationsOperationError: ErrorType {
+    case NotebookSyncFailed(String)
+}
+
+class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
+    
+    var requirement: SyncNotebooksResult?
     
     let session: Session
     let annotationStore: AnnotationStore
-    let notebookAnnotationIDs: [String: [String]]
     let previousLocalSyncAnnotationsDate: NSDate?
     let previousServerSyncAnnotationsDate: NSDate?
     
@@ -51,10 +56,9 @@ class SyncAnnotationsOperation: Operation {
     
     private let source: NotificationSource = .Sync
     
-    init(session: Session, annotationStore: AnnotationStore, notebookAnnotationIDs: [String: [String]], localSyncAnnotationsDate: NSDate?, serverSyncAnnotationsDate: NSDate?, completion: (SyncAnnotationsResult) -> Void) {
+    init(session: Session, annotationStore: AnnotationStore, localSyncAnnotationsDate: NSDate?, serverSyncAnnotationsDate: NSDate?, completion: (SyncAnnotationsResult) -> Void) {
         self.session = session
         self.annotationStore = annotationStore
-        self.notebookAnnotationIDs = notebookAnnotationIDs
         self.previousLocalSyncAnnotationsDate = localSyncAnnotationsDate
         self.previousServerSyncAnnotationsDate = serverSyncAnnotationsDate
         
@@ -62,7 +66,7 @@ class SyncAnnotationsOperation: Operation {
         
         addCondition(AuthenticateCondition(session: session))
         addObserver(BlockObserver(didFinish: { operation, errors in
-            if errors.isEmpty, let localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate {
+            if errors.isEmpty, let localSyncAnnotationsDate = self.localSyncAnnotationsDate, serverSyncAnnotationsDate = self.serverSyncAnnotationsDate, notebooksResult = self.requirement {
                 let changes = SyncAnnotationsChanges(uploadAnnotationCount: self.uploadAnnotationCount,
                     uploadNoteCount: self.uploadNoteCount,
                     uploadBookmarkCount: self.uploadBookmarkCount,
@@ -75,7 +79,7 @@ class SyncAnnotationsOperation: Operation {
                     downloadHighlightCount: self.downloadHighlightCount,
                     downloadTagCount: self.downloadTagCount,
                     downloadLinkCount: self.downloadLinkCount)
-                completion(.Success(localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: changes, deserializationErrors: self.deserializationErrors))
+                completion(.Success(notebooksResult: notebooksResult, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: changes, deserializationErrors: self.deserializationErrors))
             } else {
                 completion(.Error(errors: errors))
             }
@@ -83,6 +87,11 @@ class SyncAnnotationsOperation: Operation {
     }
     
     override func execute() {
+        guard requirement != nil else {
+            finish(SyncAnnotationsOperationError.NotebookSyncFailed("Sync notebooks failed, cannot sync annotations."))
+            return
+        }
+        
         let localSyncDate = NSDate()
         let localChanges = localChangesAfter(previousLocalSyncAnnotationsDate, onOrBefore: localSyncDate)
         
@@ -231,6 +240,8 @@ class SyncAnnotationsOperation: Operation {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing syncAnnotations")
         }
         
+        let notebookAnnotationIDs = requirement?.changes.notebookAnnotationIDs
+        
         if let remoteChanges = syncAnnotations["changes"] as? [[String: AnyObject]] {
             for change in remoteChanges {
                 do {
@@ -342,7 +353,7 @@ class SyncAnnotationsOperation: Operation {
                                         }
                                         
                                         // Don't fail if we don't get a display order from the syncFolders, just put it at the end
-                                        let displayOrder = self.notebookAnnotationIDs[notebookUniqueID]?.indexOf(uniqueID) ?? .max
+                                        let displayOrder = notebookAnnotationIDs?[notebookUniqueID]?.indexOf(uniqueID) ?? .max
                                         
                                         try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder, source: self.source)
                                     }

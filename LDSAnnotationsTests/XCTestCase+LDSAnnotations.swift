@@ -66,7 +66,6 @@ extension XCTestCase {
             /* 
              The service takes a little while after we send annotations to run through some db triggers, and transformations, so add a delay after each sync to make sure it has processed everything we've sent and is able to return to us all the user's annotations.
             */
-            NSThread.sleepForTimeInterval(2)
             dispatch_semaphore_signal(semaphore)
         }
         dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(300 * Double(NSEC_PER_SEC))))

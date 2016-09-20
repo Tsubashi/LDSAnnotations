@@ -23,25 +23,18 @@
 import Foundation
 import Operations
 
-class SyncNotebooksOperation: Operation {
+class SyncNotebooksOperation: Operation, ResultOperationType {
     
     let session: Session
     let annotationStore: AnnotationStore
     let previousLocalSyncNotebooksDate: NSDate?
     let previousServerSyncNotebooksDate: NSDate?
     
-    var localSyncNotebooksDate: NSDate?
-    var serverSyncNotebooksDate: NSDate?
-    
-    var uploadedNotebooks = [Notebook]()
-    var downloadedNotebooks = [Notebook]()
-    
-    var notebookAnnotationIDs = [String: [String]]()
-    var deserializationErrors = [ErrorType]()
+    private(set) var result: SyncNotebooksResult?
     
     private let source: NotificationSource = .Sync
     
-    init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?, completion: (SyncNotebooksResult) -> Void) {
+    init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?) {
         self.session = session
         self.annotationStore = annotationStore
         self.previousLocalSyncNotebooksDate = localSyncNotebooksDate
@@ -50,21 +43,11 @@ class SyncNotebooksOperation: Operation {
         super.init()
         
         addCondition(AuthenticateCondition(session: session))
-        addObserver(BlockObserver(didFinish: { operation, errors in
-            if errors.isEmpty, let localSyncNotebooksDate = self.localSyncNotebooksDate, serverSyncNotebooksDate = self.serverSyncNotebooksDate {
-                let changes = SyncNotebooksChanges(notebookAnnotationIDs: self.notebookAnnotationIDs, uploadedNotebooks: self.uploadedNotebooks, downloadedNotebooks: self.downloadedNotebooks)
-                completion(.Success(localSyncNotebooksDate: localSyncNotebooksDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes, deserializationErrors: self.deserializationErrors))
-            } else {
-                completion(.Error(errors: errors))
-            }
-        }))
     }
     
     override func execute() {
         let localSyncDate = NSDate()
-        let localChanges = localChangesAfter(previousLocalSyncNotebooksDate, onOrBefore: localSyncDate)
-        
-        self.localSyncNotebooksDate = localSyncDate
+        let (localChanges, uploadedNotebooks) = localChangesAfter(previousLocalSyncNotebooksDate, onOrBefore: localSyncDate)
         
         var syncFolders: [String: AnyObject] = [
             "since": (previousServerSyncNotebooksDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
@@ -85,11 +68,13 @@ class SyncNotebooksOperation: Operation {
             switch response {
             case .Success(let payload):
                 do {
-                    try self.annotationStore.inTransaction(.Sync) {
-                        try self.applyServerChanges(payload, onOrBefore: localSyncDate)
+                    let (serverSyncNotebooksDate, notebookAnnotationIDs, downloadedNotebooks, deserializationErrors) = try self.annotationStore.inTransaction(.Sync) {
+                        return try self.applyServerChanges(payload, onOrBefore: localSyncDate)
                     }
+                    let changes = SyncNotebooksChanges(notebookAnnotationIDs: notebookAnnotationIDs, uploadedNotebooks: uploadedNotebooks, downloadedNotebooks: downloadedNotebooks)
+                    self.result = SyncNotebooksResult(localSyncNotebooksDate: localSyncDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes, deserializationErrors: deserializationErrors)
                     self.finish()
-                } catch let error as NSError {
+                } catch {
                     self.finish(error)
                 }
             case .Failure(let payload):
@@ -100,10 +85,8 @@ class SyncNotebooksOperation: Operation {
         }
     }
     
-    func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> [[String: AnyObject]] {
+    func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> ([[String: AnyObject]], [Notebook]) {
         let modifiedNotebooks = annotationStore.allNotebooks(lastModifiedAfter: after, lastModifiedOnOrBefore: onOrBefore)
-        
-        uploadedNotebooks = modifiedNotebooks
         
         let localChanges = modifiedNotebooks.map { notebook -> [String: AnyObject] in
             var result: [String: AnyObject] = [
@@ -119,10 +102,10 @@ class SyncNotebooksOperation: Operation {
             return result
         }
         
-        return localChanges
+        return (localChanges, modifiedNotebooks)
     }
     
-    func applyServerChanges(payload: [String: AnyObject], onOrBefore: NSDate) throws {
+    func applyServerChanges(payload: [String: AnyObject], onOrBefore: NSDate) throws -> (NSDate, [String: [String]], [Notebook], [ErrorType]) {
         guard let syncFolders = payload["syncFolders"] as? [String: AnyObject] else {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing syncFolders")
         }
@@ -131,12 +114,11 @@ class SyncNotebooksOperation: Operation {
             throw Error.errorWithCode(.Unknown, failureReason: "Missing before")
         }
         
-        self.serverSyncNotebooksDate = serverSyncDate
-        
         var notebookAnnotationIDs = [String: [String]]()
+        var downloadedNotebooks = [Notebook]()
+        var deserializationErrors = [ErrorType]()
         
         if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
-            var downloadedNotebooks = [Notebook]()
             for change in remoteChanges {
                 do {
                     try annotationStore.db.savepoint {
@@ -198,9 +180,6 @@ class SyncNotebooksOperation: Operation {
                     deserializationErrors.append(error)
                 }
             }
-            
-            self.downloadedNotebooks = downloadedNotebooks
-            self.notebookAnnotationIDs = notebookAnnotationIDs
         }
         
         // Cleanup any notebooks with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
@@ -208,6 +187,8 @@ class SyncNotebooksOperation: Operation {
         for notebook in notebooksToDelete {
             try annotationStore.deleteNotebookWithID(notebook.id, source: source)
         }
+        
+        return (serverSyncDate, notebookAnnotationIDs, downloadedNotebooks, deserializationErrors)
     }
     
 }

@@ -25,6 +25,8 @@ import XCTest
 
 class BookmarkTests: XCTestCase {
     
+    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: NSDate(), serverSyncNotebooksDate: NSDate(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
+    
     func testBookmarkMissingPID() {
         let bookmark = [
             "name": "BookmarkName",
@@ -34,7 +36,8 @@ class BookmarkTests: XCTestCase {
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
-        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        operation.requirement = BookmarkTests.emptyNotebooksResult
         
         do {
             try annotationStore.inTransaction(.Sync) {
@@ -57,7 +60,8 @@ class BookmarkTests: XCTestCase {
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
-        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        operation.requirement = BookmarkTests.emptyNotebooksResult
         
         do {
             try annotationStore.inTransaction(.Sync) {
@@ -83,7 +87,8 @@ class BookmarkTests: XCTestCase {
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
-        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        operation.requirement = BookmarkTests.emptyNotebooksResult
         
         do {
             try annotationStore.inTransaction(.Sync) {

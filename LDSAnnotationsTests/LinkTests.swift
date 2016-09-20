@@ -25,6 +25,8 @@ import XCTest
 
 class LinkTests: XCTestCase {
     
+    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: NSDate(), serverSyncNotebooksDate: NSDate(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
+    
     func testLinkMissingPID() {
         let link = [
             "$" : "name",
@@ -34,7 +36,8 @@ class LinkTests: XCTestCase {
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
-        let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        syncAnnotationsOperation.requirement = LinkTests.emptyNotebooksResult
         
         do {
             try annotationStore.inTransaction(.Sync) {
@@ -58,7 +61,8 @@ class LinkTests: XCTestCase {
         
         let annotationStore = AnnotationStore()!
         let session = createSession()
-        let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, notebookAnnotationIDs: [:], localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
+        syncAnnotationsOperation.requirement = LinkTests.emptyNotebooksResult
         
         do {
             try annotationStore.inTransaction(.Sync) {

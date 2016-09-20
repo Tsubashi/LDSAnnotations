@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		117898B11D8342EA00FC2777 /* SyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117898B01D8342EA00FC2777 /* SyncOperation.swift */; };
 		62D7BDEA8988C62655386B21 /* Pods_LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */; };
 		C0F4661ACDB75A9524871D89 /* Pods_LDSAnnotations_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EA770A28615F5691ADAD66C /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */; };
 		D403E25E1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */; };
@@ -82,6 +83,7 @@
 
 /* Begin PBXFileReference section */
 		0F977273277E6CF53E0EE5CC /* Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
+		117898B01D8342EA00FC2777 /* SyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncOperation.swift; sourceTree = "<group>"; };
 		1EA770A28615F5691ADAD66C /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations_LDSAnnotationsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37AD5AD0F16CBD6679922E6D /* Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
 		65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -291,6 +293,7 @@
 				D95F19B81CD6D91D008618AA /* Auth */,
 				D99234811C628B7200177FD2 /* Notebooks */,
 				D40F0A201C97531D002D61EA /* Annotations */,
+				117898B01D8342EA00FC2777 /* SyncOperation.swift */,
 			);
 			name = "Web Service";
 			sourceTree = "<group>";
@@ -552,6 +555,7 @@
 				D4ACFD3E1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift in Sources */,
 				D40F0A221C975368002D61EA /* Annotation.swift in Sources */,
 				D40F0A2A1C97693C002D61EA /* Note.swift in Sources */,
+				117898B11D8342EA00FC2777 /* SyncOperation.swift in Sources */,
 				D9C470D61C614FAE00EDCD69 /* NSDate+ISO8601.swift in Sources */,
 				D49E240A1D0072D100052511 /* AccountController.swift in Sources */,
 				D95F19D11CD8DCED008618AA /* SyncNotebooksChanges.swift in Sources */,

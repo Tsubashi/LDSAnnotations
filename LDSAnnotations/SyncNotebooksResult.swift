@@ -22,9 +22,11 @@
 
 import Foundation
 
-enum SyncNotebooksResult {
+struct SyncNotebooksResult {
 
-    case Success(localSyncNotebooksDate: NSDate, serverSyncNotebooksDate: NSDate, changes: SyncNotebooksChanges, deserializationErrors: [ErrorType])
-    case Error(errors: [ErrorType])
+    let localSyncNotebooksDate: NSDate
+    let serverSyncNotebooksDate: NSDate
+    let changes: SyncNotebooksChanges
+    let deserializationErrors: [ErrorType]
 
 }
