@@ -32,7 +32,7 @@ public class Session: NSObject {
     public let statusObservers = ObserverSet<Status>()
     
     public enum Status {
-        case Unauthenticated
+        case None
         case SyncInProgress
         case SyncSuccessful
         case SyncFailed
@@ -51,7 +51,7 @@ public class Session: NSObject {
     let authenticationURL: NSURL?
     let domain: String
     let trustPolicy: TrustPolicy
-    public private(set) var status: Status = .Unauthenticated {
+    public private(set) var status: Status = .None {
         didSet {
             statusObservers.notify(status)
         }
@@ -97,12 +97,8 @@ public class Session: NSObject {
     
     /// Authenticates against the server.
     public func authenticate(completion: (ErrorType?) -> Void) {
-        status = .SyncInProgress
         let operation = AuthenticateOperation(session: self)
         operation.addObserver(BlockObserver(didFinish: { operation, errors in
-            if !errors.isEmpty {
-                self.status = .SyncFailed
-            }
             completion(errors.first)
         }))
         operationQueue.addOperation(operation)
@@ -116,7 +112,7 @@ public class Session: NSObject {
             switch self.status {
             case .SyncInProgress:
                 self.syncQueued = true
-            case .SyncSuccessful, .SyncFailed, .Unauthenticated:
+            case .SyncSuccessful, .SyncFailed, .None:
                 break
             }
 
