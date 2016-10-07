@@ -33,9 +33,6 @@ public class Session: NSObject {
     
     public enum Status {
         case Unauthenticated
-        case AuthenticationInProgress
-        case AuthenticationSuccessful
-        case AuthenticationFailed
         case SyncInProgress
         case SyncSuccessful
         case SyncFailed
@@ -100,10 +97,12 @@ public class Session: NSObject {
     
     /// Authenticates against the server.
     public func authenticate(completion: (ErrorType?) -> Void) {
-        status = .AuthenticationInProgress
+        status = .SyncInProgress
         let operation = AuthenticateOperation(session: self)
         operation.addObserver(BlockObserver(didFinish: { operation, errors in
-            self.status = errors.isEmpty ? .AuthenticationSuccessful : .AuthenticationFailed
+            if !errors.isEmpty {
+                self.status = .SyncFailed
+            }
             completion(errors.first)
         }))
         operationQueue.addOperation(operation)
@@ -114,16 +113,16 @@ public class Session: NSObject {
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
     public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
         dispatch_async(dataQueue) {
+            switch self.status {
+            case .SyncInProgress:
+                self.syncQueued = true
+            case .SyncSuccessful, .SyncFailed, .Unauthenticated:
+                break
+            }
+
             guard !self.syncQueued else {
                 // Next sync already queued, just return
                 return
-            }
-            
-            switch self.status {
-            case .AuthenticationInProgress, .AuthenticationSuccessful, .SyncInProgress:
-                self.syncQueued = true
-            case .AuthenticationFailed, .SyncSuccessful, .SyncFailed, .Unauthenticated:
-                break
             }
             
             self.status = .SyncInProgress
@@ -131,19 +130,19 @@ public class Session: NSObject {
             let syncOperation = SyncOperation(session: self, annotationStore: annotationStore, token: token) { result in
                 dispatch_async(self.dataQueue) {
                     switch result {
-                    case .Success:
+                    case let .Success(token, _, _):
                         self.status = .SyncSuccessful
+                        
+                        // Trigger next sync if one is queued
+                        if self.syncQueued {
+                            self.syncQueued = false
+                            self.sync(annotationStore: annotationStore, token: token, completion: completion)
+                        }
                     case .Error:
                         self.status = .SyncFailed
                     }
                     
                     completion(result)
-                    
-                    // Trigger next sync if one is queued
-                    if self.syncQueued {
-                        self.syncQueued = false
-                        self.sync(annotationStore: annotationStore, token: token, completion: completion)
-                    }
                 }
             }
             
