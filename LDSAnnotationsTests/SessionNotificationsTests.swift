@@ -30,29 +30,6 @@ class SessionNotificationsTests: XCTestCase {
         XCTAssertEqual(session.status, Session.Status.Unauthenticated)
     }
     
-    func testAuthSuccessNotifications() {
-        let expectation = expectationWithDescription("Successfully signed in")
-        let session = createSession()
-        
-        var statuses: [Session.Status] = []
-        let observer = session.statusObservers.add { status in
-            statuses.append(status)
-        }
-        
-        session.authenticate { error in
-            XCTAssertNil(error)
-            
-            XCTAssertEqual(session.status, Session.Status.AuthenticationSuccessful)
-            expectation.fulfill()
-        }
-        
-        waitForExpectationsWithTimeout(30, handler: nil)
-        
-        XCTAssertEqual(statuses, [Session.Status.AuthenticationInProgress, Session.Status.AuthenticationSuccessful])
-        
-        session.statusObservers.remove(observer)
-    }
-    
     func testAuthFailedNotifications() {
         let expectation = expectationWithDescription("Failed to sign in")
         let session = createSession(useIncorrectPassword: true)
@@ -68,13 +45,13 @@ class SessionNotificationsTests: XCTestCase {
             XCTAssertEqual(localError.domain, Error.Domain)
             XCTAssertEqual(localError.code, Error.Code.AuthenticationFailed.rawValue)
 
-            XCTAssertEqual(session.status, Session.Status.AuthenticationFailed)
+            XCTAssertEqual(session.status, Session.Status.SyncFailed)
             expectation.fulfill()
         }
         
         waitForExpectationsWithTimeout(30, handler: nil)
 
-        XCTAssertEqual(statuses, [Session.Status.AuthenticationInProgress, Session.Status.AuthenticationFailed])
+        XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncFailed])
         
         session.statusObservers.remove(observer)
     }
