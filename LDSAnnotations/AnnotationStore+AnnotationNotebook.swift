@@ -105,7 +105,7 @@ extension AnnotationStore {
         try inTransaction(source) {
             try self.db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID && AnnotationNotebookTable.notebookID == notebookID).delete())
             try self.trashAnnotationIfEmptyWithID(annotationID, source: source)
-            try self.notifyModifiedNotebooksWithIDs([notebookID], source: source)
+            try self.updateLastModifiedDate(notebookID: notebookID, source: source)
         }
     }
     
