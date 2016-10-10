@@ -138,4 +138,27 @@ class AnnotationStoreNotificationTests: XCTestCase {
         
         waitForExpectationsWithTimeout(2, handler: nil)
     }
+    
+    func testAddAnnotationNotebookNotification() {
+        let annotationStore = AnnotationStore()!
+
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .Local)
+
+        let addExpectation = expectationWithDescription("Notebook added")
+        let addObserver = annotationStore.notebookObservers.add { source, notebooks in
+            if source == .Local && notebooks.count == 1 {
+                addExpectation.fulfill()
+            } else {
+                XCTFail()
+            }
+        }
+        
+        try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: 1)
+        
+        waitForExpectationsWithTimeout(2, handler: nil)
+        
+        annotationStore.notebookObservers.remove(addObserver)
+    }
+    
 }

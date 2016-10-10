@@ -170,16 +170,16 @@ public class AnnotationStore {
             
             try db.transaction {
                 element = try closure()
-                
-                // Batch notify about any notebooks modified in this transaction
-                if !self.changedNotebookIDs.isEmpty {
-                    self.notebookObservers.notify((source: source, notebookIDs: self.changedNotebookIDs))
-                }
-                
-                // Batch notify about any annotations modified in this transaction
-                if !self.changedAnnotationIDs.isEmpty {
-                    self.annotationObservers.notify((source: source, annotationIDs: self.changedAnnotationIDs))
-                }
+            }
+            
+            // Batch notify about any notebooks modified in this transaction
+            if !self.changedNotebookIDs.isEmpty {
+                self.notebookObservers.notify((source: source, notebookIDs: self.changedNotebookIDs))
+            }
+            
+            // Batch notify about any annotations modified in this transaction
+            if !self.changedAnnotationIDs.isEmpty {
+                self.annotationObservers.notify((source: source, annotationIDs: self.changedAnnotationIDs))
             }
         }
         

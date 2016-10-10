@@ -270,6 +270,8 @@ extension AnnotationStore {
                     NotebookTable.lastModified <- NSDate()
                 ))
             }
+
+            try self.notifyModifiedNotebooksWithIDs([id], source: source)
         }
     }
     
