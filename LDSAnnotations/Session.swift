@@ -51,6 +51,10 @@ public class Session: NSObject {
     let authenticationURL: NSURL?
     let domain: String
     let trustPolicy: TrustPolicy
+    
+    static var networkIndicatorStart: (() -> Void)?
+    static var networkIndicatorStop: (() -> Void)?
+    
     public private(set) var status: Status = .None {
         didSet {
             statusObservers.notify(status)
@@ -97,10 +101,8 @@ public class Session: NSObject {
     
     /// Authenticates against the server.
     public func authenticate(completion: (ErrorType?) -> Void) {
-        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         let operation = AuthenticateOperation(session: self)
         operation.addObserver(BlockObserver(didFinish: { operation, errors in
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
             completion(errors.first)
         }))
         operationQueue.addOperation(operation)
@@ -111,7 +113,6 @@ public class Session: NSObject {
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
     public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
         dispatch_async(dataQueue) {
-            UIApplication.sharedApplication().networkActivityIndicatorVisible = true
             switch self.status {
             case .SyncInProgress:
                 self.syncQueued = true
@@ -121,7 +122,6 @@ public class Session: NSObject {
 
             guard !self.syncQueued else {
                 // Next sync already queued, just return
-                UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                 return
             }
             
@@ -141,7 +141,6 @@ public class Session: NSObject {
                     case .Error:
                         self.status = .SyncFailed
                     }
-                    UIApplication.sharedApplication().networkActivityIndicatorVisible = false
                     completion(result)
                 }
             }
@@ -157,6 +156,7 @@ public class Session: NSObject {
 extension Session {
     
     func put(endpoint: String, payload: [String: AnyObject], completion: (Response) -> Void) {
+        Session.networkIndicatorStop()
         guard let url = NSURL(string: "https://\(domain)\(endpoint)") else {
             completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
@@ -208,6 +208,7 @@ extension Session {
                 completion(.Failure(errors))
             }
         }
+        Session.networkIndicatorStart()
         task.resume()
     }
     
