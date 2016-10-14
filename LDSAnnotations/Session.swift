@@ -30,12 +30,18 @@ import Swiftification
 public class Session: NSObject {
     
     public let statusObservers = ObserverSet<Status>()
+    public let networkActivityObservers = ObserverSet<NetworkActivity>()
     
     public enum Status {
         case None
         case SyncInProgress
         case SyncSuccessful
         case SyncFailed
+    }
+    
+    public enum NetworkActivity {
+        case Increment
+        case Decrement
     }
     
     /// The username used to authenticate this session.
@@ -58,6 +64,12 @@ public class Session: NSObject {
     public private(set) var status: Status = .None {
         didSet {
             statusObservers.notify(status)
+        }
+    }
+    
+    public var networkActivity: NetworkActivity {
+        didSet {
+            networkActivityObservers.notify(networkActivity)
         }
     }
     
@@ -156,7 +168,7 @@ public class Session: NSObject {
 extension Session {
     
     func put(endpoint: String, payload: [String: AnyObject], completion: (Response) -> Void) {
-        Session.networkIndicatorStop()
+        networkActivity = .Decrement
         guard let url = NSURL(string: "https://\(domain)\(endpoint)") else {
             completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
@@ -208,7 +220,7 @@ extension Session {
                 completion(.Failure(errors))
             }
         }
-        Session.networkIndicatorStart()
+        networkActivity = .Increment
         task.resume()
     }
     

@@ -80,7 +80,7 @@ class AuthenticateOperation: Operation {
         let authenticationDate = NSDate()
         
         let task = session.urlSession.dataTaskWithRequest(request) { data, response, error in
-            Session.networkIndicatorStop?()
+            self.session.networkActivity = .Decrement
             if let error = error {
                 self.finish(error)
                 return
@@ -116,7 +116,7 @@ class AuthenticateOperation: Operation {
                 self.finish(Error.errorWithCode(.Unknown, failureReason: "Authentication for an unknown reason."))
             }
         }
-        Session.networkIndicatorStart()
+        self.session.networkActivity = .Increment
         task.resume()
     }
     
