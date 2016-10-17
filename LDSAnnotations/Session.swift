@@ -159,7 +159,6 @@ public class Session: NSObject {
 extension Session {
     
     func put(endpoint: String, payload: [String: AnyObject], completion: (Response) -> Void) {
-        networkActivityObservers.notify(.Stop)
         guard let url = NSURL(string: "https://\(domain)\(endpoint)") else {
             completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
@@ -177,6 +176,7 @@ extension Session {
         }
         
         let task = urlSession.dataTaskWithRequest(request) { data, response, error in
+            self.networkActivityObservers.notify(.Stop)
             if let error = error {
                 completion(.Error(error))
                 return

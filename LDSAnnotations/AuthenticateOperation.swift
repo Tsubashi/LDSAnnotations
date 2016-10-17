@@ -116,7 +116,7 @@ class AuthenticateOperation: Operation {
                 self.finish(Error.errorWithCode(.Unknown, failureReason: "Authentication for an unknown reason."))
             }
         }
-        self.session.networkActivityObservers.notify(.Start)
+        session.networkActivityObservers.notify(.Start)
         task.resume()
     }
     
