@@ -40,8 +40,8 @@ public class Session: NSObject {
     }
     
     public enum NetworkActivity {
-        case Increment
-        case Decrement
+        case Active
+        case Inactive
     }
     
     /// The username used to authenticate this session.
@@ -67,7 +67,7 @@ public class Session: NSObject {
         }
     }
     
-    public var networkActivity: NetworkActivity {
+    public var networkActivity: NetworkActivity = .Inactive {
         didSet {
             networkActivityObservers.notify(networkActivity)
         }
@@ -168,7 +168,7 @@ public class Session: NSObject {
 extension Session {
     
     func put(endpoint: String, payload: [String: AnyObject], completion: (Response) -> Void) {
-        networkActivity = .Decrement
+        networkActivity = .Inactive
         guard let url = NSURL(string: "https://\(domain)\(endpoint)") else {
             completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
             return
@@ -220,7 +220,7 @@ extension Session {
                 completion(.Failure(errors))
             }
         }
-        networkActivity = .Increment
+        networkActivity = .Active
         task.resume()
     }
     
