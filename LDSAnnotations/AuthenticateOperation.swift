@@ -80,7 +80,7 @@ class AuthenticateOperation: Operation {
         let authenticationDate = NSDate()
         
         let task = session.urlSession.dataTaskWithRequest(request) { data, response, error in
-             self.session.networkActivityObservers.notify(.Stop)
+            self.session.networkActivityObservers.notify(.Stop)
             if let error = error {
                 self.finish(error)
                 return
