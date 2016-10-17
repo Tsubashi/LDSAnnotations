@@ -30,12 +30,18 @@ import Swiftification
 public class Session: NSObject {
     
     public let statusObservers = ObserverSet<Status>()
+    public let networkActivityObservers = ObserverSet<NetworkActivity>()
     
     public enum Status {
         case None
         case SyncInProgress
         case SyncSuccessful
         case SyncFailed
+    }
+    
+    public enum NetworkActivity {
+        case Start
+        case Stop
     }
     
     /// The username used to authenticate this session.
@@ -51,6 +57,7 @@ public class Session: NSObject {
     let authenticationURL: NSURL?
     let domain: String
     let trustPolicy: TrustPolicy
+    
     public private(set) var status: Status = .None {
         didSet {
             statusObservers.notify(status)
@@ -137,7 +144,6 @@ public class Session: NSObject {
                     case .Error:
                         self.status = .SyncFailed
                     }
-                    
                     completion(result)
                 }
             }
@@ -170,6 +176,7 @@ extension Session {
         }
         
         let task = urlSession.dataTaskWithRequest(request) { data, response, error in
+            self.networkActivityObservers.notify(.Stop)
             if let error = error {
                 completion(.Error(error))
                 return
@@ -204,6 +211,7 @@ extension Session {
                 completion(.Failure(errors))
             }
         }
+        networkActivityObservers.notify(.Start)
         task.resume()
     }
     
