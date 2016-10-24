@@ -756,6 +756,30 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(lastModifiedAfter: NSDate()), 0)
     }
     
+    func testRemovingNoteFromAnnotationWithClearHighlights() {
+        let annotationStore = AnnotationStore()!
+        
+        let note = try! annotationStore.addNote("Title", content: "content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "clear", style: .Clear, appSource: "Test", device: "iphone")
+        
+        let annotation = annotationStore.annotationWithID(note.annotationID)!
+        
+        XCTAssertEqual(note, annotationStore.noteWithAnnotationID(note.annotationID)!, "Loaded note should match what was inserted")
+        
+        // Verify annotation hasn't been marked as trashed yet because its not empty
+        XCTAssertTrue(annotation.status == .Active)
+        
+        try! annotationStore.trashNoteWithID(note.id)
+        
+        // Verify note has been deleted
+        XCTAssertNil(annotationStore.noteWithID(note.id))
+        
+        // Verify no annotations are associated with note
+        XCTAssertNil(annotationStore.annotationWithNoteID(note.id))
+        
+        // Verify annotation is trashed
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Trashed)
+    }
+    
 }
 
 extension String {

@@ -406,7 +406,7 @@ extension AnnotationStore {
     func trashAnnotationIfEmptyWithID(id: Int64, source: NotificationSource) throws {
         try inTransaction(source) {
             let notEmpty = [
-                self.db.scalar(HighlightTable.table.filter(HighlightTable.annotationID == id).count),
+                self.db.scalar(HighlightTable.table.filter(HighlightTable.annotationID == id && HighlightTable.style != .Clear).count),
                 self.db.scalar(LinkTable.table.filter(LinkTable.annotationID == id).count),
                 self.db.scalar(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == id).count),
                 self.db.scalar(BookmarkTable.table.filter(BookmarkTable.annotationID == id).count),
