@@ -108,7 +108,7 @@ public extension AnnotationStore {
     /// Returns all annotation IDs associated with the given docIDs
     public func annotationIDsWithDocIDsIn(docIDs: [String]) -> [Int64] {
         do {
-            return try db.prepare(AnnotationTable.table.filter(docIDs.contains(AnnotationTable.docID)).filter(AnnotationTable.status == .Active)).map { $0[AnnotationTable.id] }
+            return try db.prepare(AnnotationTable.table.select(AnnotationTable.id).filter(docIDs.contains(AnnotationTable.docID)).filter(AnnotationTable.status == .Active)).map { $0[AnnotationTable.id] }
         } catch {
             return []
         }
