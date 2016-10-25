@@ -105,6 +105,15 @@ public extension AnnotationStore {
         }
     }
     
+    /// Returns all annotation IDs associated with the given docIDs
+    public func annotationIDsWithDocIDsIn(docIDs: [String]) -> [Int64] {
+        do {
+            return try db.prepare(AnnotationTable.table.filter(docIDs.contains(AnnotationTable.docID))).map { $0[AnnotationTable.id] }
+        } catch {
+            return []
+        }
+    }
+    
     /// Returns a list of active annotation IDs associated with notebookID, ordered by display order
     public func annotationIDsForNotebookWithID(notebookID: Int64) -> [Int64] {
         do {
@@ -131,6 +140,16 @@ public extension AnnotationStore {
                 query = query.limit(limit)
             }
             return try db.prepare(query).map { $0[AnnotationTable.id] }
+        } catch {
+            return []
+        }
+    }
+    
+    /// Returns a list of active annotation IDs for active annotations associated with tagID, ordered by last modified descending
+    public func annotationIDsWithLastModified() -> [(Int64, NSDate)] {
+        do {
+            var query = AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.lastModified).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
+            return try db.prepare(query).map { ($0[AnnotationTable.id], $0[AnnotationTable.lastModified]) }
         } catch {
             return []
         }

@@ -375,6 +375,22 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual([annotation!], annotationStore.annotations(docID: docID, paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })))
     }
     
+    func testGetAnnotationIDsWithDocIDs() {
+        let annotationStore = AnnotationStore()!
+        
+        let docID1 = "1"
+        let docID2 = "2"
+        let docID3 = "3"
+        
+        let annotations = [
+            try! annotationStore.addAnnotation(docID: docID1, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: docID2, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        ]
+        try! annotationStore.addAnnotation(docID: docID3, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        
+        XCTAssertEqual(Set(annotations.map({ $0.id })), Set(annotationStore.annotationIDsWithDocIDsIn([docID1, docID2])))
+    }
+    
     func testGetAnnotationIDsForNotebook() {
         let annotationStore = AnnotationStore()!
         
