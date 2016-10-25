@@ -375,6 +375,22 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual([annotation!], annotationStore.annotations(docID: docID, paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })))
     }
     
+    func testGetAnnotationIDsWithDocIDs() {
+        let annotationStore = AnnotationStore()!
+        
+        let docID1 = "1"
+        let docID2 = "2"
+        let docID3 = "3"
+        
+        let annotations = [
+            try! annotationStore.addAnnotation(docID: docID1, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: docID2, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        ]
+        try! annotationStore.addAnnotation(docID: docID3, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        
+        XCTAssertEqual(Set(annotations.map({ $0.id })), Set(annotationStore.annotationIDsWithDocIDsIn([docID1, docID2])))
+    }
+    
     func testGetAnnotationIDsForNotebook() {
         let annotationStore = AnnotationStore()!
         
@@ -426,6 +442,23 @@ class AnnotationStoreTests: XCTestCase {
         for limit in [1, 5, 10, 15, 20] {
             XCTAssertEqual(limit, annotationStore.annotationIDs(limit: limit).count, "Didn't load correct number of annotation IDs for notebook")
         }
+        
+        for i in 0..<10 {
+            try! annotationStore.trashAnnotationWithID(annotations[i].id)
+        }
+        XCTAssertEqual(10, annotationStore.annotationIDs(limit: 20).count)
+    }
+    
+    func testGetAnnotationIDsWithLastModified() {
+        let annotationStore = AnnotationStore()!
+        
+        var annotations = [Annotation]()
+        for _ in 0..<20 {
+            annotations.append(try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local))
+        }
+        
+        let idsAndModified = annotationStore.annotationIDsWithLastModified()
+        XCTAssertEqual(idsAndModified.count, 20)
     }
     
     func testGetAnnotationsLinkedToDocID() {
