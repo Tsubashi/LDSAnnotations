@@ -108,7 +108,7 @@ public extension AnnotationStore {
     /// Returns all annotation IDs associated with the given docIDs
     public func annotationIDsWithDocIDsIn(docIDs: [String]) -> [Int64] {
         do {
-            return try db.prepare(AnnotationTable.table.filter(docIDs.contains(AnnotationTable.docID))).map { $0[AnnotationTable.id] }
+            return try db.prepare(AnnotationTable.table.filter(docIDs.contains(AnnotationTable.docID)).filter(AnnotationTable.status == .Active)).map { $0[AnnotationTable.id] }
         } catch {
             return []
         }
@@ -135,7 +135,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotation IDs for active annotations associated with tagID, ordered by last modified descending
     public func annotationIDs(limit limit: Int? = nil) -> [Int64] {
         do {
-            var query = AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.lastModified).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
+            var query = AnnotationTable.table.select(AnnotationTable.id).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
             if let limit = limit {
                 query = query.limit(limit)
             }
@@ -148,7 +148,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotation IDs for active annotations associated with tagID, ordered by last modified descending
     public func annotationIDsWithLastModified() -> [(Int64, NSDate)] {
         do {
-            var query = AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.lastModified).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
+            let query = AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.lastModified).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
             return try db.prepare(query).map { ($0[AnnotationTable.id], $0[AnnotationTable.lastModified]) }
         } catch {
             return []

@@ -442,6 +442,23 @@ class AnnotationStoreTests: XCTestCase {
         for limit in [1, 5, 10, 15, 20] {
             XCTAssertEqual(limit, annotationStore.annotationIDs(limit: limit).count, "Didn't load correct number of annotation IDs for notebook")
         }
+        
+        for i in 0..<10 {
+            try! annotationStore.trashAnnotationWithID(annotations[i].id)
+        }
+        XCTAssertEqual(10, annotationStore.annotationIDs(limit: 20).count)
+    }
+    
+    func testGetAnnotationIDsWithLastModified() {
+        let annotationStore = AnnotationStore()!
+        
+        var annotations = [Annotation]()
+        for _ in 0..<20 {
+            annotations.append(try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local))
+        }
+        
+        let idsAndModified = annotationStore.annotationIDsWithLastModified()
+        XCTAssertEqual(idsAndModified.count, 20)
     }
     
     func testGetAnnotationsLinkedToDocID() {
