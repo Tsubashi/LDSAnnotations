@@ -259,6 +259,9 @@ extension AnnotationStore {
     }
     
     func updateLastModifiedDate(notebookID id: Int64, status: AnnotationStatus? = nil, source: NotificationSource) throws {
+        // Don't overwrite last modified during sync
+        guard source == .Local else { return }
+        
         try inTransaction(source) {
             if let status = status {
                 try self.db.run(NotebookTable.table.filter(NotebookTable.id == id).update(

@@ -243,6 +243,8 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
         let notebookAnnotationIDs = requirement?.changes.notebookAnnotationIDs
         
         if let remoteChanges = syncAnnotations["changes"] as? [[String: AnyObject]] {
+            var changedAnnotationIDs: [Int64] = []
+            var changedNotebookIDs: [Int64] = []
             for change in remoteChanges {
                 do {
                     try annotationStore.db.savepoint {
@@ -270,7 +272,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             let status = (rawAnnotation["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
                             let device = rawAnnotation["device"] as? String ?? "iphone"
                             
-                            let databaseAnnotation: Annotation?
+                            let databaseAnnotation: Annotation
                             if var existingAnnotation = self.annotationStore.annotationWithUniqueID(uniqueID) {
                                 existingAnnotation.appSource = appSource
                                 existingAnnotation.device = device
@@ -284,156 +286,157 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                                 databaseAnnotation = try self.annotationStore.addAnnotation(uniqueID: uniqueID, docID: docID, docVersion: docVersion, created: created, lastModified: lastModified, appSource: appSource, device: device, source: self.source)
                             }
                             
-                            if let annotationID = databaseAnnotation?.id {
+                            let annotationID = databaseAnnotation.id
+                            changedAnnotationIDs.append(annotationID)
+                            
+                            // MARK: Note
+                            if let note = rawAnnotation["note"] as? [String: AnyObject] {
+                                let title = note["title"] as? String
+                                let content = note["content"] as? String ?? ""
+                                if var existingNote = self.annotationStore.noteWithAnnotationID(annotationID) {
+                                    existingNote.title = title
+                                    existingNote.content = content
+                                    try self.annotationStore.updateNote(existingNote, source: self.source)
+                                } else {
+                                    try self.annotationStore.addNote(title: title, content: content, annotationID: annotationID, source: self.source)
+                                }
+                                self.downloadNoteCount += 1
+                            } else if let noteID = self.annotationStore.noteWithAnnotationID(annotationID)?.id {
+                                // The service says that the note has been deleted
                                 
-                                // MARK: Note
-                                if let note = rawAnnotation["note"] as? [String: AnyObject] {
-                                    let title = note["title"] as? String
-                                    let content = note["content"] as? String ?? ""
-                                    if var existingNote = self.annotationStore.noteWithAnnotationID(annotationID) {
-                                        existingNote.title = title
-                                        existingNote.content = content
-                                        try self.annotationStore.updateNote(existingNote, source: self.source)
-                                    } else {
-                                        try self.annotationStore.addNote(title: title, content: content, annotationID: annotationID, source: self.source)
-                                    }
-                                    self.downloadNoteCount += 1
-                                } else if let noteID = self.annotationStore.noteWithAnnotationID(annotationID)?.id {
-                                    // The service says that the note has been deleted
+                                try self.annotationStore.deleteNoteWithID(noteID, source: self.source)
+                            }
+                            
+                            // MARK: Bookmark
+                            if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
+                                if bookmark["@pid"] == nil && bookmark["uri"] != nil {
+                                    // Bookmark has a URI, but no @pid so its invalid. If both are nil, its a valid chapter-level bookmark
+                                    throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Bookmark with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
+                                }
+                                
+                                let name = bookmark["name"] as? String
+                                let paragraphAID = bookmark["@pid"] as? String
+                                let displayOrder = bookmark["sort"] as? Int
+                                let offset = (bookmark["@offset"] as? String).flatMap { Int($0) } ?? Bookmark.Offset
+                                
+                                if var databaseBookmark = self.annotationStore.bookmarkWithAnnotationID(annotationID) {
+                                    databaseBookmark.name = name
+                                    databaseBookmark.paragraphAID = paragraphAID
+                                    databaseBookmark.displayOrder = displayOrder
+                                    databaseBookmark.offset = offset
                                     
-                                    try self.annotationStore.deleteNoteWithID(noteID, source: self.source)
+                                    try self.annotationStore.updateBookmark(databaseBookmark, source: self.source)
+                                } else {
+                                    try self.annotationStore.addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID, offset: offset, source: self.source)
                                 }
                                 
-                                // MARK: Bookmark
-                                if let bookmark = rawAnnotation["bookmark"] as? [String: AnyObject] {
-                                    if bookmark["@pid"] == nil && bookmark["uri"] != nil {
-                                        // Bookmark has a URI, but no @pid so its invalid. If both are nil, its a valid chapter-level bookmark
-                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Bookmark with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
+                                self.downloadBookmarkCount += 1
+                            } else if let bookmarkID = self.annotationStore.bookmarkWithAnnotationID(annotationID)?.id {
+                                // The service says that the bookmark has been deleted
+                                
+                                try self.annotationStore.deleteBookmarkWithID(bookmarkID, source: self.source)
+                            }
+                            
+                            // MARK: Notebooks
+                            
+                            var notebookIDsToDelete = self.annotationStore.notebooksWithAnnotationID(annotationID).flatMap { $0.id }
+                            changedNotebookIDs.appendContentsOf(notebookIDsToDelete)
+                            if let folders = rawAnnotation["folders"] as? [String: [[String: AnyObject]]] {
+                                for folder in folders["folder"] ?? [] {
+                                    guard let notebookUniqueID = folder["@uri"]?.lastPathComponent else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook is missing uniqueID: \(folder)")
                                     }
                                     
-                                    let name = bookmark["name"] as? String
-                                    let paragraphAID = bookmark["@pid"] as? String
-                                    let displayOrder = bookmark["sort"] as? Int
-                                    let offset = (bookmark["@offset"] as? String).flatMap { Int($0) } ?? Bookmark.Offset
-                                    
-                                    if var databaseBookmark = self.annotationStore.bookmarkWithAnnotationID(annotationID) {
-                                        databaseBookmark.name = name
-                                        databaseBookmark.paragraphAID = paragraphAID
-                                        databaseBookmark.displayOrder = displayOrder
-                                        databaseBookmark.offset = offset
-                                        
-                                        try self.annotationStore.updateBookmark(databaseBookmark, source: self.source)
-                                    } else {
-                                        try self.annotationStore.addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, annotationID: annotationID, offset: offset, source: self.source)
+                                    guard let notebookID = self.annotationStore.notebookWithUniqueID(notebookUniqueID)?.id else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Cannot associate annotation with uniqueID '\(uniqueID)' to notebook with uniqueID '\(notebookUniqueID)'")
                                     }
                                     
-                                    self.downloadBookmarkCount += 1
-                                } else if let bookmarkID = self.annotationStore.bookmarkWithAnnotationID(annotationID)?.id {
-                                    // The service says that the bookmark has been deleted
+                                    if let index = notebookIDsToDelete.indexOf(notebookID) {
+                                        // This notebook is still connected to the annotation, so remove it from the list of notebook IDs to delete
+                                        notebookIDsToDelete.removeAtIndex(index)
+                                    }
                                     
-                                    try self.annotationStore.deleteBookmarkWithID(bookmarkID, source: self.source)
+                                    // Don't fail if we don't get a display order from the syncFolders, just put it at the end
+                                    let displayOrder = notebookAnnotationIDs?[notebookUniqueID]?.indexOf(uniqueID) ?? .max
+                                    
+                                    try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder, source: self.source)
                                 }
-                                
-                                // MARK: Notebooks
-                                
-                                var notebookIDsToDelete = self.annotationStore.notebooksWithAnnotationID(annotationID).flatMap { $0.id }
-                                if let folders = rawAnnotation["folders"] as? [String: [[String: AnyObject]]] {
-                                    for folder in folders["folder"] ?? [] {
-                                        guard let notebookUniqueID = folder["@uri"]?.lastPathComponent else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook is missing uniqueID: \(folder)")
-                                        }
-                                        
-                                        guard let notebookID = self.annotationStore.notebookWithUniqueID(notebookUniqueID)?.id else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Cannot associate annotation with uniqueID '\(uniqueID)' to notebook with uniqueID '\(notebookUniqueID)'")
-                                        }
-                                        
-                                        if let index = notebookIDsToDelete.indexOf(notebookID) {
-                                            // This notebook is still connected to the annotation, so remove it from the list of notebook IDs to delete
-                                            notebookIDsToDelete.removeAtIndex(index)
-                                        }
-                                        
-                                        // Don't fail if we don't get a display order from the syncFolders, just put it at the end
-                                        let displayOrder = notebookAnnotationIDs?[notebookUniqueID]?.indexOf(uniqueID) ?? .max
-                                        
-                                        try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotationID, notebookID: notebookID, displayOrder: displayOrder, source: self.source)
+                            }
+                            for notebookID in notebookIDsToDelete {
+                                // Any notebook IDs left in `databaseNotebookIDs` should be deleted because the service says they aren't connected anymore
+                                try self.annotationStore.removeAnnotation(annotationID: annotationID, fromNotebook: notebookID, source: self.source)
+                            }
+                            
+                            // MARK: Highlights
+                            
+                            // Delete any existing highlights and then we'll just create new ones with what the server gives us
+                            for highlightID in self.annotationStore.highlightsWithAnnotationID(annotationID).flatMap({ $0.id }) {
+                                try self.annotationStore.deleteHighlightWithID(highlightID, source: self.source)
+                            }
+                            
+                            // Add new highlights
+                            if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
+                                for highlight in highlights["highlight"] ?? [] {
+                                    guard let offsetStartString = highlight["@offset-start"] as? String, offsetStart = Int(offsetStartString) else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-start")
                                     }
-                                }
-                                for notebookID in notebookIDsToDelete {
-                                    // Any notebook IDs left in `databaseNotebookIDs` should be deleted because the service says they aren't connected anymore
-                                    try self.annotationStore.removeAnnotation(annotationID: annotationID, fromNotebook: notebookID, source: self.source)
-                                }
-                                
-                                // MARK: Highlights
-                                
-                                // Delete any existing highlights and then we'll just create new ones with what the server gives us
-                                for highlightID in self.annotationStore.highlightsWithAnnotationID(annotationID).flatMap({ $0.id }) {
-                                    try self.annotationStore.deleteHighlightWithID(highlightID, source: self.source)
-                                }
-                                
-                                // Add new highlights
-                                if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
-                                    for highlight in highlights["highlight"] ?? [] {
-                                        guard let offsetStartString = highlight["@offset-start"] as? String, offsetStart = Int(offsetStartString) else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-start")
-                                        }
-                                        guard let offsetEndString = highlight["@offset-end"] as? String, offsetEnd = Int(offsetEndString) else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-end")
-                                        }
-                                        guard let colorName = highlight["@color"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing color")
-                                        }
-                                        guard let paragraphAID = highlight["@pid"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
-                                        }
-                                        
-                                        let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
-                                        let style = (highlight["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
-                                        
-                                        try self.annotationStore.addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID, source: self.source)
-                                        self.downloadHighlightCount += 1
+                                    guard let offsetEndString = highlight["@offset-end"] as? String, offsetEnd = Int(offsetEndString) else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-end")
                                     }
-                                }
-                                
-                                // MARK: Links
-                                
-                                // Delete any existing links and then we'll just create new ones with what the server gives us
-                                for linkID in self.annotationStore.linksWithAnnotationID(annotationID).flatMap({ $0.id }) {
-                                    // Any link IDs left in `linksIDsToDelete` should be deleted because the service says they are gone
-                                    try self.annotationStore.deleteLinkWithID(linkID, source: self.source)
-                                }
-                                
-                                // Add new links now
-                                if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
-                                    for link in links["ref"] ?? [] {
-                                        guard let name = link["$"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing name")
-                                        }
-                                        guard let paragraphAIDs = link["@pid"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing paragraphAIDs")
-                                        }
-                                        guard let docID = link["@docId"] as? String else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docId")
-                                        }
-                                        guard let docVersionString = link["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
-                                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docVersion")
-                                        }
-                                        
-                                        try self.annotationStore.addLink(name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs.componentsSeparatedByString(",").map { $0.trimmed() }, annotationID: annotationID, source: self.source)
-                                        self.downloadLinkCount += 1
+                                    guard let colorName = highlight["@color"] as? String else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing color")
                                     }
-                                }
-                                
-                                // MARK: Tags
-                                
-                                // Remove any existings tags from the annotation and then we'll re-added what the server sends us
-                                for tagID in self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id }) {
-                                    try self.annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID, source: self.source)
-                                }
-                                if let tags = rawAnnotation["tags"] as? [String: [String]] {
-                                    for tagName in tags["tag"] ?? [] {
-                                        try self.annotationStore.addTag(name: tagName, annotationID: annotationID, source: self.source)
-                                        self.downloadTagCount += 1
+                                    guard let paragraphAID = highlight["@pid"] as? String else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
                                     }
+                                    
+                                    let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
+                                    let style = (highlight["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
+                                    
+                                    try self.annotationStore.addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID, source: self.source)
+                                    self.downloadHighlightCount += 1
+                                }
+                            }
+                            
+                            // MARK: Links
+                            
+                            // Delete any existing links and then we'll just create new ones with what the server gives us
+                            for linkID in self.annotationStore.linksWithAnnotationID(annotationID).flatMap({ $0.id }) {
+                                // Any link IDs left in `linksIDsToDelete` should be deleted because the service says they are gone
+                                try self.annotationStore.deleteLinkWithID(linkID, source: self.source)
+                            }
+                            
+                            // Add new links now
+                            if let links = rawAnnotation["refs"] as? [String: [[String: AnyObject]]] {
+                                for link in links["ref"] ?? [] {
+                                    guard let name = link["$"] as? String else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing name")
+                                    }
+                                    guard let paragraphAIDs = link["@pid"] as? String else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing paragraphAIDs")
+                                    }
+                                    guard let docID = link["@docId"] as? String else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docId")
+                                    }
+                                    guard let docVersionString = link["@contentVersion"] as? String, docVersion = Int(docVersionString) else {
+                                        throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docVersion")
+                                    }
+                                    
+                                    try self.annotationStore.addLink(name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs.componentsSeparatedByString(",").map { $0.trimmed() }, annotationID: annotationID, source: self.source)
+                                    self.downloadLinkCount += 1
+                                }
+                            }
+                            
+                            // MARK: Tags
+                            
+                            // Remove any existings tags from the annotation and then we'll re-added what the server sends us
+                            for tagID in self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id }) {
+                                try self.annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID, source: self.source)
+                            }
+                            if let tags = rawAnnotation["tags"] as? [String: [String]] {
+                                for tagName in tags["tag"] ?? [] {
+                                    try self.annotationStore.addTag(name: tagName, annotationID: annotationID, source: self.source)
+                                    self.downloadTagCount += 1
                                 }
                             }
                             
@@ -451,6 +454,9 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                     deserializationErrors.append(error)
                 }
             }
+            
+            try annotationStore.notifyModifiedAnnotationsWithIDs(changedAnnotationIDs, source: source)
+            try annotationStore.notifyModifiedNotebooksWithIDs(changedNotebookIDs, source: source)
         }
         
         

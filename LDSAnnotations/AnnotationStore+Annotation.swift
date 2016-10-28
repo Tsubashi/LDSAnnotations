@@ -333,7 +333,10 @@ extension AnnotationStore {
                 AnnotationTable.device <- device
             ))
             
-            try self.notifyModifiedAnnotationsWithIDs([id], source: source)
+            // Sync notifies once at the end
+            if case .Local = source {
+                try self.notifyModifiedAnnotationsWithIDs([id], source: source)
+            }
             
             return Annotation(id: id, uniqueID: uniqueID, docID: docID, docVersion: docVersion, status: .Active, created: created, lastModified: lastModified, appSource: appSource, device: device)
         }
@@ -355,13 +358,19 @@ extension AnnotationStore {
                 AnnotationTable.device <- modifiedAnnotation.device
             ))
             
-            try self.notifyModifiedAnnotationsWithIDs([annotation.id], source: source)
+            // Sync notifies once at the end
+            if case .Local = source {
+                try self.notifyModifiedAnnotationsWithIDs([annotation.id], source: source)
+            }
             
             return modifiedAnnotation
         }
     }
     
     func updateLastModifiedDate(annotationID annotationID: Int64, status: AnnotationStatus? = nil, source: NotificationSource) throws {
+        // Don't overwrite last modified during sync
+        guard source == .Local else { return }
+        
         try inTransaction(source) {
             if let status = status {
                 try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotationID).update(
