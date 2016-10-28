@@ -95,6 +95,15 @@ public extension AnnotationStore {
         return db.pluck(BookmarkTable.table.filter(BookmarkTable.annotationID == annotationID)).map { BookmarkTable.fromRow($0) }
     }
     
+    /// Returns bookmarks with annotationIDs
+    public func bookmarksWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Bookmark] {
+        do {
+            return try db.prepare(BookmarkTable.table.filter(annotationIDs.contains(BookmarkTable.annotationID))).map { BookmarkTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     /// Trashes bookmark with ID
     public func trashBookmarkWithID(id: Int64) throws {
         try trashBookmarkWithID(id, source: .Local)

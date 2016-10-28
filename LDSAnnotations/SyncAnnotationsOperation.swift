@@ -245,6 +245,43 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
         if let remoteChanges = syncAnnotations["changes"] as? [[String: AnyObject]] {
             var changedAnnotationIDs: [Int64] = []
             var changedNotebookIDs: [Int64] = []
+            
+            var noteByAnnotationID = [Int64: Note]()
+            var bookmarkByAnnotationID = [Int64: Bookmark]()
+            var highlightsByAnnotationID = [Int64: [Highlight]]()
+            var linksByAnnotationID = [Int64: [Link]]()
+            var annotationByUniqueID = [String: Annotation]()
+            let initialSync = annotationStore.annotationCount() == 0
+            if !initialSync {
+                let annotationUniqueIDs = remoteChanges.flatMap { $0["annotationId"] as? String }
+                let annotations = annotationStore.annotationsWithUniqueIDsIn(annotationUniqueIDs)
+                let annotationIDs = annotations.map { $0.id }
+                
+                for annotation in annotations {
+                    annotationByUniqueID[annotation.uniqueID] = annotation
+                }
+                for note in annotationStore.notesWithAnnotationIDsIn(annotationIDs) {
+                    noteByAnnotationID[note.annotationID] = note
+                }
+                for bookmark in annotationStore.bookmarksWithAnnotationIDsIn(annotationIDs) {
+                    bookmarkByAnnotationID[bookmark.annotationID] = bookmark
+                }
+                for hightlight in annotationStore.highlightsWithAnnotationIDsIn(annotationIDs) {
+                    if highlightsByAnnotationID[hightlight.annotationID] != nil {
+                        highlightsByAnnotationID[hightlight.annotationID]?.append(hightlight)
+                    } else {
+                        highlightsByAnnotationID[hightlight.annotationID] = [hightlight]
+                    }
+                }
+                for link in annotationStore.linksWithAnnotationIDsIn(annotationIDs) {
+                    if linksByAnnotationID[link.annotationID] != nil {
+                        linksByAnnotationID[link.annotationID]?.append(link)
+                    } else {
+                        linksByAnnotationID[link.annotationID] = [link]
+                    }
+                }
+            }
+            
             for change in remoteChanges {
                 do {
                     try annotationStore.db.savepoint {
@@ -273,7 +310,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             let device = rawAnnotation["device"] as? String ?? "iphone"
                             
                             let databaseAnnotation: Annotation
-                            if var existingAnnotation = self.annotationStore.annotationWithUniqueID(uniqueID) {
+                            if var existingAnnotation = annotationByUniqueID[uniqueID] {
                                 existingAnnotation.appSource = appSource
                                 existingAnnotation.device = device
                                 existingAnnotation.docID = docID
@@ -293,7 +330,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             if let note = rawAnnotation["note"] as? [String: AnyObject] {
                                 let title = note["title"] as? String
                                 let content = note["content"] as? String ?? ""
-                                if var existingNote = self.annotationStore.noteWithAnnotationID(annotationID) {
+                                if !initialSync, var existingNote = noteByAnnotationID[annotationID] {
                                     existingNote.title = title
                                     existingNote.content = content
                                     try self.annotationStore.updateNote(existingNote, source: self.source)
@@ -301,7 +338,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                                     try self.annotationStore.addNote(title: title, content: content, annotationID: annotationID, source: self.source)
                                 }
                                 self.downloadNoteCount += 1
-                            } else if let noteID = self.annotationStore.noteWithAnnotationID(annotationID)?.id {
+                            } else if let noteID = noteByAnnotationID[annotationID]?.id {
                                 // The service says that the note has been deleted
                                 
                                 try self.annotationStore.deleteNoteWithID(noteID, source: self.source)
@@ -319,7 +356,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                                 let displayOrder = bookmark["sort"] as? Int
                                 let offset = (bookmark["@offset"] as? String).flatMap { Int($0) } ?? Bookmark.Offset
                                 
-                                if var databaseBookmark = self.annotationStore.bookmarkWithAnnotationID(annotationID) {
+                                if !initialSync, var databaseBookmark = bookmarkByAnnotationID[annotationID] {
                                     databaseBookmark.name = name
                                     databaseBookmark.paragraphAID = paragraphAID
                                     databaseBookmark.displayOrder = displayOrder
@@ -331,7 +368,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                                 }
                                 
                                 self.downloadBookmarkCount += 1
-                            } else if let bookmarkID = self.annotationStore.bookmarkWithAnnotationID(annotationID)?.id {
+                            } else if let bookmarkID = bookmarkByAnnotationID[annotationID]?.id {
                                 // The service says that the bookmark has been deleted
                                 
                                 try self.annotationStore.deleteBookmarkWithID(bookmarkID, source: self.source)
@@ -370,9 +407,12 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Highlights
                             
                             // Delete any existing highlights and then we'll just create new ones with what the server gives us
-                            for highlightID in self.annotationStore.highlightsWithAnnotationID(annotationID).flatMap({ $0.id }) {
-                                try self.annotationStore.deleteHighlightWithID(highlightID, source: self.source)
+                            if !initialSync, let highlights = highlightsByAnnotationID[annotationID] {
+                                for highlightID in highlights.map({ $0.id }) {
+                                    try self.annotationStore.deleteHighlightWithID(highlightID, source: self.source)
+                                }
                             }
+                            
                             
                             // Add new highlights
                             if let highlights = rawAnnotation["highlights"] as? [String: [[String: AnyObject]]] {
@@ -401,9 +441,11 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Links
                             
                             // Delete any existing links and then we'll just create new ones with what the server gives us
-                            for linkID in self.annotationStore.linksWithAnnotationID(annotationID).flatMap({ $0.id }) {
-                                // Any link IDs left in `linksIDsToDelete` should be deleted because the service says they are gone
-                                try self.annotationStore.deleteLinkWithID(linkID, source: self.source)
+                            if !initialSync, let links = linksByAnnotationID[annotationID] {
+                                for linkID in links.map({ $0.id }) {
+                                    // Any link IDs left in `linksIDsToDelete` should be deleted because the service says they are gone
+                                    try self.annotationStore.deleteLinkWithID(linkID, source: self.source)
+                                }
                             }
                             
                             // Add new links now
@@ -430,7 +472,8 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Tags
                             
                             // Remove any existings tags from the annotation and then we'll re-added what the server sends us
-                            for tagID in self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id }) {
+                            let tagIDs = initialSync ? [] : self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id })
+                            for tagID in tagIDs {
                                 try self.annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID, source: self.source)
                             }
                             if let tags = rawAnnotation["tags"] as? [String: [String]] {
