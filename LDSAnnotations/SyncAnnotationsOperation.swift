@@ -251,34 +251,31 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
             var highlightsByAnnotationID = [Int64: [Highlight]]()
             var linksByAnnotationID = [Int64: [Link]]()
             var annotationByUniqueID = [String: Annotation]()
-            let initialSync = annotationStore.annotationCount() == 0
-            if !initialSync {
-                let annotationUniqueIDs = remoteChanges.flatMap { $0["annotationId"] as? String }
-                let annotations = annotationStore.annotationsWithUniqueIDsIn(annotationUniqueIDs)
-                let annotationIDs = annotations.map { $0.id }
-                
-                for annotation in annotations {
-                    annotationByUniqueID[annotation.uniqueID] = annotation
+            let annotationUniqueIDs = remoteChanges.flatMap { $0["annotationId"] as? String }
+            let annotations = annotationStore.annotationsWithUniqueIDsIn(annotationUniqueIDs)
+            let annotationIDs = annotations.map { $0.id }
+            
+            for annotation in annotations {
+                annotationByUniqueID[annotation.uniqueID] = annotation
+            }
+            for note in annotationStore.notesWithAnnotationIDsIn(annotationIDs) {
+                noteByAnnotationID[note.annotationID] = note
+            }
+            for bookmark in annotationStore.bookmarksWithAnnotationIDsIn(annotationIDs) {
+                bookmarkByAnnotationID[bookmark.annotationID] = bookmark
+            }
+            for hightlight in annotationStore.highlightsWithAnnotationIDsIn(annotationIDs) {
+                if highlightsByAnnotationID[hightlight.annotationID] != nil {
+                    highlightsByAnnotationID[hightlight.annotationID]?.append(hightlight)
+                } else {
+                    highlightsByAnnotationID[hightlight.annotationID] = [hightlight]
                 }
-                for note in annotationStore.notesWithAnnotationIDsIn(annotationIDs) {
-                    noteByAnnotationID[note.annotationID] = note
-                }
-                for bookmark in annotationStore.bookmarksWithAnnotationIDsIn(annotationIDs) {
-                    bookmarkByAnnotationID[bookmark.annotationID] = bookmark
-                }
-                for hightlight in annotationStore.highlightsWithAnnotationIDsIn(annotationIDs) {
-                    if highlightsByAnnotationID[hightlight.annotationID] != nil {
-                        highlightsByAnnotationID[hightlight.annotationID]?.append(hightlight)
-                    } else {
-                        highlightsByAnnotationID[hightlight.annotationID] = [hightlight]
-                    }
-                }
-                for link in annotationStore.linksWithAnnotationIDsIn(annotationIDs) {
-                    if linksByAnnotationID[link.annotationID] != nil {
-                        linksByAnnotationID[link.annotationID]?.append(link)
-                    } else {
-                        linksByAnnotationID[link.annotationID] = [link]
-                    }
+            }
+            for link in annotationStore.linksWithAnnotationIDsIn(annotationIDs) {
+                if linksByAnnotationID[link.annotationID] != nil {
+                    linksByAnnotationID[link.annotationID]?.append(link)
+                } else {
+                    linksByAnnotationID[link.annotationID] = [link]
                 }
             }
             
@@ -330,7 +327,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             if let note = rawAnnotation["note"] as? [String: AnyObject] {
                                 let title = note["title"] as? String
                                 let content = note["content"] as? String ?? ""
-                                if !initialSync, var existingNote = noteByAnnotationID[annotationID] {
+                                if var existingNote = noteByAnnotationID[annotationID] {
                                     existingNote.title = title
                                     existingNote.content = content
                                     try self.annotationStore.updateNote(existingNote, source: self.source)
@@ -356,7 +353,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                                 let displayOrder = bookmark["sort"] as? Int
                                 let offset = (bookmark["@offset"] as? String).flatMap { Int($0) } ?? Bookmark.Offset
                                 
-                                if !initialSync, var databaseBookmark = bookmarkByAnnotationID[annotationID] {
+                                if var databaseBookmark = bookmarkByAnnotationID[annotationID] {
                                     databaseBookmark.name = name
                                     databaseBookmark.paragraphAID = paragraphAID
                                     databaseBookmark.displayOrder = displayOrder
@@ -407,7 +404,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Highlights
                             
                             // Delete any existing highlights and then we'll just create new ones with what the server gives us
-                            if !initialSync, let highlights = highlightsByAnnotationID[annotationID] {
+                            if let highlights = highlightsByAnnotationID[annotationID] {
                                 for highlightID in highlights.map({ $0.id }) {
                                     try self.annotationStore.deleteHighlightWithID(highlightID, source: self.source)
                                 }
@@ -441,7 +438,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Links
                             
                             // Delete any existing links and then we'll just create new ones with what the server gives us
-                            if !initialSync, let links = linksByAnnotationID[annotationID] {
+                            if let links = linksByAnnotationID[annotationID] {
                                 for linkID in links.map({ $0.id }) {
                                     // Any link IDs left in `linksIDsToDelete` should be deleted because the service says they are gone
                                     try self.annotationStore.deleteLinkWithID(linkID, source: self.source)
@@ -472,7 +469,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Tags
                             
                             // Remove any existings tags from the annotation and then we'll re-added what the server sends us
-                            let tagIDs = initialSync ? [] : self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id })
+                            let tagIDs = self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id })
                             for tagID in tagIDs {
                                 try self.annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID, source: self.source)
                             }
