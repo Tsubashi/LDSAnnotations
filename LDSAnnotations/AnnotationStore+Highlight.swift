@@ -69,6 +69,15 @@ extension AnnotationStore {
             return []
         }
     }
+    
+    /// Returns list of highlights with annotationIDs
+    public func highlightsWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Highlight] {
+        do {
+            return try db.prepare(HighlightTable.table.filter(annotationIDs.contains(HighlightTable.annotationID))).map { HighlightTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
 
     /// Trash highlight with ID
     public func trashHighlightWithID(id: Int64) throws {

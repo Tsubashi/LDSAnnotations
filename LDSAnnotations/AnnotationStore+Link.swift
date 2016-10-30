@@ -83,6 +83,15 @@ public extension AnnotationStore {
         }
     }
     
+    /// Returns list of links with annotation IDs
+    public func linksWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Link] {
+        do {
+            return try db.prepare(LinkTable.table.filter(annotationIDs.contains(LinkTable.annotationID))).map { LinkTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     /// Return link with ID, then marks annotation as trashed if is has no other related annotation objects
     public func trashLinkWithID(id: Int64) throws {
         try trashLinkWithID(id, source: .Local)

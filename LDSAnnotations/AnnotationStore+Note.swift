@@ -82,6 +82,15 @@ public extension AnnotationStore {
     public func noteWithAnnotationID(annotationID: Int64) -> Note? {
         return db.pluck(NoteTable.table.filter(NoteTable.annotationID == annotationID)).map { NoteTable.fromRow($0) }
     }
+    
+    /// Returns notes with annotationIDs
+    public func notesWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Note] {
+        do {
+            return try db.prepare(NoteTable.table.filter(annotationIDs.contains(NoteTable.annotationID))).map { NoteTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
 
     /// Deletes note with id, and then trashes associated annotation if it has no other related annotation objects
     public func trashNoteWithID(id: Int64) throws {

@@ -261,6 +261,15 @@ public extension AnnotationStore {
         return db.pluck(AnnotationTable.table.filter(AnnotationTable.uniqueID == uniqueID)).map { AnnotationTable.fromRow($0) }
     }
     
+    /// Returns annotations with uniqueIDs
+    public func annotationsWithUniqueIDsIn(uniqueIDs: [String]) -> [Annotation] {
+        do {
+            return try db.prepare(AnnotationTable.table.filter(uniqueIDs.contains(AnnotationTable.uniqueID))).map { AnnotationTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     /// Returns annotation with ID
     public func annotationWithID(id: Int64) -> Annotation? {
         return db.pluck(AnnotationTable.table.filter(AnnotationTable.id == id)).map { AnnotationTable.fromRow($0) }
