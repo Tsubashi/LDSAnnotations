@@ -142,6 +142,26 @@ public extension AnnotationStore {
         }
     }
     
+    /// Returns notebook IDs by annotationID
+    func notebookIDsWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Int64: [Int64]] {
+        do {
+            let results = try db.prepare(AnnotationNotebookTable.table.select(AnnotationNotebookTable.notebookID, AnnotationNotebookTable.annotationID).filter(annotationIDs.contains(AnnotationNotebookTable.annotationID)).order(AnnotationNotebookTable.displayOrder.asc)).map { (annotationID: $0[AnnotationNotebookTable.annotationID], notebookID: $0[AnnotationNotebookTable.notebookID]) }
+            
+            var notebookIDsByAnnotationID = [Int64: [Int64]]()
+            for result in results {
+                if notebookIDsByAnnotationID[result.annotationID] != nil {
+                    notebookIDsByAnnotationID[result.annotationID]?.append(result.notebookID)
+                } else {
+                    notebookIDsByAnnotationID[result.annotationID] = [result.notebookID]
+                }
+            }
+            
+            return notebookIDsByAnnotationID
+        } catch {
+            return [:]
+        }
+    }
+    
     /// Returns an unordered list of trashed notebooks.
     public func trashedNotebooks() -> [Notebook] {
         do {

@@ -90,6 +90,27 @@ public extension AnnotationStore {
         }
     }
     
+    /// Returns tag IDs by annotationID
+    func tagIDsWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Int64: [Int64]] {
+        do {
+            
+            let results = try db.prepare(AnnotationTagTable.table.select(AnnotationTagTable.tagID, AnnotationTagTable.annotationID).filter(annotationIDs.contains(AnnotationTagTable.annotationID))).map { (annotationID: $0[AnnotationTagTable.annotationID], tagID: $0[AnnotationTagTable.tagID]) }
+            
+            var tagIDsByAnnotationID = [Int64: [Int64]]()
+            for result in results {
+                if tagIDsByAnnotationID[result.annotationID] != nil {
+                    tagIDsByAnnotationID[result.annotationID]?.append(result.tagID)
+                } else {
+                    tagIDsByAnnotationID[result.annotationID] = [result.tagID]
+                }
+            }
+            
+            return tagIDsByAnnotationID
+        } catch {
+            return [:]
+        }
+    }
+    
     /// Selects the date of the most recent annotation associated with tagID
     public func dateOfMostRecentAnnotationWithTagID(tagID: Int64) -> NSDate? {
         return db.pluck(AnnotationTable.table.select(AnnotationTable.lastModified).join(AnnotationTagTable.table.join(TagTable.table, on: AnnotationTagTable.tagID == TagTable.table[TagTable.id]), on: AnnotationTable.id == AnnotationTagTable.annotationID).filter(TagTable.table[TagTable.id] == tagID).order(AnnotationTable.lastModified.desc)).map { $0[AnnotationTable.lastModified] }

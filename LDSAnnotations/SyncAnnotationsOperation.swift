@@ -279,6 +279,9 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                 }
             }
             
+            let notebookIDsByAnnotationID = annotationStore.notebookIDsWithAnnotationIDsIn(annotationIDs)
+            let tagsIDsByAnnotationID = annotationStore.tagIDsWithAnnotationIDsIn(annotationIDs)
+            
             for change in remoteChanges {
                 do {
                     try annotationStore.db.savepoint {
@@ -373,7 +376,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             
                             // MARK: Notebooks
                             
-                            var notebookIDsToDelete = self.annotationStore.notebooksWithAnnotationID(annotationID).flatMap { $0.id }
+                            var notebookIDsToDelete = notebookIDsByAnnotationID[annotationID] ?? []
                             changedNotebookIDs.appendContentsOf(notebookIDsToDelete)
                             if let folders = rawAnnotation["folders"] as? [String: [[String: AnyObject]]] {
                                 for folder in folders["folder"] ?? [] {
@@ -469,7 +472,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             // MARK: Tags
                             
                             // Remove any existings tags from the annotation and then we'll re-added what the server sends us
-                            let tagIDs = self.annotationStore.tagsWithAnnotationID(annotationID).flatMap({ $0.id })
+                            let tagIDs = tagsIDsByAnnotationID[annotationID] ?? []
                             for tagID in tagIDs {
                                 try self.annotationStore.deleteTag(tagID: tagID, fromAnnotation: annotationID, source: self.source)
                             }
@@ -482,7 +485,7 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
                             
                             self.downloadAnnotationCount += 1
                         case .Trash, .Delete:
-                            if let existingAnnotationID = self.annotationStore.annotationWithUniqueID(uniqueID)?.id {
+                            if let existingAnnotationID = annotationByUniqueID[uniqueID]?.id {
                                 // Don't store trashed or deleted annotations, just delete them from the db
                                 try self.annotationStore.deleteAnnotationWithID(existingAnnotationID, source: self.source)
                             } else {
