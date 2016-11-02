@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		110640D31DC906A200BD620C /* AnnotationStore+Merge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110640D21DC906A200BD620C /* AnnotationStore+Merge.swift */; };
+		11228F861DC92ED900DF14B5 /* AnnotationStoreMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11228F851DC92ED900DF14B5 /* AnnotationStoreMergeTests.swift */; };
 		117898B11D8342EA00FC2777 /* SyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117898B01D8342EA00FC2777 /* SyncOperation.swift */; };
 		62D7BDEA8988C62655386B21 /* Pods_LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */; };
 		C0F4661ACDB75A9524871D89 /* Pods_LDSAnnotations_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EA770A28615F5691ADAD66C /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */; };
@@ -83,6 +85,8 @@
 
 /* Begin PBXFileReference section */
 		0F977273277E6CF53E0EE5CC /* Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
+		110640D21DC906A200BD620C /* AnnotationStore+Merge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Merge.swift"; sourceTree = "<group>"; };
+		11228F851DC92ED900DF14B5 /* AnnotationStoreMergeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationStoreMergeTests.swift; sourceTree = "<group>"; };
 		117898B01D8342EA00FC2777 /* SyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncOperation.swift; sourceTree = "<group>"; };
 		1EA770A28615F5691ADAD66C /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations_LDSAnnotationsTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		37AD5AD0F16CBD6679922E6D /* Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -209,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				D9E25A5F1D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift */,
+				11228F851DC92ED900DF14B5 /* AnnotationStoreMergeTests.swift */,
 				D95F19B41CD66F09008618AA /* AnnotationStoreTests.swift */,
 				D90A3CE71C95C7280060094B /* AuthenticationTests.swift */,
 				D95F19B21CD664B2008618AA /* BookmarkTests.swift */,
@@ -305,6 +310,7 @@
 				D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */,
 				D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */,
 				D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */,
+				110640D21DC906A200BD620C /* AnnotationStore+Merge.swift */,
 				D4A90CE51C9877B10010F8F2 /* AnnotationStore+Annotation.swift */,
 				D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */,
 				D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */,
@@ -535,6 +541,7 @@
 				D95392D01D02611200CB4921 /* LinkTests.swift in Sources */,
 				D403E25E1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift in Sources */,
 				D4AB10FB1D5134D8001C3C0E /* SyncAnnotationsTests.swift in Sources */,
+				11228F861DC92ED900DF14B5 /* AnnotationStoreMergeTests.swift in Sources */,
 				D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */,
 				D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */,
 				D9E25A601D2EA97E0065A2C2 /* AnnotationStoreNotificationTests.swift in Sources */,
@@ -551,6 +558,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				110640D31DC906A200BD620C /* AnnotationStore+Merge.swift in Sources */,
 				D9C470971C602B4A00EDCD69 /* AuthenticateCondition.swift in Sources */,
 				D4ACFD3E1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift in Sources */,
 				D40F0A221C975368002D61EA /* Annotation.swift in Sources */,
