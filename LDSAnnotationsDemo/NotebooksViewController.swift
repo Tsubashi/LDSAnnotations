@@ -133,7 +133,7 @@ extension NotebooksViewController {
         }
         
         let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
-            let name = alertController.textFields?[safe: 0]?.text ?? ""
+            let name = alertController.textFields?[0].text ?? ""
             self.addNotebookWithName(name)
         })
         doneAction.enabled = false
@@ -147,7 +147,7 @@ extension NotebooksViewController {
     
     func textFieldDidChange(textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
-            let name = alertController.textFields?[safe: 0]?.text ?? ""
+            let name = alertController.textFields?[0].text ?? ""
             alertController.preferredAction?.enabled = (name.length > 0)
         }
     }
@@ -265,7 +265,7 @@ extension NotebooksViewController: UITableViewDelegate {
             }
             
             let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
-                let name = alertController.textFields?[safe: 0]?.text ?? ""
+                let name = alertController.textFields?[0].text ?? ""
                 self.renameNotebook(notebook, name: name)
             })
             alertController.addAction(doneAction)

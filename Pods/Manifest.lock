@@ -1,23 +1,23 @@
 PODS:
   - Locksmith (2.0.8)
-  - Operations (3.2.0):
-    - Operations/Standard (= 3.2.0)
-  - Operations/Standard (3.2.0)
+  - Operations (3.4.0):
+    - Operations/Standard (= 3.4.0)
+  - Operations/Standard (3.4.0)
   - SQLite.swift (0.10.1)
-  - Swiftification (5.9.0)
+  - Swiftification (6.0.1)
 
 DEPENDENCIES:
-  - Locksmith
+  - Locksmith (= 2.0.8)
   - Operations
-  - SQLite.swift
-  - Swiftification
+  - SQLite.swift (= 0.10.1)
+  - Swiftification (= 6.0.1)
 
 SPEC CHECKSUMS:
   Locksmith: a8ed41ac4c06506ea8cb199d8ec8a8d3d108eb2a
-  Operations: 4c5f06d7328f1b097d5dac5c0d614917ecbc96e7
+  Operations: cf9f1b79ee7cfe02884ba3db7a82670590b1cfbd
   SQLite.swift: 6a6e4b034efc317ce4e203b6af2d3024fee2b570
-  Swiftification: 3a4ccfca418db7ce71861b7f0731fcc402952c30
+  Swiftification: 93de992649e05e6fa3d2cb65eb8bb982195f47b0
 
-PODFILE CHECKSUM: 098dba7390849dbce673b51de33206fe16b082df
+PODFILE CHECKSUM: 8d7a736118234d744b0c07d0f5e30a5e5f92fce2
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.1.1
