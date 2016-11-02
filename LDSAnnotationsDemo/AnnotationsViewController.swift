@@ -122,7 +122,7 @@ class AnnotationsViewController: UIViewController {
 extension AnnotationsViewController {
     func textFieldDidChange(textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
-            let name = alertController.textFields?[safe: 0]?.text ?? ""
+            let name = alertController.textFields?[0].text ?? ""
             alertController.preferredAction?.enabled = (name.length > 0)
         }
     }

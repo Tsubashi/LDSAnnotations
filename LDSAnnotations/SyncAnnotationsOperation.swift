@@ -115,11 +115,11 @@ class SyncAnnotationsOperation: Operation, AutomaticInjectionOperationType {
         session.put("/ws/annotation/v1.4/Services/rest/sync/annotations-ids?xver=2", payload: payload) { response in
             switch response {
             case .Success(let payload):
-                let errorsJSON = (payload[safe: "syncAnnotationsIds"] as? [String: AnyObject])?[safe: "errors"]
+                let errorsJSON = (payload["syncAnnotationsIds"] as? [String: AnyObject])?["errors"]
                 if let errorsJSON = errorsJSON as? [[String: AnyObject]] where !errorsJSON.isEmpty {
                     // Server returned errors, fail
                     
-                    let errors = errorsJSON.map { Error.errorWithCode(.SyncFailed, failureReason: String(format: "Failed to sync annotation with unique ID \"%@\": %@", $0[safe: "id"] as? String ?? "Unknown", $0[safe: "msg"] as? String ?? "Unknown")) }
+                    let errors = errorsJSON.map { Error.errorWithCode(.SyncFailed, failureReason: String(format: "Failed to sync annotation with unique ID \"%@\": %@", $0["id"] as? String ?? "Unknown", $0["msg"] as? String ?? "Unknown")) }
                     self.finish(errors)
                     
                 } else {

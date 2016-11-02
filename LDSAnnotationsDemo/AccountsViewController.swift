@@ -121,8 +121,8 @@ extension AccountsViewController {
         }
         
         let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
-            let username = alertController.textFields?[safe: 0]?.text ?? ""
-            let password = alertController.textFields?[safe: 1]?.text ?? ""
+            let username = alertController.textFields?[0].text ?? ""
+            let password = alertController.textFields?[1].text ?? ""
             self.addAccountWithUsername(username, password: password)
         })
         doneAction.enabled = false
@@ -136,8 +136,8 @@ extension AccountsViewController {
     
     func textFieldDidChange(textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
-            let username = alertController.textFields?[safe: 0]?.text ?? ""
-            let password = alertController.textFields?[safe: 1]?.text ?? ""
+            let username = alertController.textFields?[0].text ?? ""
+            let password = alertController.textFields?[1].text ?? ""
             alertController.preferredAction?.enabled = (username.length > 0 && password.length > 0)
         }
     }

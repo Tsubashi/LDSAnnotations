@@ -27,7 +27,9 @@ extension AnnotationStore {
     
     class func annotationStoreForUsername(username: String) -> AnnotationStore? {
         let storeName = String(format: "%@.sqlite", username)
-        return AnnotationStore(path: NSFileManager.privateDocumentsURL.URLByAppendingPathComponent(storeName).path)
+        guard let url = NSFileManager.privateDocumentsURL.URLByAppendingPathComponent(storeName) else { return nil }
+        
+        return AnnotationStore(path: url.path)
     }
     
 }
