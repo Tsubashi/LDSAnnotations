@@ -34,7 +34,7 @@ class NoteTable {
     static let content = Expression<String>("content")
     static let annotationID = Expression<Int64>("annotation_id")
 
-    static func fromRow(row: Row) -> Note {
+    static func fromRow(_ row: Row) -> Note {
         return Note(id: row[id], title: row[title], content: row[content], annotationID: row[annotationID])
     }
     
@@ -45,46 +45,54 @@ class NoteTable {
 public extension AnnotationStore {
 
     /// Adds note and links it to annotation
-    public func addNote(title title: String?, content: String, annotationID: Int64) throws -> Note {
-        return try addNote(title: title, content:content, annotationID: annotationID, source: .Local)
+    @discardableResult public func addNote(title: String?, content: String, annotationID: Int64) throws -> Note {
+        return try addNote(title: title, content:content, annotationID: annotationID, source: .local)
     }
     
     /// Adds note and related annotation, and associates it to notebook
-    public func addNote(title title: String?, content: String, appSource: String, device: String, notebookID: Int64) throws -> Note {
-        return try addNote(title: title, content: content, appSource: appSource, device: device, notebookID: notebookID, source: .Local)
+    @discardableResult public func addNote(title: String?, content: String, appSource: String, device: String, notebookID: Int64) throws -> Note {
+        return try addNote(title: title, content: content, appSource: appSource, device: device, notebookID: notebookID, source: .local)
     }
     
     /// Adds note, related annotation & highlights
-    public func addNote(title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource:
+    @discardableResult public func addNote(_ title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource:
         String, device: String) throws -> Note {
         
-        let source: NotificationSource = .Local
-        return try inTransaction(source) {
+        let source: NotificationSource = .local
+        return try inTransaction(notificationSource: source) {
             let highlights = try self.addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: source)
             
-            guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
+            guard let annotationID = highlights.first?.annotationID else { throw AnnotationError.errorWithCode(.saveHighlightFailed, failureReason: "Failed to create highlights") }
             
             return try self.addNote(title: title, content: content, annotationID: annotationID, source: source)
         }
     }
     
     /// Adds a new note with `content`.
-    public func updateNote(note: Note) throws -> Note {
-        return try updateNote(note, source: .Local)
+    @discardableResult public func updateNote(_ note: Note) throws -> Note {
+        return try updateNote(note, source: .local)
     }
     
     /// Returns note with ID
-    public func noteWithID(id: Int64) -> Note? {
-        return db.pluck(NoteTable.table.filter(NoteTable.id == id)).map { NoteTable.fromRow($0) }
+    public func noteWithID(_ id: Int64) -> Note? {
+        do {
+            return try db.pluck(NoteTable.table.filter(NoteTable.id == id)).map { NoteTable.fromRow($0) }
+        } catch {
+            return nil
+        }
     }
     
     /// Returns note with annotationID
-    public func noteWithAnnotationID(annotationID: Int64) -> Note? {
-        return db.pluck(NoteTable.table.filter(NoteTable.annotationID == annotationID)).map { NoteTable.fromRow($0) }
+    public func noteWithAnnotationID(_ annotationID: Int64) -> Note? {
+        do {
+            return try db.pluck(NoteTable.table.filter(NoteTable.annotationID == annotationID)).map { NoteTable.fromRow($0) }
+        } catch {
+            return nil
+        }
     }
     
     /// Returns notes with annotationIDs
-    public func notesWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Note] {
+    public func notesWithAnnotationIDsIn(_ annotationIDs: [Int64]) -> [Note] {
         do {
             return try db.prepare(NoteTable.table.filter(annotationIDs.contains(NoteTable.annotationID))).map { NoteTable.fromRow($0) }
         } catch {
@@ -93,8 +101,8 @@ public extension AnnotationStore {
     }
 
     /// Deletes note with id, and then trashes associated annotation if it has no other related annotation objects
-    public func trashNoteWithID(id: Int64) throws {
-        try trashNoteWithID(id, source: .Local)
+    public func trashNoteWithID(_ id: Int64) throws {
+        try trashNoteWithID(id, source: .local)
     }
     
 }
@@ -112,8 +120,8 @@ extension AnnotationStore {
         })
     }
     
-    func addNote(title title: String?, content: String, annotationID: Int64, source: NotificationSource) throws -> Note {
-        return try inTransaction(source) {
+    @discardableResult func addNote(title: String?, content: String, annotationID: Int64, source: NotificationSource) throws -> Note {
+        return try inTransaction(notificationSource: source) {
             let id = try self.db.run(NoteTable.table.insert(
                 NoteTable.title <- title,
                 NoteTable.content <- content,
@@ -127,8 +135,8 @@ extension AnnotationStore {
         }
     }
     
-    func addNote(title title: String?, content: String, appSource: String, device: String, notebookID: Int64, source: NotificationSource) throws -> Note {
-        return try inTransaction(source) {
+    @discardableResult func addNote(title: String?, content: String, appSource: String, device: String, notebookID: Int64, source: NotificationSource) throws -> Note {
+        return try inTransaction(notificationSource: source) {
             let annotation = try self.addAnnotation(docID: nil, docVersion: nil, appSource: appSource, device: device, source: source)
             let note = try self.addNote(title: title, content: content, annotationID: annotation.id, source: source)
             
@@ -139,12 +147,12 @@ extension AnnotationStore {
         }
     }
     
-    func updateNote(note: Note, source: NotificationSource) throws -> Note {
+    @discardableResult func updateNote(_ note: Note, source: NotificationSource) throws -> Note {
         guard note.annotationID != 0 || ((note.title == nil || note.title?.isEmpty == true) && note.content.isEmpty) else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a note without content and an annotation ID.")
+            throw AnnotationError.errorWithCode(.requiredFieldMissing, failureReason: "Cannot add a note without content and an annotation ID.")
         }
 
-        return try inTransaction(source) {
+        return try inTransaction(notificationSource: source) {
             try self.db.run(NoteTable.table.filter(NoteTable.id == note.id).update(
                 NoteTable.title <- note.title,
                 NoteTable.content <- note.content,
@@ -158,23 +166,23 @@ extension AnnotationStore {
         }
     }
     
-    func trashNoteWithID(id: Int64, source: NotificationSource) throws {
-        guard let annotationID = db.pluck(NoteTable.table.select(NoteTable.id, NoteTable.annotationID).filter(NoteTable.id == id)).map({ $0[NoteTable.annotationID] }) else { return }
+    func trashNoteWithID(_ id: Int64, source: NotificationSource) throws {
+        guard let annotationID = try db.pluck(NoteTable.table.select(NoteTable.id, NoteTable.annotationID).filter(NoteTable.id == id)).map({ $0[NoteTable.annotationID] }) else { return }
 
-        try inTransaction(source) {
+        try inTransaction(notificationSource: source) {
             try self.deleteNoteWithID(id, source: source)
             try self.trashAnnotationIfEmptyWithID(annotationID, source: source)
         }
     }
     
-    func deleteNoteWithID(id: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteNoteWithID(_ id: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(NoteTable.table.filter(NoteTable.id == id).delete())
         }
     }
     
-    func deleteNotesWithAnnotationID(annotationID: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteNotesWithAnnotationID(_ annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(NoteTable.table.filter(NoteTable.annotationID == annotationID).delete())
         }
     }

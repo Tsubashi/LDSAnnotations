@@ -22,25 +22,25 @@
 
 import Foundation
 
-extension NSDate {
+extension Date {
 
-    struct Date {
-        static let formatterISO8601: NSDateFormatter = {
-            let formatter = NSDateFormatter()
-            formatter.calendar = NSCalendar(calendarIdentifier: NSCalendarIdentifierISO8601)
-            formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-            formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
+    struct Formatter {
+        static let formatterISO8601: DateFormatter = {
+            let formatter = DateFormatter()
+            formatter.calendar = Calendar(identifier: Calendar.Identifier.iso8601)
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
             formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ"
             return formatter
         }()
     }
     
     var formattedISO8601: String {
-        return Date.formatterISO8601.stringFromDate(self)
+        return Formatter.formatterISO8601.string(from: self)
     }
     
-    static func parseFormattedISO8601(formattedISO8601: String) -> NSDate? {
-        return Date.formatterISO8601.dateFromString(formattedISO8601)
+    static func parseFormattedISO8601(_ formattedISO8601: String) -> Date? {
+        return Formatter.formatterISO8601.date(from: formattedISO8601)
     }
 
 }

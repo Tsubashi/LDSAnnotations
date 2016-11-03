@@ -48,8 +48,8 @@ public struct Highlight: Equatable {
         self.annotationID = annotationID
     }
     
-    func jsonObject() -> [String: AnyObject] {
-        var result: [String: AnyObject] = [
+    func jsonObject() -> [String: Any] {
+        var result: [String: Any] = [
             "@color": colorName,
             "@pid": paragraphRange.paragraphAID,
         ]
@@ -69,7 +69,7 @@ public struct Highlight: Equatable {
 extension Highlight: Hashable {
     
     public var hashValue: Int {
-        return (id ?? 0).hashValue
+        return id.hashValue
             ^ paragraphRange.hashValue
             ^ colorName.hashValue
             ^ style.rawValue.hashValue

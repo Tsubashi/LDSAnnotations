@@ -46,7 +46,7 @@ public struct Note: Equatable {
         self.annotationID = annotationID
     }
     
-    func jsonObject() -> [String: AnyObject] {
+    func jsonObject() -> [String: Any] {
         var result = ["content": content]
         if let title = title {
             result["title"] = title

@@ -26,9 +26,9 @@ import Foundation
 public enum TrustPolicy {
     
     /// Validate the server's certificate.
-    case Validate
+    case validate
     
     /// Implicitly trust the server's certificate without validation.
-    case Trust
+    case trust
     
 }

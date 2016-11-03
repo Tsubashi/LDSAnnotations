@@ -54,8 +54,8 @@ public struct Bookmark: Equatable {
         self.offset = offset
     }
     
-    func jsonObject() -> [String: AnyObject] {
-        var result = [String: AnyObject]()
+    func jsonObject() -> [String: Any] {
+        var result = [String: Any]()
         
         result["@offset"] = offset
         

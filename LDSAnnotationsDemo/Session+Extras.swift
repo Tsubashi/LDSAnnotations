@@ -26,16 +26,16 @@ import LDSAnnotations
 extension Session {
     
     convenience init(username: String, password: String) {
-        guard let userAgent = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleName") as? String else {
+        guard let userAgent = Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String else {
             fatalError("Missing bundle name")
         }
-        guard let clientVersion = NSBundle.mainBundle().objectForInfoDictionaryKey("CFBundleShortVersionString") as? String else {
+        guard let clientVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String else {
             fatalError("Missing bundle version")
         }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
+        guard let clientUsername = UserDefaults.standard.string(forKey: "ClientUsername") else {
             fatalError("Missing ClientUsername")
         }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
+        guard let clientPassword = UserDefaults.standard.string(forKey: "ClientPassword") else {
             fatalError("Missing ClientPassword")
         }
         

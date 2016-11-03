@@ -17,8 +17,8 @@ class AnnotationStoreMergeTests: XCTestCase {
 
     func testMergeNote() {
         let annotationStore = AnnotationStore()!
-        try! annotationStore.addAnnotation(docID: "1", docVersion: 1, appSource: "source", device: "device", source: .Local)
-        let expected = try! annotationStore.addNote(title: nil, content: "", annotationID: 1, source: .Local)
+        try! annotationStore.addAnnotation(docID: "1", docVersion: 1, appSource: "source", device: "device", source: .local)
+        let expected = try! annotationStore.addNote(title: nil, content: "", annotationID: 1, source: .local)
         
         let otherStore = AnnotationStore()!
         otherStore.addAll(from: annotationStore, appSource: "source", device: "device")
@@ -29,8 +29,8 @@ class AnnotationStoreMergeTests: XCTestCase {
     
     func testMergeBookmark() {
         let annotationStore = AnnotationStore()!
-        try! annotationStore.addAnnotation(docID: "1", docVersion: 1, appSource: "source", device: "device", source: .Local)
-        try! annotationStore.addBookmark(name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0, source: .Local)
+        try! annotationStore.addAnnotation(docID: "1", docVersion: 1, appSource: "source", device: "device", source: .local)
+        try! annotationStore.addBookmark(name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0, source: .local)
         let expected = Bookmark(id: 1, name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0)
         
         let otherStore = AnnotationStore()!
@@ -42,8 +42,8 @@ class AnnotationStoreMergeTests: XCTestCase {
     
     func testMergeLink() {
         let annotationStore = AnnotationStore()!
-        try! annotationStore.addAnnotation(docID: "1", docVersion: 1, appSource: "source", device: "device", source: .Local)
-        try! annotationStore.addLink(name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1, source: .Local)
+        try! annotationStore.addAnnotation(docID: "1", docVersion: 1, appSource: "source", device: "device", source: .local)
+        try! annotationStore.addLink(name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1, source: .local)
         let expected = Link(id: 1, name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1)
         
         let otherStore = AnnotationStore()!
@@ -94,7 +94,7 @@ class AnnotationStoreMergeTests: XCTestCase {
         XCTAssertEqual(alphabet.count, otherStore.annotationIDsForNotebookWithID(notebook.id).count, "Didn't load all annotation IDs")
         
         // Make sure order was preserved
-        for (index, annotation) in otherStore.annotationsWithNotebookID(1).enumerate() {
+        for (index, annotation) in otherStore.annotationsWithNotebookID(1).enumerated() {
             XCTAssertEqual(otherStore.noteWithAnnotationID(annotation.id)?.content, alphabet[index])
         }
     }
@@ -107,7 +107,7 @@ class AnnotationStoreMergeTests: XCTestCase {
         var tagNameToAnnotationUniqueIDs = [String: [String]]()
         
         for letter in alphabet {
-            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
             annotationIDs.append(annotation.id)
             annotationUniqueIDs.append(annotation.uniqueID)
             

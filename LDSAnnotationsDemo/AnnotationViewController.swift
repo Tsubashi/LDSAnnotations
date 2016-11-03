@@ -30,20 +30,20 @@ class AnnotationViewController: UITableViewController {
     let annotationStore: AnnotationStore
     
     enum Section: Int {
-        case Note
-        case Bookmark
-        case Highlights
-        case Tags
-        case Links
-        case Notebooks
-        case Count
+        case note
+        case bookmark
+        case highlights
+        case tags
+        case links
+        case notebooks
+        case count
     }
     
     init(annotation: Annotation, annotationStore: AnnotationStore) {
         self.annotation = annotation
         self.annotationStore = annotationStore
         
-        super.init(style: .Grouped)
+        super.init(style: .grouped)
         
         title = "Annotation"
     }
@@ -55,7 +55,7 @@ class AnnotationViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 44
     }
@@ -63,87 +63,87 @@ class AnnotationViewController: UITableViewController {
 
 // MARK: - UITableViewDataSource
 extension AnnotationViewController {
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return Section.Count.rawValue
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        return Section.count.rawValue
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         guard let section = Section(rawValue: section) else { return 0 }
         
         switch section {
-        case .Note:
+        case .note:
             return annotationStore.noteWithAnnotationID(annotation.id) != nil ? 1 : 0
-        case .Bookmark:
+        case .bookmark:
             return annotationStore.bookmarkWithAnnotationID(annotation.id) != nil ? 1 : 0
-        case .Highlights:
+        case .highlights:
             return annotationStore.highlightsWithAnnotationID(annotation.id).count
-        case .Tags:
+        case .tags:
             return annotationStore.tagsWithAnnotationID(annotation.id).count
-        case .Links:
+        case .links:
             return annotationStore.linksWithAnnotationID(annotation.id).count
-        case .Notebooks:
+        case .notebooks:
             return annotationStore.notebooksWithAnnotationID(annotation.id).count
-        case .Count:
+        case .count:
             return 0
         }
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath)
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         cell.textLabel?.numberOfLines = 0
         
         guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
         
         switch section {
-        case .Note:
+        case .note:
             if let note = annotationStore.noteWithAnnotationID(annotation.id) {
                 cell.textLabel?.text = note.title ?? note.content
             }
-        case .Bookmark:
+        case .bookmark:
             if let bookmark = annotationStore.bookmarkWithAnnotationID(annotation.id) {
                 cell.textLabel?.text = bookmark.name
             }
-        case .Highlights:
-            for (index, highlight) in annotationStore.highlightsWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
+        case .highlights:
+            for (index, highlight) in annotationStore.highlightsWithAnnotationID(annotation.id).enumerated() where index == indexPath.row {
                 let style = highlight.style == .Underline ? "Underline" : "Highlight"
                 cell.textLabel?.text = "paragraph AID: \(highlight.paragraphRange.paragraphAID)\noffset start: \(highlight.paragraphRange.startWordOffset)\noffset end: \(highlight.paragraphRange.endWordOffset)\ncolor: \(highlight.colorName)\nstyle: \(style)"
             }
-        case .Tags:
-            for (index, tag) in annotationStore.tagsWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
+        case .tags:
+            for (index, tag) in annotationStore.tagsWithAnnotationID(annotation.id).enumerated() where index == indexPath.row {
                 cell.textLabel?.text = tag.name
             }
-        case .Links:
-            for (index, link) in annotationStore.linksWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
+        case .links:
+            for (index, link) in annotationStore.linksWithAnnotationID(annotation.id).enumerated() where index == indexPath.row {
                 cell.textLabel?.text = link.name
             }
-        case .Notebooks:
-            for (index, notebook) in annotationStore.notebooksWithAnnotationID(annotation.id).enumerate() where index == indexPath.row {
+        case .notebooks:
+            for (index, notebook) in annotationStore.notebooksWithAnnotationID(annotation.id).enumerated() where index == indexPath.row {
                 cell.textLabel?.text = notebook.name
             }
-        case .Count:
+        case .count:
             break
         }
 
         return cell
     }
     
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         guard let section = Section(rawValue: section) else { return nil }
         
         switch section {
-        case .Note:
+        case .note:
             return "Note"
-        case .Bookmark:
+        case .bookmark:
             return "Bookmark"
-        case .Highlights:
+        case .highlights:
             return "Highlights"
-        case .Tags:
+        case .tags:
             return "Tags"
-        case .Links:
+        case .links:
             return "Links"
-        case .Notebooks:
+        case .notebooks:
             return "Notebooks"
-        case .Count:
+        case .count:
             return nil
         }
     }

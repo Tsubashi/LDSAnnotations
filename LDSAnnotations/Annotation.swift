@@ -41,16 +41,16 @@ public struct Annotation: Equatable {
     public internal(set) var status: AnnotationStatus
     
     /// When the annotation was created in local time.
-    public internal(set) var created: NSDate?
+    public internal(set) var created: Date?
 
     /// When the annotation was last modified in local time.
-    public internal(set) var lastModified: NSDate
+    public internal(set) var lastModified: Date
 
     public var appSource: String?
     
     public var device: String?
     
-    init(id: Int64, uniqueID: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: NSDate?, lastModified: NSDate, appSource: String?, device: String?) {
+    init(id: Int64, uniqueID: String, docID: String?, docVersion: Int?, status: AnnotationStatus, created: Date?, lastModified: Date, appSource: String?, device: String?) {
         self.id = id
         self.uniqueID = uniqueID
         self.docID = docID
@@ -62,8 +62,8 @@ public struct Annotation: Equatable {
         self.device = device
     }
     
-    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
-        var result: [String: AnyObject] = [
+    func jsonObject(annotationStore: AnnotationStore) -> [String: Any] {
+        var result: [String: Any] = [
             "@id": uniqueID,
             "timestamp": lastModified.formattedISO8601
         ]

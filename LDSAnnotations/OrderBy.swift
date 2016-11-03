@@ -25,12 +25,12 @@ import Foundation
 public enum OrderBy: Int {
     
     /// Order alphabetically by name
-    case Name = 0
+    case name = 0
     
     /// Order by most recent, descending
-    case MostRecent = 1
+    case mostRecent = 1
     
     // Order by number of annotations, descending
-    case NumberOfAnnotations = 2
+    case numberOfAnnotations = 2
     
 }

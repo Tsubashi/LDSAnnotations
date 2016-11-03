@@ -21,9 +21,9 @@
 //
 
 import Foundation
-import Operations
+import ProcedureKit
 
-class AuthenticateOperation: Operation {
+class AuthenticateOperation: Procedure {
     
     let session: Session
     
@@ -32,7 +32,7 @@ class AuthenticateOperation: Operation {
         
         super.init()
         
-        addCondition(MutuallyExclusive<AuthenticateOperation>())
+        add(condition: MutuallyExclusive<AuthenticateOperation>())
     }
     
     override func execute() {
@@ -42,26 +42,26 @@ class AuthenticateOperation: Operation {
         }
         
         guard let url = session.authenticationURL else {
-            finish(Error.errorWithCode(.Unknown, failureReason: "Missing authentication URL"))
+            finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Missing authentication URL"))
             return
         }
         
-        let request = NSMutableURLRequest(URL: url)
+        var request = URLRequest(url: url)
         
-        guard let cookieValue = "wh=\(session.domain) wu=/header wo=1 rh=http://\(session.domain) ru=/header".stringByAddingPercentEscapesForQueryValue(), let cookie = NSHTTPCookie(properties: [
-            NSHTTPCookieName: "ObFormLoginCookie",
-            NSHTTPCookieValue: cookieValue,
-            NSHTTPCookieDomain: ".lds.org",
-            NSHTTPCookiePath : "/login.html",
-            NSHTTPCookieExpires: NSDate(timeIntervalSinceNow: 60 * 60),
+        guard let cookieValue = "wh=\(session.domain) wu=/header wo=1 rh=http://\(session.domain) ru=/header".stringByAddingPercentEscapesForQueryValue(), let cookie = HTTPCookie(properties: [
+            HTTPCookiePropertyKey.name: "ObFormLoginCookie",
+            HTTPCookiePropertyKey.value: cookieValue,
+            HTTPCookiePropertyKey.domain: ".lds.org",
+            HTTPCookiePropertyKey.path : "/login.html",
+            HTTPCookiePropertyKey.expires: Date(timeIntervalSinceNow: 60 * 60),
         ]) else {
-            finish(Error.errorWithCode(.Unknown, failureReason: "Malformed authentication domain"))
+            finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Malformed authentication domain"))
             return
         }
-        request.allHTTPHeaderFields = NSHTTPCookie.requestHeaderFieldsWithCookies([cookie])
+        request.allHTTPHeaderFields = HTTPCookie.requestHeaderFields(with: [cookie])
         
         request.timeoutInterval = 90
-        request.HTTPMethod = "POST"
+        request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         
         guard let body = [
@@ -69,54 +69,54 @@ class AuthenticateOperation: Operation {
             "password": session.password,
         ].map({ key, value in
             return "\(key)=\(value.stringByAddingPercentEscapesForQueryValue()!)"
-        }).joinWithSeparator("&").dataUsingEncoding(NSUTF8StringEncoding) else {
-            finish(Error.errorWithCode(.Unknown, failureReason: "Malformed parameter"))
+        }).joined(separator: "&").data(using: String.Encoding.utf8) else {
+            finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Malformed parameter"))
             return
         }
         
-        request.HTTPBody = body
-        request.setValue("\(body.length)", forHTTPHeaderField: "Content-Length")
+        request.httpBody = body
+        request.setValue("\(body.count)", forHTTPHeaderField: "Content-Length")
         
-        let authenticationDate = NSDate()
+        let authenticationDate = Date()
         
-        let task = session.urlSession.dataTaskWithRequest(request) { data, response, error in
-            self.session.networkActivityObservers.notify(.Stop)
+        let task = session.urlSession.dataTask(with: request, completionHandler: { data, response, error in
+            self.session.networkActivityObservers.notify(.stop)
             if let error = error {
-                self.finish(error)
+                self.finish(withError: error)
                 return
             }
             
-            guard let httpResponse = response as? NSHTTPURLResponse, responseHeaderFields = httpResponse.allHeaderFields as? [String: String], responseURL = httpResponse.URL else {
-                self.finish(Error.errorWithCode(.Unknown, failureReason: "Unexpected response"))
+            guard let httpResponse = response as? HTTPURLResponse, let responseHeaderFields = httpResponse.allHeaderFields as? [String: String], let responseURL = httpResponse.url else {
+                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Unexpected response"))
                 return
             }
             
-            let cookies = NSHTTPCookie.cookiesWithResponseHeaderFields(responseHeaderFields, forURL: responseURL)
-            if cookies.contains({ $0.name == "ObFormLoginCookie" && $0.value == "done" }) {
+            let cookies = HTTPCookie.cookies(withResponseHeaderFields: responseHeaderFields, for: responseURL)
+            if cookies.contains(where: { $0.name == "ObFormLoginCookie" && $0.value == "done" }) {
                 self.session.lastSuccessfulAuthenticationDate = authenticationDate
                 self.finish()
                 return
             }
             
             let errorKey: String
-            if let locationValue = responseHeaderFields["Location"], errorRange = locationValue.rangeOfString("error=") {
-                errorKey = locationValue.substringFromIndex(errorRange.endIndex)
+            if let locationValue = responseHeaderFields["Location"], let errorRange = locationValue.range(of: "error=") {
+                errorKey = locationValue.substring(from: errorRange.upperBound)
             } else {
                 errorKey = "unknown"
             }
             
             switch errorKey {
             case "authfailed":
-                self.finish(Error.errorWithCode(.AuthenticationFailed, failureReason: "Incorrect username and/or password."))
+                self.finish(withError: AnnotationError.errorWithCode(.authenticationFailed, failureReason: "Incorrect username and/or password."))
             case "lockout":
-                self.finish(Error.errorWithCode(.LockedOut, failureReason: "Account is locked."))
+                self.finish(withError: AnnotationError.errorWithCode(.lockedOut, failureReason: "Account is locked."))
             case "pwdexpired":
-                self.finish(Error.errorWithCode(.PasswordExpired, failureReason: "Password is expired."))
+                self.finish(withError: AnnotationError.errorWithCode(.passwordExpired, failureReason: "Password is expired."))
             default:
-                self.finish(Error.errorWithCode(.Unknown, failureReason: "Authentication for an unknown reason."))
+                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Authentication for an unknown reason."))
             }
-        }
-        session.networkActivityObservers.notify(.Start)
+        }) 
+        session.networkActivityObservers.notify(.start)
         task.resume()
     }
     

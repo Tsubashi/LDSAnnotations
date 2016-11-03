@@ -40,10 +40,10 @@ class NotebooksViewController: UIViewController {
         switch status {
         case .Active:
             title = "Notebooks"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(add))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
         case .Trashed:
             title = "Trashed Notebooks"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .Plain, target: self, action: #selector(deleteAll))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .plain, target: self, action: #selector(deleteAll))
         case .Deleted:
             fatalError("Deleted notebooks are not supported")
         }
@@ -54,21 +54,21 @@ class NotebooksViewController: UIViewController {
     }
     
     lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .Plain)
+        let tableView = UITableView(frame: .zero, style: .plain)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    private static let CellIdentifier = "Cell"
+    fileprivate static let CellIdentifier = "Cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: NotebooksViewController.CellIdentifier)
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: NotebooksViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -77,23 +77,23 @@ class NotebooksViewController: UIViewController {
             "tableView": tableView,
         ]
         
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views))
         
         reloadData()
         
-        annotationStore.notebookObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.notebooksDidChange)
+        annotationStore.notebookObservers.add(self, operationQueue: .main, type(of: self).notebooksDidChange)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         tableView.flashScrollIndicators()
@@ -104,16 +104,16 @@ class NotebooksViewController: UIViewController {
     func reloadData() {
         switch status {
         case .Active:
-            notebooks = annotationStore.notebooks().sort { $0.name < $1.name }
+            notebooks = annotationStore.notebooks().sorted { $0.name < $1.name }
         case .Trashed:
-            notebooks = annotationStore.trashedNotebooks().sort { $0.name < $1.name }
+            notebooks = annotationStore.trashedNotebooks().sorted { $0.name < $1.name }
         case .Deleted:
             fatalError("Deleted notebooks are not supported")
         }
     }
     
-    func notebooksDidChange(source: NotificationSource, notebookIDs: Set<Int64>) {
-        assert(NSThread.isMainThread())
+    func notebooksDidChange(_ source: NotificationSource, notebookIDs: Set<Int64>) {
+        assert(Thread.isMainThread)
         
         reloadData()
         tableView.reloadData()
@@ -126,46 +126,46 @@ class NotebooksViewController: UIViewController {
 extension NotebooksViewController {
     
     func add() {
-        let alertController = UIAlertController(title: "Add Notebook", message: "Enter the name for your notebook.", preferredStyle: .Alert)
-        alertController.addTextFieldWithConfigurationHandler { textField in
+        let alertController = UIAlertController(title: "Add Notebook", message: "Enter the name for your notebook.", preferredStyle: .alert)
+        alertController.addTextField { textField in
             textField.placeholder = "Name"
-            textField.addTarget(self, action: #selector(NotebooksViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(NotebooksViewController.textFieldDidChange(_:)), for: .editingChanged)
         }
         
-        let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
+        let doneAction = UIAlertAction(title: "OK", style: .default, handler: { _ in
             let name = alertController.textFields?[0].text ?? ""
             self.addNotebookWithName(name)
         })
-        doneAction.enabled = false
+        doneAction.isEnabled = false
         alertController.addAction(doneAction)
         alertController.preferredAction = doneAction
         
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
-    func textFieldDidChange(textField: UITextField) {
+    func textFieldDidChange(_ textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
             let name = alertController.textFields?[0].text ?? ""
-            alertController.preferredAction?.enabled = (name.length > 0)
+            alertController.preferredAction?.isEnabled = (name.length > 0)
         }
     }
     
-    func addNotebookWithName(name: String) {
+    func addNotebookWithName(_ name: String) {
         do {
             try annotationStore.addNotebook(name: name)
         } catch {
             NSLog("Failed to add notebook: %@", "\(error)")
             
-            let alertController = UIAlertController(title: "Unable to Add Notebook", message: "Failed to save notebook.", preferredStyle: .Alert)
-            alertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            let alertController = UIAlertController(title: "Unable to Add Notebook", message: "Failed to save notebook.", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             
-            self.presentViewController(alertController, animated: true, completion: nil)
+            self.present(alertController, animated: true, completion: nil)
         }
     }
     
-    func renameNotebook(notebook: Notebook, name: String) {
+    func renameNotebook(_ notebook: Notebook, name: String) {
         do {
             var modifiedNotebook = notebook
             modifiedNotebook.name = name
@@ -173,10 +173,10 @@ extension NotebooksViewController {
         } catch {
             NSLog("Failed to rename notebook: %@", "\(error)")
             
-            let alertController = UIAlertController(title: "Unable to Rename Notebook", message: "Failed to save notebook.", preferredStyle: .Alert)
-            alertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            let alertController = UIAlertController(title: "Unable to Rename Notebook", message: "Failed to save notebook.", preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             
-            self.presentViewController(alertController, animated: true, completion: nil)
+            self.present(alertController, animated: true, completion: nil)
         }
     }
     
@@ -194,16 +194,16 @@ extension NotebooksViewController {
 
 extension NotebooksViewController: UITableViewDataSource {
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notebooks.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(NotebooksViewController.CellIdentifier, forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: NotebooksViewController.CellIdentifier, for: indexPath)
         
         let notebook = notebooks[indexPath.row]
         cell.textLabel?.text = notebook.name
@@ -211,7 +211,7 @@ extension NotebooksViewController: UITableViewDataSource {
         return cell
     }
     
-    func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String? {
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         switch status {
         case .Active:
             return "Trash"
@@ -222,8 +222,8 @@ extension NotebooksViewController: UITableViewDataSource {
         }
     }
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             let notebook = notebooks[indexPath.row]
             switch notebook.status {
             case .Active:
@@ -250,30 +250,30 @@ extension NotebooksViewController: UITableViewDataSource {
 
 extension NotebooksViewController: UITableViewDelegate {
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        tableView.deselectRowAtIndexPath(indexPath, animated: false)
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
         
         switch status {
         case .Active:
             let notebook = notebooks[indexPath.row]
             
-            let alertController = UIAlertController(title: "Rename Notebook", message: "Enter the new name for your notebook.", preferredStyle: .Alert)
-            alertController.addTextFieldWithConfigurationHandler { textField in
+            let alertController = UIAlertController(title: "Rename Notebook", message: "Enter the new name for your notebook.", preferredStyle: .alert)
+            alertController.addTextField { textField in
                 textField.text = notebook.name
                 textField.placeholder = "Name"
-                textField.addTarget(self, action: #selector(NotebooksViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
+                textField.addTarget(self, action: #selector(NotebooksViewController.textFieldDidChange(_:)), for: .editingChanged)
             }
             
-            let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
+            let doneAction = UIAlertAction(title: "OK", style: .default, handler: { _ in
                 let name = alertController.textFields?[0].text ?? ""
                 self.renameNotebook(notebook, name: name)
             })
             alertController.addAction(doneAction)
             alertController.preferredAction = doneAction
             
-            alertController.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+            alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             
-            presentViewController(alertController, animated: true, completion: nil)
+            present(alertController, animated: true, completion: nil)
         case .Trashed:
             let notebook = notebooks[indexPath.row]
             do {

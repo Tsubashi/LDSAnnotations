@@ -33,8 +33,8 @@ public class AccountController {
     
     private static let service = "LDSAccount"
     
-    public func addOrUpdateAccountWithUsername(username: String, password: String) throws {
-        try Locksmith.updateData(["password": password], forUserAccount: username, inService: AccountController.service)
+    public func addOrUpdateAccount(withUsername username: String, password: String) throws {
+        try Locksmith.updateData(data: ["password": password], forUserAccount: username, inService: AccountController.service)
         
         if !usernames.contains(username) {
             usernames.append(username)
@@ -43,9 +43,9 @@ public class AccountController {
         addAccountObservers.notify(username)
     }
     
-    public func deleteAccountWithUsername(username: String) throws {
+    public func deleteAccount(username: String) throws {
         do {
-            try Locksmith.deleteDataForUserAccount(username, inService: AccountController.service)
+            try Locksmith.deleteDataForUserAccount(userAccount: username, inService: AccountController.service)
         } catch {
             // It's not catastrophic if the password cannot be deleted
         }
@@ -59,29 +59,29 @@ public class AccountController {
     
     private(set) public var usernames: [String] {
         get {
-            return (NSUserDefaults.standardUserDefaults().arrayForKey(AccountController.usernamesKey) as? [String] ?? []).sort()
+            return (UserDefaults.standard.array(forKey: AccountController.usernamesKey) as? [String] ?? []).sorted()
         }
         set {
-            NSUserDefaults.standardUserDefaults().setObject(newValue, forKey: AccountController.usernamesKey)
+            UserDefaults.standard.set(newValue, forKey: AccountController.usernamesKey)
         }
     }
     
-    public func passwordForUsername(username: String) -> String? {
-        return Locksmith.loadDataForUserAccount(username, inService: AccountController.service)?["password"] as? String
+    public func password(forUsername username: String) -> String? {
+        return Locksmith.loadDataForUserAccount(userAccount: username, inService: AccountController.service)?["password"] as? String
     }
     
     private static let tokensKey = "tokens"
     
-    public func syncTokenForUsername(username: String) -> SyncToken? {
-        guard let tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String], rawToken = tokens[username] else { return nil }
+    public func syncToken(forUsername username: String) -> SyncToken? {
+        guard let tokens = UserDefaults.standard.object(forKey: AccountController.tokensKey) as? [String: String], let rawToken = tokens[username] else { return nil }
         
         return SyncToken(rawValue: rawToken)
     }
     
-    public func setSyncToken(token: SyncToken?, forUsername username: String) {
-        var tokens = NSUserDefaults.standardUserDefaults().objectForKey(AccountController.tokensKey) as? [String: String] ?? [:]
+    public func setSyncToken(_ token: SyncToken?, forUsername username: String) {
+        var tokens = UserDefaults.standard.object(forKey: AccountController.tokensKey) as? [String: String] ?? [:]
         tokens[username] = token?.rawValue
-        NSUserDefaults.standardUserDefaults().setObject(tokens, forKey: AccountController.tokensKey)
+        UserDefaults.standard.set(tokens, forKey: AccountController.tokensKey)
     }
     
 }

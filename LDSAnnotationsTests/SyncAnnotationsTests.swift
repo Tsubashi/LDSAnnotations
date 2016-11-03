@@ -29,20 +29,20 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
 
         var note = try! annotationStore1.addNote("BeforeTitle", content: "BeforeContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -53,10 +53,10 @@ class SyncAnnotationsTests: XCTestCase {
         try! annotationStore1.updateNote(note)
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -66,12 +66,12 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         let bookmarks = [
             try! annotationStore1.addBookmark(name: "Bookmark1", paragraphAID: "1", displayOrder: 0, docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone"),
@@ -82,22 +82,22 @@ class SyncAnnotationsTests: XCTestCase {
         ]
     
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
 
-        let shuffledBookmarks = bookmarks.shuffle()
+        let shuffledBookmarks = bookmarks.shuffled()
         try! annotationStore1.reorderBookmarks(shuffledBookmarks)
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -107,12 +107,12 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
         let highlights = try! annotationStore1.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "2"), ParagraphRange(paragraphAID: "3")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
@@ -120,10 +120,10 @@ class SyncAnnotationsTests: XCTestCase {
         let highlight2 = highlights.last!
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -131,10 +131,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a highlight, sync the change
         try! annotationStore1.trashHighlightWithID(highlight1.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the highlight was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -142,10 +142,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a highlight, sync the change
         try! annotationStore1.trashHighlightWithID(highlight2.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the highlight was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -155,22 +155,22 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
         let link1 = try! annotationStore1.addLink(name: "Link1", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["2"], fromDocID: "13859831", fromDocVersion: 1, fromParagraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
         let link2 = try! annotationStore1.addLink(name: "Link2", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["3"], annotationID: link1.annotationID)
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -178,10 +178,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a link, sync the change
         try! annotationStore1.trashLinkWithID(link1.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the link was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -189,10 +189,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a link, sync the change
         try! annotationStore1.trashLinkWithID(link2.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the link was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -202,12 +202,12 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
         let annotationID = try! annotationStore1.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone").first!.annotationID
@@ -215,32 +215,32 @@ class SyncAnnotationsTests: XCTestCase {
         let tag2 = try! annotationStore1.addTag(name: "Tag2", annotationID: annotationID)
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a tag, sync the change
-        try! annotationStore1.trashTagWithID(tag1.id, source: .Local)
+        try! annotationStore1.trashTagWithID(tag1.id, source: .local)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the tag was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
         // Delete a tag, sync the change
-        try! annotationStore1.trashTagWithID(tag2.id, source: .Local)
+        try! annotationStore1.trashTagWithID(tag2.id, source: .local)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the tag was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -250,12 +250,12 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         let notebook = try! annotationStore1.addNotebook(name: "Notebook")
         
@@ -272,22 +272,22 @@ class SyncAnnotationsTests: XCTestCase {
         let annotation4 = annotationStore1.annotationWithID(note4.annotationID)!
 
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
         
-        let shuffledAnnotationIDs = [annotation1.id, annotation2.id, annotation3.id, annotation4.id].shuffle()
+        let shuffledAnnotationIDs = [annotation1.id, annotation2.id, annotation3.id, annotation4.id].shuffled()
         try! annotationStore1.reorderAnnotationIDs(shuffledAnnotationIDs, notebookID: notebook.id)
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
 
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -297,12 +297,12 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
         let notebook = try! annotationStore1.addNotebook(name: "Notebook1")
@@ -312,10 +312,10 @@ class SyncAnnotationsTests: XCTestCase {
         let annotation2 = annotationStore1.annotationWithID(note2.annotationID)!
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -323,10 +323,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a note, sync the change
         try! annotationStore1.trashNoteWithID(note1.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the notebook was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -334,10 +334,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete an annotation, sync the change
         try! annotationStore1.trashAnnotationWithID(annotation2.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the notebook was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -345,10 +345,10 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a notebook, sync the change
         try! annotationStore1.trashNoteWithID(notebook.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the notebook was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -358,21 +358,21 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
         let note = try! annotationStore1.addNote("NoteTitle", content: "NoteContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
 
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -380,9 +380,9 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete a highlight, sync the change
         try! annotationStore1.trashNoteWithID(note.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the highlight was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -392,21 +392,21 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
         let bookmark = try! annotationStore1.addBookmark(name: "BookmarkName", paragraphAID: "1", displayOrder: 1, docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone")
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync annotations")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the changes
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
@@ -414,16 +414,16 @@ class SyncAnnotationsTests: XCTestCase {
         // Delete bookmark and sync the change
         try! annotationStore1.trashBookmarkWithID(bookmark.id)
         
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync changes")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync changes")
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Get sync changes")
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
         
         // Verify the bookmark was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
     }
 
-    func verifyEqual(annotationStore1 annotationStore1: AnnotationStore, annotationStore2: AnnotationStore) {
+    func verifyEqual(annotationStore1: AnnotationStore, annotationStore2: AnnotationStore) {
         let annotations1 = annotationStore1.annotations().filter { $0.status == .Active }
         let annotations2 = annotationStore2.annotations().filter { $0.status == .Active }
         XCTAssertEqual(annotations1.count, annotations2.count)
@@ -460,7 +460,7 @@ class SyncAnnotationsTests: XCTestCase {
         let notebookAnnotations2 = notebooks2.map { (uniqueID: $0.uniqueID, annotations: annotationStore2.annotationsWithNotebookID($0.id)) }
         
         for (uniqueID, highlights1) in annotationHighlights1 {
-            guard let highlights2 = annotationHighlights2.find({ $0.uniqueID == uniqueID }).map({ $0.highlights }) else {
+            guard let highlights2 = annotationHighlights2.find(where: { $0.uniqueID == uniqueID }).map({ $0.highlights }) else {
                 // No highlights2 found, assert that highlights1 is empty
                 XCTAssertTrue(highlights1.isEmpty)
                 continue
@@ -471,7 +471,7 @@ class SyncAnnotationsTests: XCTestCase {
         }
         
         for (uniqueID, links1) in annotationLinks1 {
-            guard let links2 = annotationLinks2.find({ $0.uniqueID == uniqueID }).map({ $0.links }) else {
+            guard let links2 = annotationLinks2.find(where: { $0.uniqueID == uniqueID }).map({ $0.links }) else {
                 // No links2 found, assert that links1 is empty
                 XCTAssertTrue(links1.isEmpty)
                 continue
@@ -482,7 +482,7 @@ class SyncAnnotationsTests: XCTestCase {
         }
         
         for (uniqueID, tags1) in annotationTags1 {
-            guard let tags2 = annotationTags2.find({ $0.uniqueID == uniqueID }).map({ $0.tags }) else {
+            guard let tags2 = annotationTags2.find(where: { $0.uniqueID == uniqueID }).map({ $0.tags }) else {
                 // No tags2 found, assert that tags1 is empty
                 XCTAssertTrue(tags1.isEmpty)
                 continue
@@ -493,7 +493,7 @@ class SyncAnnotationsTests: XCTestCase {
         }
         
         for (uniqueID, notebooks1) in annotationNotebooks1 {
-            guard let notebooks2 = annotationNotebooks2.find({ $0.uniqueID == uniqueID }).map({ $0.notebooks }) else {
+            guard let notebooks2 = annotationNotebooks2.find(where: { $0.uniqueID == uniqueID }).map({ $0.notebooks }) else {
                 // No notebooks2 found, assert that notebooks1 is empty
                 XCTAssertTrue(notebooks1.isEmpty)
                 continue
@@ -504,7 +504,7 @@ class SyncAnnotationsTests: XCTestCase {
         }
         
         for (uniqueID, note1) in annotationNotes1 {
-            guard let note2 = annotationNotes2.find({ $0.uniqueID == uniqueID}).map({ $0.note }) else {
+            guard let note2 = annotationNotes2.find(where: { $0.uniqueID == uniqueID}).map({ $0.note }) else {
                 XCTAssertNil(note1)
                 continue
             }
@@ -512,7 +512,7 @@ class SyncAnnotationsTests: XCTestCase {
         }
         
         for (uniqueID, bookmark1) in annotationBookmarks1 {
-            guard let bookmark2 = annotationBookmarks2.find({ $0.uniqueID == uniqueID}).map({ $0.bookmark }) else {
+            guard let bookmark2 = annotationBookmarks2.find(where: { $0.uniqueID == uniqueID}).map({ $0.bookmark }) else {
                 XCTAssertNil(bookmark1)
                 continue
             }
@@ -520,7 +520,7 @@ class SyncAnnotationsTests: XCTestCase {
         }
         
         for (uniqueID, annotations1) in notebookAnnotations1 {
-            guard let annotations2 = notebookAnnotations2.find({ $0.uniqueID == uniqueID }).map({ $0.annotations }) else {
+            guard let annotations2 = notebookAnnotations2.find(where: { $0.uniqueID == uniqueID }).map({ $0.annotations }) else {
                 // No annotations2 found, assert that annotations1 is empty
                 XCTAssertTrue(annotations1.isEmpty)
                 continue
@@ -571,11 +571,11 @@ private struct LinkShell: Equatable, Hashable {
     var docID: String
     var docVersion: Int
     var paragraphAIDs: [String]
-    var hashValue: Int { return name.hashValue ^ docID.hashValue ^ docVersion.hashValue ^ paragraphAIDs.sort().joinWithSeparator(",").hashValue }
+    var hashValue: Int { return name.hashValue ^ docID.hashValue ^ docVersion.hashValue ^ paragraphAIDs.sorted().joined(separator: ",").hashValue }
 }
 
 private func == (lhs: LinkShell, rhs: LinkShell) -> Bool {
-    return lhs.name == rhs.name && lhs.docID == rhs.docID && lhs.docVersion == rhs.docVersion && lhs.paragraphAIDs.sort().joinWithSeparator(",") == rhs.paragraphAIDs.sort().joinWithSeparator(",")
+    return lhs.name == rhs.name && lhs.docID == rhs.docID && lhs.docVersion == rhs.docVersion && lhs.paragraphAIDs.sorted().joined(separator: ",") == rhs.paragraphAIDs.sorted().joined(separator: ",")
 }
 
 private struct NotebookShell: Equatable, Hashable {

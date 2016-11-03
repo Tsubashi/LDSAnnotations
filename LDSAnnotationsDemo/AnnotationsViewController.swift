@@ -41,7 +41,7 @@ class AnnotationsViewController: UIViewController {
             title = "Annotations"
         case .Trashed:
             title = "Trashed Annotations"
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .Plain, target: self, action: #selector(deleteAll))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .plain, target: self, action: #selector(deleteAll))
         case .Deleted:
             fatalError("Deleted annotations are not supported")
         }
@@ -52,21 +52,21 @@ class AnnotationsViewController: UIViewController {
     }
     
     lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .Plain)
+        let tableView = UITableView(frame: .zero, style: .plain)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    private static let CellIdentifier = "Cell"
+    fileprivate static let CellIdentifier = "Cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(SubtitleTableViewCell.self, forCellReuseIdentifier: AnnotationsViewController.CellIdentifier)
+        tableView.register(SubtitleTableViewCell.self, forCellReuseIdentifier: AnnotationsViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -75,23 +75,23 @@ class AnnotationsViewController: UIViewController {
             "tableView": tableView,
         ]
         
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views))
         
         reloadData()
         
-        annotationStore.annotationObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.annotationsDidChange)
+        annotationStore.annotationObservers.add(self, operationQueue: .main, type(of: self).annotationsDidChange)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         tableView.flashScrollIndicators()
@@ -102,16 +102,16 @@ class AnnotationsViewController: UIViewController {
     func reloadData() {
         switch status {
         case .Active:
-            annotations = annotationStore.annotations().sort { $0.lastModified > $1.lastModified }
+            annotations = annotationStore.annotations().sorted { $0.lastModified > $1.lastModified }
         case .Trashed:
-            annotations = annotationStore.trashedAnnotations().sort { $0.lastModified > $1.lastModified }
+            annotations = annotationStore.trashedAnnotations().sorted { $0.lastModified > $1.lastModified }
         case .Deleted:
             fatalError("Deleted annotations are not supported")
         }
     }
     
-    func annotationsDidChange(source: NotificationSource, annotationIDs: Set<Int64>) {
-        assert(NSThread.isMainThread())
+    func annotationsDidChange(_ source: NotificationSource, annotationIDs: Set<Int64>) {
+        assert(Thread.isMainThread)
         
         reloadData()
         tableView.reloadData()
@@ -120,10 +120,10 @@ class AnnotationsViewController: UIViewController {
 
 // MARK: - Add/rename/delete annotations
 extension AnnotationsViewController {
-    func textFieldDidChange(textField: UITextField) {
+    func textFieldDidChange(_ textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
             let name = alertController.textFields?[0].text ?? ""
-            alertController.preferredAction?.enabled = (name.length > 0)
+            alertController.preferredAction?.isEnabled = (name.length > 0)
         }
     }
     
@@ -138,25 +138,25 @@ extension AnnotationsViewController {
 
 // MARK: - UITableViewDataSource
 extension AnnotationsViewController: UITableViewDataSource {
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return annotations.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(AnnotationsViewController.CellIdentifier, forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: AnnotationsViewController.CellIdentifier, for: indexPath)
         
         let annotation = annotations[indexPath.row]
-        cell.textLabel?.text = "\(annotation.id ?? 0)"
+        cell.textLabel?.text = "\(annotation.id)"
         cell.detailTextLabel?.text = subtitleFor(annotation: annotation)
         
         return cell
     }
     
-    private func subtitleFor(annotation annotation: Annotation) -> String {
+    fileprivate func subtitleFor(annotation: Annotation) -> String {
         var parts = [String]()
         if let _ = annotationStore.noteWithAnnotationID(annotation.id) {
             parts.append("1 note")
@@ -181,10 +181,10 @@ extension AnnotationsViewController: UITableViewDataSource {
             parts.append("\(notebooks.count) notebook(s)")
         }
         
-        return parts.joinWithSeparator(", ")
+        return parts.joined(separator: ", ")
     }
     
-    func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String? {
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         switch status {
         case .Active:
             return "Trash"
@@ -195,8 +195,8 @@ extension AnnotationsViewController: UITableViewDataSource {
         }
     }
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             let annotation = annotations[indexPath.row]
             switch annotation.status {
             case .Active:
@@ -220,13 +220,13 @@ extension AnnotationsViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension AnnotationsViewController: UITableViewDelegate {
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch status {
         case .Active:
             let annotation = annotations[indexPath.row]
             navigationController?.pushViewController(AnnotationViewController(annotation: annotation, annotationStore: annotationStore), animated: true)
         case .Trashed:
-            tableView.deselectRowAtIndexPath(indexPath, animated: false)
+            tableView.deselectRow(at: indexPath, animated: false)
             
             let annotation = annotations[indexPath.row]
             do {

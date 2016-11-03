@@ -26,7 +26,7 @@ import Swiftification
 
 class HighlightTests: XCTestCase {
     
-    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: NSDate(), serverSyncNotebooksDate: NSDate(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
+    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: Date(), serverSyncNotebooksDate: Date(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
     
     func testHighlightMissingPID() {
         let highlight = [
@@ -38,11 +38,11 @@ class HighlightTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = HighlightTests.emptyNotebooksResult
+        operation.requirement = .ready(HighlightTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -61,11 +61,11 @@ class HighlightTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = HighlightTests.emptyNotebooksResult
+        operation.requirement = .ready(HighlightTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -85,11 +85,11 @@ class HighlightTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = HighlightTests.emptyNotebooksResult
+        operation.requirement = .ready(HighlightTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -114,11 +114,11 @@ class HighlightTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = HighlightTests.emptyNotebooksResult
+        operation.requirement = .ready(HighlightTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForHighlight(highlight), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -132,9 +132,9 @@ class HighlightTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
     
-    func payloadForHighlight(highlight: [String: AnyObject]) -> [String: AnyObject] {
-        let uniqueID = NSUUID().UUIDString
-        let annotation = [
+    func payloadForHighlight(_ highlight: [String: Any]) -> [String: Any] {
+        let uniqueID = UUID().uuidString
+        let annotation: [String: Any] = [
             "changeType": "new",
             "timestamp" : "2016-08-04T11:21:38.849-06:00",
             "annotationId" : uniqueID,
@@ -149,8 +149,7 @@ class HighlightTests: XCTestCase {
                 "highlights": ["highlight": [highlight]]
             ]
         ]
-        let annotations = [annotation]
-        return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
+        return ["syncAnnotations": ["count": 1, "changes": [annotation]]]
     }
     
 }

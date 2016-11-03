@@ -23,7 +23,7 @@
 import Foundation
 
 enum Response {
-    case Success([String: AnyObject])
-    case Failure([[String: String]])
-    case Error(NSError)
+    case success([String: Any])
+    case failure([[String: String]])
+    case error(Error)
 }

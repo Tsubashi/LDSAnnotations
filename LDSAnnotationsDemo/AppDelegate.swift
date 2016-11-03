@@ -28,19 +28,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(NSFileManager.privateDocumentsURL, withIntermediateDirectories: true, attributes: nil)
+            try FileManager.default.createDirectory(at: FileManager.privateDocumentsURL, withIntermediateDirectories: true, attributes: nil)
         } catch {}
         do {
-            try NSFileManager.privateDocumentsURL.setResourceValue(true, forKey: NSURLIsExcludedFromBackupKey)
+            try (FileManager.privateDocumentsURL as NSURL).setResourceValue(true, forKey: URLResourceKey.isExcludedFromBackupKey)
         } catch {}
         
         let viewController = AccountsViewController()
         
         let navigationController = UINavigationController(rootViewController: viewController)
         
-        window = UIWindow(frame: UIScreen.mainScreen().bounds)
+        window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         

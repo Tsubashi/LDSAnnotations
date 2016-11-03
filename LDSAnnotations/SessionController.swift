@@ -30,16 +30,16 @@ public class SessionController {
     private var sessionByUsername = [String: Session]()
     public let sessionAddedObservers = ObserverSet<Session>()
     
-    public func addSession(session: Session, withUsername username: String) {
+    public func addSession(_ session: Session, withUsername username: String) {
         sessionByUsername[username] = session
         sessionAddedObservers.notify(session)
     }
 
-    public func removeSessionForUsername(username: String) {
-        sessionByUsername.removeValueForKey(username)
+    public func removeSession(forUsername username: String) {
+        sessionByUsername.removeValue(forKey: username)
     }
     
-    public func sessionForUsername(username: String) -> Session? {
+    public func session(forUsername username: String) -> Session? {
         return sessionByUsername[username]
     }
     

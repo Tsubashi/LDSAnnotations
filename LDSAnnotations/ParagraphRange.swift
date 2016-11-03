@@ -33,7 +33,7 @@ public struct ParagraphRange: Equatable {
     public init(paragraphAID: String, startWordOffset: Int = ParagraphRange.FirstWordOffset, endWordOffset: Int? = nil) {
         self.paragraphAID = paragraphAID
         self.startWordOffset = startWordOffset <= 1 ? ParagraphRange.FirstWordOffset : startWordOffset
-        self.endWordOffset = endWordOffset >= 1 ? endWordOffset : nil
+        self.endWordOffset = (endWordOffset ?? 0) >= 1 ? endWordOffset : nil
     }
     
 }

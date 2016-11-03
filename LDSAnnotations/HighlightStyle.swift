@@ -43,7 +43,7 @@ extension HighlightStyle: Value {
         return String.declaredDatatype
     }
     
-    public static func fromDatatypeValue(stringValue: String) -> HighlightStyle {
+    public static func fromDatatypeValue(_ stringValue: String) -> HighlightStyle {
         return HighlightStyle(rawValue: stringValue) ?? .Highlight
     }
     

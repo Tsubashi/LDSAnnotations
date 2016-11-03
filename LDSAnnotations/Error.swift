@@ -22,26 +22,26 @@
 
 import Foundation
 
-public struct Error {
+public struct AnnotationError {
     
     public static let Domain = "com.crosswaterbridge.LDSAnnotations"
     
     public enum Code: Int {
-        case Unknown = -1000
-        case AuthenticationFailed = -1001
-        case LockedOut = -1002
-        case PasswordExpired = -1003
-        case SaveAnnotationFailed = -3000
-        case SaveHighlightFailed = -3001
-        case RequiredFieldMissing = -3008
-        case SyncFailed = -4000
-        case SyncDeserializationFailed = -4001
-        case TransactionError = -5000
+        case unknown = -1000
+        case authenticationFailed = -1001
+        case lockedOut = -1002
+        case passwordExpired = -1003
+        case saveAnnotationFailed = -3000
+        case saveHighlightFailed = -3001
+        case requiredFieldMissing = -3008
+        case syncFailed = -4000
+        case syncDeserializationFailed = -4001
+        case transactionError = -5000
     }
     
-    static func errorWithCode(code: Error.Code, failureReason: String) -> NSError {
+    static func errorWithCode(_ code: AnnotationError.Code, failureReason: String) -> NSError {
         let userInfo = [NSLocalizedFailureReasonErrorKey: failureReason]
-        return NSError(domain: Error.Domain, code: code.rawValue, userInfo: userInfo)
+        return NSError(domain: AnnotationError.Domain, code: code.rawValue, userInfo: userInfo)
     }
     
 }

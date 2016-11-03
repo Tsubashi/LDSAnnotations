@@ -25,20 +25,20 @@ import XCTest
 
 extension XCTestCase {
 
-    func createSession(useIncorrectPassword useIncorrectPassword: Bool = false) -> Session {
-        guard let username = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountUsername") else {
+    func createSession(useIncorrectPassword: Bool = false) -> Session {
+        guard let username = UserDefaults.standard.string(forKey: "TestAccountUsername") else {
             XCTFail("Missing TestAccountUsername")
             fatalError()
         }
-        guard let password = NSUserDefaults.standardUserDefaults().stringForKey("TestAccountPassword") else {
+        guard let password = UserDefaults.standard.string(forKey: "TestAccountPassword") else {
             XCTFail("Missing TestAccountPassword")
             fatalError()
         }
-        guard let clientUsername = NSUserDefaults.standardUserDefaults().stringForKey("ClientUsername") else {
+        guard let clientUsername = UserDefaults.standard.string(forKey: "ClientUsername") else {
             XCTFail("Missing ClientUsername")
             fatalError()
         }
-        guard let clientPassword = NSUserDefaults.standardUserDefaults().stringForKey("ClientPassword") else {
+        guard let clientPassword = UserDefaults.standard.string(forKey: "ClientPassword") else {
             XCTFail("Missing ClientPassword")
             fatalError()
         }
@@ -49,16 +49,17 @@ extension XCTestCase {
         return Session(username: username, password: useIncorrectPassword ? "wrong-\(password)" : password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
     }
     
-    func sync(annotationStore: AnnotationStore, session: Session, inout token: SyncToken?, description: String, allowSyncFailure: Bool = false, completion: ((uploadCount: Int, downloadCount: Int) -> Void)? = nil) {
-        let semaphore = dispatch_semaphore_create(0)
+    func sync(_ annotationStore: AnnotationStore, session: Session, token: SyncToken?, description: String, allowSyncFailure: Bool = false, completion: ((_ uploadCount: Int, _ downloadCount: Int) -> Void)? = nil) -> SyncToken? {
+        let semaphore = DispatchSemaphore(value: 0)
+        var updatedToken: SyncToken?
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             switch syncResult {
-            case let .Success(token: newToken, changes: changes, deserializationErrors: _):
-                token = newToken
-                completion?(uploadCount: changes.uploadedNotebooks.count + changes.uploadAnnotationCount, downloadCount: changes.downloadedNotebooks.count + changes.downloadAnnotationCount)
-            case let .Error(errors: errors):
+            case let .success(token: newToken, changes: changes, deserializationErrors: _):
+                updatedToken = newToken
+                completion?(changes.uploadedNotebooks.count + changes.uploadAnnotationCount, changes.downloadedNotebooks.count + changes.downloadAnnotationCount)
+            case let .error(errors: errors):
                 if allowSyncFailure {
-                    completion?(uploadCount: 0, downloadCount: 0)
+                    completion?(0, 0)
                 } else {
                     XCTFail("Failed with errors \(errors)")
                 }
@@ -66,13 +67,16 @@ extension XCTestCase {
             /* 
              The service takes a little while after we send annotations to run through some db triggers, and transformations, so add a delay after each sync to make sure it has processed everything we've sent and is able to return to us all the user's annotations.
             */
-            dispatch_semaphore_signal(semaphore)
+            semaphore.signal()
         }
-        dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, Int64(300 * Double(NSEC_PER_SEC))))
+        semaphore.wait(timeout: DispatchTime.now() + Double(Int64(300 * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC))
+        
+        return updatedToken
     }
     
-    func resetAnnotations(annotationStore annotationStore: AnnotationStore, session: Session, inout token: SyncToken?) {
-        sync(annotationStore, session: session, token: &token, description: "Initial sync") { uploadCount, downloadCount in
+    func resetAnnotations(annotationStore: AnnotationStore, session: Session, token: SyncToken?) -> SyncToken? {
+        var currentToken = token
+        currentToken = sync(annotationStore, session: session, token: currentToken, description: "Initial sync") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 0, "There were existing local annotations")
             
             let count = annotationStore.annotationCount() + annotationStore.trashedAnnotationCount() + annotationStore.notebookCount() + annotationStore.trashedNotebookCount()
@@ -83,23 +87,25 @@ extension XCTestCase {
         let deleteCount = annotationStore.annotationCount() + annotationStore.notebookCount()
         if deleteCount > 0 {
             for notebook in annotationStore.notebooks() {
-                try! annotationStore.trashNotebookWithID(notebook.id, source: .Local)
+                try! annotationStore.trashNotebookWithID(notebook.id, source: .local)
             }
             for annotation in annotationStore.annotations() {
-                try! annotationStore.trashAnnotationWithID(annotation.id, source: .Local)
+                try! annotationStore.trashAnnotationWithID(annotation.id, source: .local)
             }
             
-            sync(annotationStore, session: session, token: &token, description: "Sync deleted annotations") { uploadCount, downloadCount in
+            currentToken = sync(annotationStore, session: session, token: currentToken, description: "Sync deleted annotations") { uploadCount, downloadCount in
                 XCTAssertEqual(uploadCount, deleteCount, "Not all local annotations were deleted")
                 XCTAssertEqual(downloadCount, 0)
             }
             
-            try! annotationStore.deleteNotebooks(annotationStore.trashedNotebooks(), source: .Local)
-            try! annotationStore.deleteAnnotations(annotationStore.trashedAnnotations(), source: .Local)
+            try! annotationStore.deleteNotebooks(annotationStore.trashedNotebooks(), source: .local)
+            try! annotationStore.deleteAnnotations(annotationStore.trashedAnnotations(), source: .local)
             
             let count = annotationStore.annotationCount() + annotationStore.notebookCount()
             XCTAssertEqual(count, 0)
         }
+        
+        return currentToken
     }
     
 }

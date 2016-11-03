@@ -44,39 +44,39 @@ class AccountViewController: UIViewController {
     }
     
     enum Row {
-        case Notebooks
-        case Annotations
-        case TrashedNotebooks
-        case TrashedAnnotations
+        case notebooks
+        case annotations
+        case trashedNotebooks
+        case trashedAnnotations
     }
     
     let sections: [(title: String, rows: [Row])] = [
         (title: "Active", rows: [
-            .Notebooks,
-            .Annotations
+            .notebooks,
+            .annotations
         ]),
         (title: "Trashed", rows: [
-            .TrashedNotebooks,
-            .TrashedAnnotations
+            .trashedNotebooks,
+            .trashedAnnotations
         ]),
     ]
     
     lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .Grouped)
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    private static let CellIdentifier = "Cell"
+    fileprivate static let CellIdentifier = "Cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(Value1TableViewCell.self, forCellReuseIdentifier: AccountViewController.CellIdentifier)
+        tableView.register(Value1TableViewCell.self, forCellReuseIdentifier: AccountViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -85,26 +85,26 @@ class AccountViewController: UIViewController {
             "tableView": tableView,
         ]
         
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views))
         
         reloadData()
         
-        annotationStore.notebookObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.notebooksDidChange)
-        annotationStore.annotationObservers.add(self, operationQueue: .mainQueue(), self.dynamicType.annotationsDidChange)
+        annotationStore.notebookObservers.add(self, operationQueue: .main, type(of: self).notebooksDidChange)
+        annotationStore.annotationObservers.add(self, operationQueue: .main, type(of: self).annotationsDidChange)
         
         performSync()
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         tableView.flashScrollIndicators()
@@ -122,30 +122,30 @@ class AccountViewController: UIViewController {
         trashedAnnotationCount = annotationStore.trashedAnnotationCount()
     }
     
-    func notebooksDidChange(source: NotificationSource, notebookIDs: Set<Int64>) {
+    func notebooksDidChange(_ source: NotificationSource, notebookIDs: Set<Int64>) {
         reloadData()
         tableView.reloadData()
         
-        if source != .Sync {
+        if case .local = source {
             performSync()
         }
     }
     
-    func annotationsDidChange(source: NotificationSource, annotationIDs: Set<Int64>) {
+    func annotationsDidChange(_ source: NotificationSource, annotationIDs: Set<Int64>) {
         reloadData()
         tableView.reloadData()
         
-        if source != .Sync {
+        if case .local = source {
             performSync()
         }
     }
     
     func performSync() {
-        let token = AccountController.sharedController.syncTokenForUsername(session.username)
+        let token = AccountController.sharedController.syncToken(forUsername: session.username)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
-            dispatch_sync(dispatch_get_main_queue()) {
+            DispatchQueue.main.sync {
                 switch syncResult {
-                case let .Success(token: token, changes: changes, deserializationErrors: deserializationErrors):
+                case let .success(token: token, changes: changes, deserializationErrors: deserializationErrors):
                     let uploaded = [
                         "\(changes.uploadedNotebooks.count) notebooks",
                         "\(changes.uploadAnnotationCount) annotations",
@@ -165,12 +165,12 @@ class AccountViewController: UIViewController {
                         "\(changes.downloadLinkCount) links",
                     ]
                     
-                    NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joinWithSeparator(", "), downloaded.joinWithSeparator(", "))
+                    NSLog("Sync completed:\n    Uploaded: %@\n    Downloaded: %@", uploaded.joined(separator: ", "), downloaded.joined(separator: ", "))
                     
                     deserializationErrors.forEach { NSLog("\($0)") }
                     
                     AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
-                case let .Error(errors: errors):
+                case let .error(errors: errors):
                     NSLog("Sync failed: \(errors)")
                 }
             }
@@ -180,38 +180,38 @@ class AccountViewController: UIViewController {
 
 // MARK: - UITableViewDataSource
 extension AccountViewController: UITableViewDataSource {
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return sections.count
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return sections[section].rows.count
     }
     
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return sections[section].title
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(AccountViewController.CellIdentifier, forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: AccountViewController.CellIdentifier, for: indexPath)
         
         switch sections[indexPath.section].rows[indexPath.row] {
-        case .Notebooks:
+        case .notebooks:
             cell.textLabel?.text = "Notebooks"
             cell.detailTextLabel?.text = "\(notebookCount)"
-            cell.accessoryType = .DisclosureIndicator
-        case .Annotations:
+            cell.accessoryType = .disclosureIndicator
+        case .annotations:
             cell.textLabel?.text = "Annotations"
             cell.detailTextLabel?.text = "\(annotationCount)"
-            cell.accessoryType = .DisclosureIndicator
-        case .TrashedNotebooks:
+            cell.accessoryType = .disclosureIndicator
+        case .trashedNotebooks:
             cell.textLabel?.text = "Notebooks"
             cell.detailTextLabel?.text = "\(trashedNotebookCount)"
-            cell.accessoryType = .DisclosureIndicator
-        case .TrashedAnnotations:
+            cell.accessoryType = .disclosureIndicator
+        case .trashedAnnotations:
             cell.textLabel?.text = "Annotations"
             cell.detailTextLabel?.text = "\(trashedAnnotationCount)"
-            cell.accessoryType = .DisclosureIndicator
+            cell.accessoryType = .disclosureIndicator
         }
         
         return cell
@@ -220,21 +220,21 @@ extension AccountViewController: UITableViewDataSource {
 
 // MARK: - UITableViewDelegate
 extension AccountViewController: UITableViewDelegate {
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch sections[indexPath.section].rows[indexPath.row] {
-        case .Notebooks:
+        case .notebooks:
             let viewController = NotebooksViewController(annotationStore: annotationStore, status: .Active)
             
             navigationController?.pushViewController(viewController, animated: true)
-        case .Annotations:
+        case .annotations:
             let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .Active)
             
             navigationController?.pushViewController(viewController, animated: true)
-        case .TrashedNotebooks:
+        case .trashedNotebooks:
             let viewController = NotebooksViewController(annotationStore: annotationStore, status: .Trashed)
             
             navigationController?.pushViewController(viewController, animated: true)
-        case .TrashedAnnotations:
+        case .trashedAnnotations:
             let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .Trashed)
             
             navigationController?.pushViewController(viewController, animated: true)

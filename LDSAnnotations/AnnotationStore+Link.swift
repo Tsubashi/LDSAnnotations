@@ -36,12 +36,12 @@ class LinkTable {
     static let paragraphAIDs = Expression<String>("paragraph_aids")
     static let annotationID = Expression<Int64>("annotation_id")
     
-    static func fromRow(row: Row) -> Link {
+    static func fromRow(_ row: Row) -> Link {
         return Link(id: row[id],
             name: row[name],
             docID: row[docID],
             docVersion: row[docVersion],
-            paragraphAIDs: row[paragraphAIDs].componentsSeparatedByString(",").map({ $0.stringByTrimmingCharactersInSet(.whitespaceCharacterSet()) }),
+            paragraphAIDs: row[paragraphAIDs].components(separatedBy: ",").map({ $0.trimmingCharacters(in: .whitespaces) }),
             annotationID: row[annotationID])
     }
     
@@ -52,30 +52,30 @@ class LinkTable {
 public extension AnnotationStore {
     
     /// Creates a link and adds it to annotation with ID
-    public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], annotationID: Int64) throws -> Link {
-        return try addLink(name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID, source: .Local)
+    @discardableResult public func addLink(name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], annotationID: Int64) throws -> Link {
+        return try addLink(name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID, source: .local)
     }
 
     /// Creates a link and adds related annotation and highlights
-    public func addLink(name name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> Link {
-        let source: NotificationSource = .Local
-        return try inTransaction(source) {
+    @discardableResult public func addLink(name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> Link {
+        let source: NotificationSource = .local
+        return try inTransaction(notificationSource: source) {
             // Create annotation and highlights for this link
             let highlights = try self.addHighlights(docID: fromDocID, docVersion: fromDocVersion, paragraphRanges: fromParagraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: source)
             
-            guard let annotationID = highlights.first?.annotationID else { throw Error.errorWithCode(.SaveHighlightFailed, failureReason: "Failed to create highlights") }
+            guard let annotationID = highlights.first?.annotationID else { throw AnnotationError.errorWithCode(.saveHighlightFailed, failureReason: "Failed to create highlights") }
             
             return try self.addLink(name: name, docID: toDocID, docVersion: toDocVersion, paragraphAIDs: toParagraphAIDs, annotationID: annotationID, source: source)
         }
     }
     
     /// Updates link
-    public func updateLink(link: Link) throws -> Link {
-        return try updateLink(link, source: .Local)
+    @discardableResult public func updateLink(_ link: Link) throws -> Link {
+        return try updateLink(link, source: .local)
     }
     
     /// Returns list of links with annotation ID
-    public func linksWithAnnotationID(annotationID: Int64) -> [Link] {
+    public func linksWithAnnotationID(_ annotationID: Int64) -> [Link] {
         do {
             return try db.prepare(LinkTable.table.filter(LinkTable.annotationID == annotationID)).map { LinkTable.fromRow($0) }
         } catch {
@@ -84,7 +84,7 @@ public extension AnnotationStore {
     }
     
     /// Returns list of links with annotation IDs
-    public func linksWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Link] {
+    public func linksWithAnnotationIDsIn(_ annotationIDs: [Int64]) -> [Link] {
         do {
             return try db.prepare(LinkTable.table.filter(annotationIDs.contains(LinkTable.annotationID))).map { LinkTable.fromRow($0) }
         } catch {
@@ -93,8 +93,8 @@ public extension AnnotationStore {
     }
     
     /// Return link with ID, then marks annotation as trashed if is has no other related annotation objects
-    public func trashLinkWithID(id: Int64) throws {
-        try trashLinkWithID(id, source: .Local)
+    public func trashLinkWithID(_ id: Int64) throws {
+        try trashLinkWithID(id, source: .local)
     }
 
 }
@@ -114,17 +114,20 @@ extension AnnotationStore {
         })
     }
 
-    func addLink(name name: String, docID: String, docVersion: Int, paragraphAIDs: [String], annotationID: Int64, source: NotificationSource) throws -> Link {
-        guard !name.isEmpty && !docID.isEmpty && docVersion > 0 && !paragraphAIDs.isEmpty && annotationID != 0 else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
+    @discardableResult func addLink(name: String, docID: String, docVersion: Int, paragraphAIDs: [String], annotationID: Int64, source: NotificationSource) throws -> Link {
+        // TODO: Swift 3 compiler was complaining when these were all together...
+        let firstCondition = !name.isEmpty && !docID.isEmpty && docVersion > 0
+        let secondCondition = !paragraphAIDs.isEmpty && annotationID != 0
+        guard firstCondition && secondCondition else {
+            throw AnnotationError.errorWithCode(.requiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
-        return try inTransaction(source) {
+        return try inTransaction(notificationSource: source) {
             let id = try self.db.run(LinkTable.table.insert(
                 LinkTable.name <- name,
                 LinkTable.docID <- docID,
                 LinkTable.docVersion <- docVersion,
-                LinkTable.paragraphAIDs <- paragraphAIDs.joinWithSeparator(","),
+                LinkTable.paragraphAIDs <- paragraphAIDs.joined(separator: ","),
                 LinkTable.annotationID <- annotationID
             ))
             
@@ -135,17 +138,20 @@ extension AnnotationStore {
         }
     }
     
-    func updateLink(link: Link, source: NotificationSource) throws -> Link {
-        guard !link.name.isEmpty && !link.docID.isEmpty && link.docVersion > 0 && !link.paragraphAIDs.isEmpty && link.annotationID != 0 else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
+    @discardableResult func updateLink(_ link: Link, source: NotificationSource) throws -> Link {
+        // TODO: Swift 3 compiler was complaining when these were all together...
+        let firstCondition = !link.name.isEmpty && !link.docID.isEmpty && link.docVersion > 0
+        let secondCondition = !link.paragraphAIDs.isEmpty && link.annotationID != 0
+        guard firstCondition && secondCondition else {
+            throw AnnotationError.errorWithCode(.requiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
-        return try inTransaction(source) {
+        return try inTransaction(notificationSource: source) {
             try self.db.run(LinkTable.table.filter(LinkTable.id == link.id).update(
                 LinkTable.name <- link.name,
                 LinkTable.docID <- link.docID,
                 LinkTable.docVersion <- link.docVersion,
-                LinkTable.paragraphAIDs <- link.paragraphAIDs.joinWithSeparator(","),
+                LinkTable.paragraphAIDs <- link.paragraphAIDs.joined(separator: ","),
                 LinkTable.annotationID <- link.annotationID
             ))
             
@@ -156,26 +162,30 @@ extension AnnotationStore {
         }
     }
     
-    func linkWithID(id: Int64) -> Link? {
-        return db.pluck(LinkTable.table.filter(LinkTable.id == id)).map { LinkTable.fromRow($0) }
+    func linkWithID(_ id: Int64) -> Link? {
+        do {
+            return try db.pluck(LinkTable.table.filter(LinkTable.id == id)).map { LinkTable.fromRow($0) }
+        } catch {
+            return nil
+        }
     }
     
-    func deleteLinkWithID(id: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteLinkWithID(_ id: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(LinkTable.table.filter(LinkTable.id == id).delete())
         }
     }
     
-    func deleteLinksWithAnnotationID(annotationID: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteLinksWithAnnotationID(_ annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(LinkTable.table.filter(LinkTable.annotationID == annotationID).delete())
         }
     }
     
-    func trashLinkWithID(id: Int64, source: NotificationSource) throws {
-        guard let annotationID = db.pluck(LinkTable.table.select(LinkTable.id, LinkTable.annotationID).filter(LinkTable.id == id)).map({ $0[LinkTable.annotationID] }) else { return }
+    func trashLinkWithID(_ id: Int64, source: NotificationSource) throws {
+        guard let annotationID = try db.pluck(LinkTable.table.select(LinkTable.id, LinkTable.annotationID).filter(LinkTable.id == id)).map({ $0[LinkTable.annotationID] }) else { return }
         
-        try inTransaction(source) {
+        try inTransaction(notificationSource: source) {
             try self.deleteLinkWithID(id, source: source)
             try self.trashAnnotationIfEmptyWithID(annotationID, source: source)
         }

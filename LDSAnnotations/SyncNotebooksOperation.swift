@@ -21,20 +21,21 @@
 //
 
 import Foundation
-import Operations
+import ProcedureKit
 
-class SyncNotebooksOperation: Operation, ResultOperationType {
+class SyncNotebooksOperation: Procedure, ResultInjection {
     
     let session: Session
     let annotationStore: AnnotationStore
-    let previousLocalSyncNotebooksDate: NSDate?
-    let previousServerSyncNotebooksDate: NSDate?
+    let previousLocalSyncNotebooksDate: Date?
+    let previousServerSyncNotebooksDate: Date?
     
-    private(set) var result: SyncNotebooksResult?
+    var result: PendingValue<SyncNotebooksResult> = .pending
+    var requirement: PendingValue<Void> = .void
     
-    private let source: NotificationSource = .Sync
+    private let source: NotificationSource = .sync
     
-    init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: NSDate?, serverSyncNotebooksDate: NSDate?) {
+    init(session: Session, annotationStore: AnnotationStore, localSyncNotebooksDate: Date?, serverSyncNotebooksDate: Date?) {
         self.session = session
         self.annotationStore = annotationStore
         self.previousLocalSyncNotebooksDate = localSyncNotebooksDate
@@ -42,16 +43,16 @@ class SyncNotebooksOperation: Operation, ResultOperationType {
         
         super.init()
         
-        addCondition(AuthenticateCondition(session: session))
+        add(condition: AuthenticateCondition(session: session))
     }
     
     override func execute() {
-        let localSyncDate = NSDate()
+        let localSyncDate = Date()
         let (localChanges, uploadedNotebooks) = localChangesAfter(previousLocalSyncNotebooksDate, onOrBefore: localSyncDate)
         
-        var syncFolders: [String: AnyObject] = [
-            "since": (previousServerSyncNotebooksDate ?? NSDate(timeIntervalSince1970: 0)).formattedISO8601,
-            "clientTime": NSDate().formattedISO8601,
+        var syncFolders: [String: Any] = [
+            "since": (previousServerSyncNotebooksDate ?? Date(timeIntervalSince1970: 0)).formattedISO8601,
+            "clientTime": Date().formattedISO8601,
         ]
         
         if !localChanges.isEmpty {
@@ -66,30 +67,30 @@ class SyncNotebooksOperation: Operation, ResultOperationType {
         
         session.put("/ws/annotation/v1.4/Services/rest/sync/folders?xver=2", payload: payload) { response in
             switch response {
-            case .Success(let payload):
+            case .success(let payload):
                 do {
-                    let (serverSyncNotebooksDate, notebookAnnotationIDs, downloadedNotebooks, deserializationErrors) = try self.annotationStore.inTransaction(.Sync) {
+                    let (serverSyncNotebooksDate, notebookAnnotationIDs, downloadedNotebooks, deserializationErrors) = try self.annotationStore.inTransaction(notificationSource: .sync) {
                         return try self.applyServerChanges(payload, onOrBefore: localSyncDate)
                     }
                     let changes = SyncNotebooksChanges(notebookAnnotationIDs: notebookAnnotationIDs, uploadedNotebooks: uploadedNotebooks, downloadedNotebooks: downloadedNotebooks)
-                    self.result = SyncNotebooksResult(localSyncNotebooksDate: localSyncDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes, deserializationErrors: deserializationErrors)
+                    self.result = .ready(SyncNotebooksResult(localSyncNotebooksDate: localSyncDate, serverSyncNotebooksDate: serverSyncNotebooksDate, changes: changes, deserializationErrors: deserializationErrors))
                     self.finish()
                 } catch {
-                    self.finish(error)
+                    self.finish(withError: error)
                 }
-            case .Failure(let payload):
-                self.finish(Error.errorWithCode(.Unknown, failureReason: "Failure response: \(payload)"))
-            case .Error(let error):
-                self.finish(error)
+            case .failure(let payload):
+                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Failure response: \(payload)"))
+            case .error(let error):
+                self.finish(withError: error)
             }
         }
     }
     
-    func localChangesAfter(after: NSDate?, onOrBefore: NSDate) -> ([[String: AnyObject]], [Notebook]) {
+    func localChangesAfter(_ after: Date?, onOrBefore: Date) -> ([[String: Any]], [Notebook]) {
         let modifiedNotebooks = annotationStore.allNotebooks(lastModifiedAfter: after, lastModifiedOnOrBefore: onOrBefore)
         
-        let localChanges = modifiedNotebooks.map { notebook -> [String: AnyObject] in
-            var result: [String: AnyObject] = [
+        let localChanges = modifiedNotebooks.map { notebook -> [String: Any] in
+            var result: [String: Any] = [
                 "changeType": ChangeType(status: notebook.status).rawValue,
                 "folderId": notebook.uniqueID,
                 "timestamp": notebook.lastModified.formattedISO8601,
@@ -105,31 +106,31 @@ class SyncNotebooksOperation: Operation, ResultOperationType {
         return (localChanges, modifiedNotebooks)
     }
     
-    func applyServerChanges(payload: [String: AnyObject], onOrBefore: NSDate) throws -> (NSDate, [String: [String]], [Notebook], [ErrorType]) {
-        guard let syncFolders = payload["syncFolders"] as? [String: AnyObject] else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Missing syncFolders")
+    func applyServerChanges(_ payload: [String: Any], onOrBefore: Date) throws -> (Date, [String: [String]], [Notebook], [Error]) {
+        guard let syncFolders = payload["syncFolders"] as? [String: Any] else {
+            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing syncFolders")
         }
         
-        guard let rawServerSyncDate = syncFolders["before"] as? String, serverSyncDate = NSDate.parseFormattedISO8601(rawServerSyncDate) else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Missing before")
+        guard let rawServerSyncDate = syncFolders["before"] as? String, let serverSyncDate = Date.parseFormattedISO8601(rawServerSyncDate) else {
+            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing before")
         }
         
         var notebookAnnotationIDs = [String: [String]]()
         var downloadedNotebooks = [Notebook]()
-        var deserializationErrors = [ErrorType]()
+        var deserializationErrors = [Error]()
         
-        if let remoteChanges = syncFolders["changes"] as? [[String: AnyObject]] {
+        if let remoteChanges = syncFolders["changes"] as? [[String: Any]] {
             for change in remoteChanges {
                 do {
                     try annotationStore.db.savepoint {
                         guard let uniqueID = change["folderId"] as? String else {
-                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook is missing missing folderId")
+                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook is missing missing folderId")
                         }
-                        guard let rawChangeType = change["changeType"] as? String, changeType = ChangeType(rawValue: rawChangeType) else {
-                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing changeType")
+                        guard let rawChangeType = change["changeType"] as? String, let changeType = ChangeType(rawValue: rawChangeType) else {
+                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing changeType")
                         }
-                        guard let rawNotebook = change["folder"] as? [String: AnyObject] else {
-                            throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing folder")
+                        guard let rawNotebook = change["folder"] as? [String: Any] else {
+                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing folder")
                         }
                         
                         let displayOrders = rawNotebook["order"] as? [String: [String]]
@@ -138,11 +139,11 @@ class SyncNotebooksOperation: Operation, ResultOperationType {
                         
                         switch changeType {
                         case .New:
-                            guard let rawLastModified = rawNotebook["timestamp"] as? String, lastModified = NSDate.parseFormattedISO8601(rawLastModified) else {
-                                throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing last modified date")
+                            guard let rawLastModified = rawNotebook["timestamp"] as? String, let lastModified = Date.parseFormattedISO8601(rawLastModified) else {
+                                throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing last modified date")
                             }
                             guard let name = rawNotebook["label"] as? String else {
-                                throw Error.errorWithCode(.SyncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing name")
+                                throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing name")
                             }
                             
                             let description = rawNotebook["desc"] as? String
@@ -164,7 +165,7 @@ class SyncNotebooksOperation: Operation, ResultOperationType {
                             for annotationUniqueID in annotationUniqueIDs ?? [] {
                                 guard let annotation = self.annotationStore.annotationWithUniqueID(annotationUniqueID) else { continue }
                                 
-                                let displayOrder = annotationUniqueIDs?.indexOf(annotationUniqueID) ?? .max
+                                let displayOrder = annotationUniqueIDs?.index(of: annotationUniqueID) ?? .max
                                 try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: downloadedNotebook.id, displayOrder: displayOrder, source: self.source)
                             }
                         case .Trash, .Delete:
@@ -176,7 +177,7 @@ class SyncNotebooksOperation: Operation, ResultOperationType {
                             }
                         }
                     }
-                } catch let error as NSError where Error.Code(rawValue: error.code) == .SyncDeserializationFailed {
+                } catch let error as NSError where AnnotationError.Code(rawValue: error.code) == .syncDeserializationFailed {
                     deserializationErrors.append(error)
                 }
             }

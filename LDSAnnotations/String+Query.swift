@@ -25,9 +25,9 @@ import Foundation
 extension String {
     
     func stringByAddingPercentEscapesForQueryValue() -> String? {
-        let characterSet = NSMutableCharacterSet.alphanumericCharacterSet()
-        characterSet.addCharactersInString("-._~")
-        return stringByAddingPercentEncodingWithAllowedCharacters(characterSet)
+        var characterSet = CharacterSet.alphanumerics
+        characterSet.insert(charactersIn: "-._~")
+        return addingPercentEncoding(withAllowedCharacters: characterSet)
     }
     
 }

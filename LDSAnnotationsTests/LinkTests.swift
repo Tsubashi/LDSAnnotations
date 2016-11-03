@@ -25,7 +25,7 @@ import XCTest
 
 class LinkTests: XCTestCase {
     
-    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: NSDate(), serverSyncNotebooksDate: NSDate(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
+    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: Date(), serverSyncNotebooksDate: Date(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
     
     func testLinkMissingPID() {
         let link = [
@@ -37,11 +37,11 @@ class LinkTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        syncAnnotationsOperation.requirement = LinkTests.emptyNotebooksResult
+        syncAnnotationsOperation.requirement = .ready(LinkTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try syncAnnotationsOperation.applyServerChanges(self.payloadForLink(link), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try syncAnnotationsOperation.applyServerChanges(self.payloadForLink(link), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -62,11 +62,11 @@ class LinkTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let syncAnnotationsOperation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        syncAnnotationsOperation.requirement = LinkTests.emptyNotebooksResult
+        syncAnnotationsOperation.requirement = .ready(LinkTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try syncAnnotationsOperation.applyServerChanges(self.payloadForLink(link), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try syncAnnotationsOperation.applyServerChanges(self.payloadForLink(link), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -80,9 +80,9 @@ class LinkTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
     
-    func payloadForLink(link: [String: AnyObject]) -> [String: AnyObject] {
-        let uniqueID = NSUUID().UUIDString
-        let annotation = [
+    func payloadForLink(_ link: [String: Any]) -> [String: Any] {
+        let uniqueID = UUID().uuidString
+        let annotation: [String: Any] = [
             "changeType": "new",
             "timestamp" : "2016-08-04T11:21:38.849-06:00",
             "annotationId" : uniqueID,

@@ -26,7 +26,7 @@ import XCTest
 class SessionControllerNotificationTests: XCTestCase {
 
     func testSessionAddedNotification() {
-        let expectation = expectationWithDescription("Notification Received")
+        let expectation = self.expectation(description: "Notification Received")
 
         let testSession = createSession()
 
@@ -38,10 +38,10 @@ class SessionControllerNotificationTests: XCTestCase {
         
         sessionController.addSession(testSession, withUsername: testSession.username)
         
-        waitForExpectationsWithTimeout(30, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
         
         sessionController.sessionAddedObservers.remove(observer)
-        sessionController.removeSessionForUsername(testSession.username)
+        sessionController.removeSession(forUsername: testSession.username)
     }
     
 }

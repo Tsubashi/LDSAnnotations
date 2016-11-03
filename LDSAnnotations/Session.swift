@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import Operations
+import ProcedureKit
 import Swiftification
 
 /// Communicates with the annotation service.
@@ -33,15 +33,15 @@ public class Session: NSObject {
     public let networkActivityObservers = ObserverSet<NetworkActivity>()
     
     public enum Status {
-        case None
-        case SyncInProgress
-        case SyncSuccessful
-        case SyncFailed
+        case none
+        case syncInProgress
+        case syncSuccessful
+        case syncFailed
     }
     
     public enum NetworkActivity {
-        case Start
-        case Stop
+        case start
+        case stop
     }
     
     /// The username used to authenticate this session.
@@ -54,11 +54,11 @@ public class Session: NSObject {
     let clientVersion: String
     let clientUsername: String
     let clientPassword: String
-    let authenticationURL: NSURL?
+    let authenticationURL: URL?
     let domain: String
     let trustPolicy: TrustPolicy
     
-    public private(set) var status: Status = .None {
+    public private(set) var status: Status = .none {
         didSet {
             statusObservers.notify(status)
         }
@@ -67,10 +67,10 @@ public class Session: NSObject {
     /// Callback to get the local doc version of the given doc IDs.
     ///
     /// Returns a dictionary of doc IDs to doc versions.
-    public var docVersionsForDocIDs: ((docIDs: [String]) -> ([String: Int]))?
+    public var docVersionsForDocIDs: ((_ docIDs: [String]) -> ([String: Int]))?
     
     /// Constructs a session.
-    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: NSURL? = NSURL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", trustPolicy: TrustPolicy = .Trust) {
+    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: URL? = URL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", trustPolicy: TrustPolicy = .trust) {
         self.username = username
         self.password = password
         self.userAgent = userAgent
@@ -82,20 +82,20 @@ public class Session: NSObject {
         self.trustPolicy = trustPolicy
     }
     
-    lazy var urlSession: NSURLSession = {
-        return NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration(), delegate: self, delegateQueue: nil)
+    lazy var urlSession: Foundation.URLSession = {
+        return Foundation.URLSession(configuration: URLSessionConfiguration.default, delegate: self, delegateQueue: nil)
     }()
     
-    let operationQueue = OperationQueue()
-    private let dataQueue = dispatch_queue_create("LDSAnnotations.session.syncqueue", DISPATCH_QUEUE_SERIAL)
+    let procedureQueue = ProcedureQueue()
+    private let dataQueue = DispatchQueue(label: "LDSAnnotations.session.syncqueue", attributes: [])
     
-    var lastSuccessfulAuthenticationDate: NSDate?
+    var lastSuccessfulAuthenticationDate: Date?
     
     private var syncQueued = false
     
     var authenticated: Bool {
-        let gracePeriod: NSTimeInterval = 15 * 60
-        if let lastSuccessfulAuthenticationDate = lastSuccessfulAuthenticationDate where NSDate().timeIntervalSinceDate(lastSuccessfulAuthenticationDate) < gracePeriod {
+        let gracePeriod: TimeInterval = 15 * 60
+        if let lastSuccessfulAuthenticationDate = lastSuccessfulAuthenticationDate, Date().timeIntervalSince(lastSuccessfulAuthenticationDate) < gracePeriod {
             return true
         } else {
             return false
@@ -103,23 +103,23 @@ public class Session: NSObject {
     }
     
     /// Authenticates against the server.
-    public func authenticate(completion: (ErrorType?) -> Void) {
+    public func authenticate(_ completion: @escaping (Error?) -> Void) {
         let operation = AuthenticateOperation(session: self)
-        operation.addObserver(BlockObserver(didFinish: { operation, errors in
+        operation.add(observer: BlockObserver(didFinish: { operation, errors in
             completion(errors.first)
         }))
-        operationQueue.addOperation(operation)
+        procedureQueue.addOperation(operation)
     }
     
     /// Uploads all local annotations modifications made since the last sync, then downloads and stores all annotation modifications made after the last sync.
     ///
     /// Upon a successful sync, the result includes a `token` which should be used for the next sync.
-    public func sync(annotationStore annotationStore: AnnotationStore, token: SyncToken?, completion: (SyncResult) -> Void) {
-        dispatch_async(dataQueue) {
+    public func sync(annotationStore: AnnotationStore, token: SyncToken?, completion: @escaping (SyncResult) -> Void) {
+        dataQueue.async {
             switch self.status {
-            case .SyncInProgress:
+            case .syncInProgress:
                 self.syncQueued = true
-            case .SyncSuccessful, .SyncFailed, .None:
+            case .syncSuccessful, .syncFailed, .none:
                 break
             }
 
@@ -128,27 +128,27 @@ public class Session: NSObject {
                 return
             }
             
-            self.status = .SyncInProgress
+            self.status = .syncInProgress
             
             let syncOperation = SyncOperation(session: self, annotationStore: annotationStore, token: token) { result in
-                dispatch_async(self.dataQueue) {
+                self.dataQueue.async {
                     switch result {
-                    case let .Success(token, _, _):
-                        self.status = .SyncSuccessful
+                    case let .success(token, _, _):
+                        self.status = .syncSuccessful
                         
                         // Trigger next sync if one is queued
                         if self.syncQueued {
                             self.syncQueued = false
                             self.sync(annotationStore: annotationStore, token: token, completion: completion)
                         }
-                    case .Error:
-                        self.status = .SyncFailed
+                    case .error:
+                        self.status = .syncFailed
                     }
                     completion(result)
                 }
             }
             
-            self.operationQueue.addOperation(syncOperation)
+            self.procedureQueue.addOperation(syncOperation)
         }
     }
 
@@ -158,60 +158,60 @@ public class Session: NSObject {
 
 extension Session {
     
-    func put(endpoint: String, payload: [String: AnyObject], completion: (Response) -> Void) {
-        guard let url = NSURL(string: "https://\(domain)\(endpoint)") else {
-            completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Malformed URL")))
+    func put(_ endpoint: String, payload: [String: Any], completion: @escaping (Response) -> Void) {
+        guard let url = URL(string: "https://\(domain)\(endpoint)") else {
+            completion(.error(AnnotationError.errorWithCode(.unknown, failureReason: "Malformed URL")))
             return
         }
         
-        let request = NSMutableURLRequest(URL: url)
-        request.HTTPMethod = "PUT"
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
         
         do {
             try request.setAnnotationServiceHeadersWithSession(self, clientUsername: clientUsername, clientPassword: clientPassword)
-            try request.setBodyWithJSONObject(payload)
+            try request.setBodyWithJSONObject(payload as AnyObject)
         } catch let error as NSError {
-            completion(.Error(error))
+            completion(.error(error))
             return
         }
         
-        let task = urlSession.dataTaskWithRequest(request) { data, response, error in
-            self.networkActivityObservers.notify(.Stop)
+        let task = urlSession.dataTask(with: request, completionHandler: { data, response, error in
+            self.networkActivityObservers.notify(.stop)
             if let error = error {
-                completion(.Error(error))
+                completion(.error(error))
                 return
             }
             
-            guard let data = data, response = response as? NSHTTPURLResponse else {
-                completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Missing response")))
+            guard let data = data, let response = response as? HTTPURLResponse else {
+                completion(.error(AnnotationError.errorWithCode(.unknown, failureReason: "Missing response")))
                 return
             }
             
-            let jsonObject: AnyObject
+            let jsonObject: Any
             do {
-                jsonObject = try NSJSONSerialization.JSONObjectWithData(data, options: [])
+                jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
             } catch let error as NSError {
-                completion(.Error(error))
+                completion(.error(error))
                 return
             }
             
-            guard let jsonDictionary = jsonObject as? [String: AnyObject] else {
-                completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Unexpected JSON response")))
+            guard let jsonDictionary = jsonObject as? [String: Any] else {
+                completion(.error(AnnotationError.errorWithCode(.unknown, failureReason: "Unexpected JSON response")))
                 return
             }
             
             if response.statusCode == 200 {
-                completion(.Success(jsonDictionary))
+                completion(.success(jsonDictionary))
             } else {
-                guard let errorsWrapper = jsonDictionary["errors"] as? [String: AnyObject], errors = errorsWrapper["error"] as? [[String: String]] where !errors.isEmpty else {
-                    completion(.Error(Error.errorWithCode(.Unknown, failureReason: "Unexpected JSON response")))
+                guard let errorsWrapper = jsonDictionary["errors"] as? [String: Any], let errors = errorsWrapper["error"] as? [[String: String]], !errors.isEmpty else {
+                    completion(.error(AnnotationError.errorWithCode(.unknown, failureReason: "Unexpected JSON response")))
                     return
                 }
                 
-                completion(.Failure(errors))
+                completion(.failure(errors))
             }
-        }
-        networkActivityObservers.notify(.Start)
+        }) 
+        networkActivityObservers.notify(.start)
         task.resume()
     }
     
@@ -219,14 +219,14 @@ extension Session {
 
 // MARK: - NSURLSessionDelegate
 
-extension Session: NSURLSessionDelegate {
+extension Session: URLSessionDelegate {
     
-    public func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+    public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         switch trustPolicy {
-        case .Validate:
-            completionHandler(.PerformDefaultHandling, nil)
-        case .Trust:
-            completionHandler(.UseCredential, challenge.protectionSpace.serverTrust.flatMap { NSURLCredential(forTrust: $0) })
+        case .validate:
+            completionHandler(.performDefaultHandling, nil)
+        case .trust:
+            completionHandler(.useCredential, challenge.protectionSpace.serverTrust.flatMap { URLCredential(trust: $0) })
         }
     }
     
@@ -234,9 +234,9 @@ extension Session: NSURLSessionDelegate {
 
 // MARK: - Auth redirection
 
-extension Session: NSURLSessionTaskDelegate {
+extension Session: URLSessionTaskDelegate {
 
-    public func URLSession(session: NSURLSession, task: NSURLSessionTask, willPerformHTTPRedirection response: NSHTTPURLResponse, newRequest request: NSURLRequest, completionHandler: (NSURLRequest?) -> Void) {
+    public func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         if response.statusCode == 302 {
             completionHandler(nil)
         } else {

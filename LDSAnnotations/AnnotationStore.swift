@@ -24,7 +24,7 @@ import Foundation
 import SQLite
 import Swiftification
 
-class SetBox<T where T: Hashable>: NSObject {
+class SetBox<T>: NSObject where T: Hashable {
     
     var set = Set<T>()
     
@@ -38,35 +38,35 @@ public class AnnotationStore {
     let db: Connection
     
     lazy var inSyncTransactionKey: String = {
-        return "sync-txn:\(unsafeAddressOf(self))"
+        return "sync-txn:\(Unmanaged.passUnretained(self).toOpaque())"
     }()
     
     lazy var inLocalTransactionKey: String = {
-        return "local-txn:\(unsafeAddressOf(self))"
+        return "local-txn:\(Unmanaged.passUnretained(self).toOpaque())"
     }()
     
     private var changedAnnotationIDSetBox: SetBox<Int64> {
         set {
-            NSThread.currentThread().threadDictionary["annotation-ids:\(unsafeAddressOf(self))"] = newValue
+            Thread.current.threadDictionary["annotation-ids:\(Unmanaged.passUnretained(self).toOpaque())"] = newValue
         }
         get {
-            return NSThread.currentThread().threadDictionary["annotation-ids:\(unsafeAddressOf(self))"] as? SetBox<Int64> ?? SetBox()
+            return Thread.current.threadDictionary["annotation-ids:\(Unmanaged.passUnretained(self).toOpaque())"] as? SetBox<Int64> ?? SetBox()
         }
     }
     
     private var changedNotebookIDSetBox: SetBox<Int64> {
         set {
-            NSThread.currentThread().threadDictionary["notebook-ids:\(unsafeAddressOf(self))"] = newValue
+            Thread.current.threadDictionary["notebook-ids:\(Unmanaged.passUnretained(self).toOpaque())"] = newValue
         }
         get {
-            return NSThread.currentThread().threadDictionary["notebook-ids:\(unsafeAddressOf(self))"] as? SetBox<Int64> ?? SetBox()
+            return Thread.current.threadDictionary["notebook-ids:\(Unmanaged.passUnretained(self).toOpaque())"] as? SetBox<Int64> ?? SetBox()
         }
     }
     
     var changedNotebookIDs: Set<Int64> {
         set {
             let setBox = changedNotebookIDSetBox
-            setBox.set.unionInPlace(newValue)
+            setBox.set.formUnion(newValue)
             changedNotebookIDSetBox = setBox
         }
         get {
@@ -77,7 +77,7 @@ public class AnnotationStore {
     var changedAnnotationIDs: Set<Int64> {
         set {
             let setBox = changedAnnotationIDSetBox
-            setBox.set.unionInPlace(newValue)
+            setBox.set.formUnion(newValue)
             changedAnnotationIDSetBox = setBox
         }
         get {
@@ -95,8 +95,8 @@ public class AnnotationStore {
                 // Keep retrying if database is locked
                 return true
             }
-            if databaseVersion < self.dynamicType.currentVersion {
-                upgradeDatabaseFromVersion(databaseVersion)
+            if databaseVersion < type(of: self).currentVersion {
+                upgradeDatabase(fromVersion: databaseVersion)
             }
         } catch {
             return nil
@@ -105,7 +105,11 @@ public class AnnotationStore {
     
     var databaseVersion: Int {
         get {
-            return Int(db.scalar("PRAGMA user_version") as? Int64 ?? 0)
+            do {
+                return try Int(db.scalar("PRAGMA user_version") as? Int64 ?? 0)
+            } catch {
+                return 0
+            }
         }
         set {
             do {
@@ -114,7 +118,7 @@ public class AnnotationStore {
         }
     }
     
-    private func upgradeDatabaseFromVersion(fromVersion: Int) {
+    private func upgradeDatabase(fromVersion: Int) {
         if fromVersion < 1 {
             do {
                 try db.transaction {
@@ -143,29 +147,29 @@ public class AnnotationStore {
     /// Makes multiple queries or modifications in a single transaction.
     ///
     /// This method is reentrant.
-    func inTransaction<T>(source: NotificationSource, closure: (() throws -> T)) throws -> T {
+    @discardableResult func inTransaction<T>(notificationSource source: NotificationSource, closure: @escaping (() throws -> T)) throws -> T {
         let inTransactionKey: String
         
         switch source {
-        case .Local:
+        case .local:
             inTransactionKey = inLocalTransactionKey
-            guard NSThread.currentThread().threadDictionary[inSyncTransactionKey] == nil else {
-                throw Error.errorWithCode(.TransactionError, failureReason: "A local transaction cannot be started in a sync transaction")
+            guard Thread.current.threadDictionary[inSyncTransactionKey] == nil else {
+                throw AnnotationError.errorWithCode(.transactionError, failureReason: "A local transaction cannot be started in a sync transaction")
             }
-        case .Sync:
+        case .sync:
             inTransactionKey = inSyncTransactionKey
-            guard NSThread.currentThread().threadDictionary[inLocalTransactionKey] == nil else {
-                throw Error.errorWithCode(.TransactionError, failureReason: "A sync transaction cannot be started in a local transaction")
+            guard Thread.current.threadDictionary[inLocalTransactionKey] == nil else {
+                throw AnnotationError.errorWithCode(.transactionError, failureReason: "A sync transaction cannot be started in a local transaction")
             }
         }
         
         var element: T?
-        if NSThread.currentThread().threadDictionary[inTransactionKey] != nil {
+        if Thread.current.threadDictionary[inTransactionKey] != nil {
             element = try closure()
         } else {
-            NSThread.currentThread().threadDictionary[inTransactionKey] = true
+            Thread.current.threadDictionary[inTransactionKey] = true
             defer {
-                NSThread.currentThread().threadDictionary.removeObjectForKey(inTransactionKey)
+                Thread.current.threadDictionary.removeObject(forKey: inTransactionKey)
             }
             
             try db.transaction {
@@ -187,7 +191,7 @@ public class AnnotationStore {
             return element
         }
         
-        throw Error.errorWithCode(.TransactionError, failureReason: "inTransaction has incorrect return type")
+        throw AnnotationError.errorWithCode(.transactionError, failureReason: "inTransaction has incorrect return type")
     }
     
 }

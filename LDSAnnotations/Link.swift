@@ -51,12 +51,12 @@ public struct Link: Equatable {
         self.annotationID = annotationID
     }
     
-    func jsonObject() -> [String: AnyObject] {
+    func jsonObject() -> [String: Any] {
         return [
             "$": name,
             "@docId": docID,
             "@contentVersion": docVersion,
-            "@pid": paragraphAIDs.joinWithSeparator(",")
+            "@pid": paragraphAIDs.joined(separator: ",")
         ]
     }
     

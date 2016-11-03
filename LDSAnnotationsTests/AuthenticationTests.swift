@@ -26,7 +26,7 @@ import LDSAnnotations
 class AuthenticationTests: XCTestCase {
     
     func testSuccess() {
-        let expectation = expectationWithDescription("Successfully signed in")
+        let expectation = self.expectation(description: "Successfully signed in")
         
         let session = createSession()
         session.authenticate { error in
@@ -34,22 +34,22 @@ class AuthenticationTests: XCTestCase {
             expectation.fulfill()
         }
         
-        waitForExpectationsWithTimeout(30, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
     }
     
     func testFailure() {
-        let expectation = expectationWithDescription("Failed to sign in")
+        let expectation = self.expectation(description: "Failed to sign in")
         
         let session = createSession(useIncorrectPassword: true)
         session.authenticate { error in
             XCTAssertNotNil(error)
             let localError = error as! NSError
-            XCTAssertEqual(localError.domain, Error.Domain)
-            XCTAssertEqual(localError.code, Error.Code.AuthenticationFailed.rawValue)
+            XCTAssertEqual(localError.domain, AnnotationError.Domain)
+            XCTAssertEqual(localError.code, AnnotationError.Code.authenticationFailed.rawValue)
             expectation.fulfill()
         }
         
-        waitForExpectationsWithTimeout(30, handler: nil)
+        waitForExpectations(timeout: 30, handler: nil)
     }
     
 }

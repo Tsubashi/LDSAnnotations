@@ -21,7 +21,7 @@
 //
 
 import Foundation
-import Operations
+import ProcedureKit
 
 class AuthenticateCondition: Condition {
     
@@ -35,11 +35,11 @@ class AuthenticateCondition: Condition {
         addDependency(AuthenticateOperation(session: session))
     }
     
-    override func evaluate(operation: Operation, completion: OperationConditionResult -> Void) {
+    override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         if session.authenticated {
-            completion(.Satisfied)
+            completion(.satisfied)
         } else {
-            completion(.Failed(Error.errorWithCode(.Unknown, failureReason: "Not authenticated")))
+            completion(.failed(AnnotationError.errorWithCode(.unknown, failureReason: "Not authenticated")))
         }
     }
     

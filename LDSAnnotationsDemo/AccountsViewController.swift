@@ -32,7 +32,7 @@ class AccountsViewController: UIViewController {
         automaticallyAdjustsScrollViewInsets = false
         
         title = "Accounts"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(add))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -40,21 +40,21 @@ class AccountsViewController: UIViewController {
     }
     
     lazy var tableView: UITableView = {
-        let tableView = UITableView(frame: .zero, style: .Grouped)
+        let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.translatesAutoresizingMaskIntoConstraints = false
         return tableView
     }()
     
-    private static let CellIdentifier = "Cell"
+    fileprivate static let CellIdentifier = "Cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         automaticallyAdjustsScrollViewInsets = true
         
-        tableView.registerClass(UITableViewCell.self, forCellReuseIdentifier: AccountsViewController.CellIdentifier)
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: AccountsViewController.CellIdentifier)
         tableView.estimatedRowHeight = 44
         
         view.addSubview(tableView)
@@ -63,24 +63,24 @@ class AccountsViewController: UIViewController {
             "tableView": tableView,
         ]
         
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("|[tableView]|", options: [], metrics: nil, views: views))
-        view.addConstraints(NSLayoutConstraint.constraintsWithVisualFormat("V:|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "|[tableView]|", options: [], metrics: nil, views: views))
+        view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views))
         
         reloadData()
         
-        AccountController.sharedController.addAccountObservers.add(self, self.dynamicType.didAddAccount)
-        AccountController.sharedController.deleteAccountObservers.add(self, self.dynamicType.didDeleteAccount)
+        AccountController.sharedController.addAccountObservers.add(self, type(of: self).didAddAccount)
+        AccountController.sharedController.deleteAccountObservers.add(self, type(of: self).didDeleteAccount)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            tableView.deselectRow(at: indexPath, animated: true)
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         tableView.flashScrollIndicators()
@@ -92,12 +92,12 @@ class AccountsViewController: UIViewController {
         usernames = AccountController.sharedController.usernames
     }
     
-    func didAddAccount(username: String) {
+    func didAddAccount(_ username: String) {
         reloadData()
         tableView.reloadData()
     }
     
-    func didDeleteAccount(username: String) {
+    func didDeleteAccount(_ username: String) {
         reloadData()
         tableView.reloadData()
     }
@@ -109,65 +109,65 @@ class AccountsViewController: UIViewController {
 extension AccountsViewController {
 
     func add() {
-        let alertController = UIAlertController(title: "Add Account", message: "Enter the username and password for your LDS Account.", preferredStyle: .Alert)
-        alertController.addTextFieldWithConfigurationHandler { textField in
+        let alertController = UIAlertController(title: "Add Account", message: "Enter the username and password for your LDS Account.", preferredStyle: .alert)
+        alertController.addTextField { textField in
             textField.placeholder = "Username"
-            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
+            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), for: .editingChanged)
         }
-        alertController.addTextFieldWithConfigurationHandler { textField in
+        alertController.addTextField { textField in
             textField.placeholder = "Password"
-            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), forControlEvents: .EditingChanged)
-            textField.secureTextEntry = true
+            textField.addTarget(self, action: #selector(AccountsViewController.textFieldDidChange(_:)), for: .editingChanged)
+            textField.isSecureTextEntry = true
         }
         
-        let doneAction = UIAlertAction(title: "OK", style: .Default, handler: { _ in
+        let doneAction = UIAlertAction(title: "OK", style: .default, handler: { _ in
             let username = alertController.textFields?[0].text ?? ""
             let password = alertController.textFields?[1].text ?? ""
             self.addAccountWithUsername(username, password: password)
         })
-        doneAction.enabled = false
+        doneAction.isEnabled = false
         alertController.addAction(doneAction)
         alertController.preferredAction = doneAction
         
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
     
-    func textFieldDidChange(textField: UITextField) {
+    func textFieldDidChange(_ textField: UITextField) {
         if let alertController = presentedViewController as? UIAlertController {
             let username = alertController.textFields?[0].text ?? ""
             let password = alertController.textFields?[1].text ?? ""
-            alertController.preferredAction?.enabled = (username.length > 0 && password.length > 0)
+            alertController.preferredAction?.isEnabled = (username.length > 0 && password.length > 0)
         }
     }
     
-    func addAccountWithUsername(username: String, password: String) {
+    func addAccountWithUsername(_ username: String, password: String) {
         
-        let session = SessionController.sharedController.sessionForUsername(username) ?? Session(username: username, password: password)
+        let session = SessionController.sharedController.session(forUsername: username) ?? Session(username: username, password: password)
         session.authenticate { error in
             if let error = error {
                 NSLog("Failed to authenticate account: \(error)")
                 
-                dispatch_async(dispatch_get_main_queue()) {
-                    let alertController = UIAlertController(title: "Unable to Add Account", message: "Failed to sign in with the given username and password.", preferredStyle: .Alert)
-                    alertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                DispatchQueue.main.async {
+                    let alertController = UIAlertController(title: "Unable to Add Account", message: "Failed to sign in with the given username and password.", preferredStyle: .alert)
+                    alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                     
-                    self.presentViewController(alertController, animated: true, completion: nil)
+                    self.present(alertController, animated: true, completion: nil)
                 }
             } else {
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     SessionController.sharedController.addSession(session, withUsername: username)
                     
                     do {
-                        try AccountController.sharedController.addOrUpdateAccountWithUsername(username, password: password)
+                        try AccountController.sharedController.addOrUpdateAccount(withUsername: username, password: password)
                     } catch {
                         NSLog("Failed to add account: %@", "\(error)")
                     
-                        let alertController = UIAlertController(title: "Unable to Add Account", message: "Failed to save account to keychain.", preferredStyle: .Alert)
-                        alertController.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                        let alertController = UIAlertController(title: "Unable to Add Account", message: "Failed to save account to keychain.", preferredStyle: .alert)
+                        alertController.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
                         
-                        self.presentViewController(alertController, animated: true, completion: nil)
+                        self.present(alertController, animated: true, completion: nil)
                     }
                 }
             }
@@ -180,29 +180,29 @@ extension AccountsViewController {
 
 extension AccountsViewController: UITableViewDataSource {
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return usernames.count
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier(AccountsViewController.CellIdentifier, forIndexPath: indexPath)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: AccountsViewController.CellIdentifier, for: indexPath)
         
         let username = usernames[indexPath.row]
         cell.textLabel?.text = username
-        cell.accessoryType = .DisclosureIndicator
+        cell.accessoryType = .disclosureIndicator
         
         return cell
     }
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
             let username = usernames[indexPath.row]
             do {
-                try AccountController.sharedController.deleteAccountWithUsername(username)
+                try AccountController.sharedController.deleteAccount(username: username)
             } catch {
                 NSLog("Failed to delete account: %@", "\(error)")
             }
@@ -215,14 +215,14 @@ extension AccountsViewController: UITableViewDataSource {
 
 extension AccountsViewController: UITableViewDelegate {
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let username = usernames[indexPath.row]
-        if let password = AccountController.sharedController.passwordForUsername(username), annotationStore = AnnotationStore.annotationStoreForUsername(username) {
+        if let password = AccountController.sharedController.password(forUsername: username), let annotationStore = AnnotationStore.annotationStoreForUsername(username) {
             let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)
         } else {
-            tableView.deselectRowAtIndexPath(indexPath, animated: false)
+            tableView.deselectRow(at: indexPath, animated: false)
         }
     }
     

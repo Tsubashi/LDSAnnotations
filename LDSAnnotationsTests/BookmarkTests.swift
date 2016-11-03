@@ -25,7 +25,7 @@ import XCTest
 
 class BookmarkTests: XCTestCase {
     
-    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: NSDate(), serverSyncNotebooksDate: NSDate(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
+    static let emptyNotebooksResult = SyncNotebooksResult(localSyncNotebooksDate: Date(), serverSyncNotebooksDate: Date(), changes: SyncNotebooksChanges(notebookAnnotationIDs: [:], uploadedNotebooks: [], downloadedNotebooks: []), deserializationErrors: [])
     
     func testBookmarkMissingPID() {
         let bookmark = [
@@ -37,11 +37,11 @@ class BookmarkTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = BookmarkTests.emptyNotebooksResult
+        operation.requirement = .ready(BookmarkTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -51,7 +51,7 @@ class BookmarkTests: XCTestCase {
     }
     
     func testBookmarkWithOffset() {
-        let bookmark = [
+        let bookmark: [String: Any] = [
             "name": "BookmarkName",
             "@pid": "20527924",
             "sort": 1,
@@ -61,11 +61,11 @@ class BookmarkTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = BookmarkTests.emptyNotebooksResult
+        operation.requirement = .ready(BookmarkTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -78,7 +78,7 @@ class BookmarkTests: XCTestCase {
     }
     
     func testBookmarkWithSentinelOffset() {
-        let bookmark = [
+        let bookmark: [String: Any] = [
             "name": "BookmarkName",
             "@pid": "20527924",
             "sort": 1,
@@ -88,11 +88,11 @@ class BookmarkTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         let operation = SyncAnnotationsOperation(session: session, annotationStore: annotationStore, localSyncAnnotationsDate: nil, serverSyncAnnotationsDate: nil) { _ in }
-        operation.requirement = BookmarkTests.emptyNotebooksResult
+        operation.requirement = .ready(BookmarkTests.emptyNotebooksResult)
         
         do {
-            try annotationStore.inTransaction(.Sync) {
-                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: NSDate())
+            try annotationStore.inTransaction(notificationSource: .sync) {
+                try operation.applyServerChanges(self.payloadForBookmark(bookmark), onOrBefore: Date())
             }
         } catch {
             XCTFail("Unexpected error: \(error)")
@@ -103,9 +103,9 @@ class BookmarkTests: XCTestCase {
         XCTAssertEqual(actual, expected)
     }
 
-    func payloadForBookmark(bookmark: [String: AnyObject]) -> [String: AnyObject] {
-        let uniqueID = NSUUID().UUIDString
-        let annotation = [
+    func payloadForBookmark(_ bookmark: [String: Any]) -> [String: Any] {
+        let uniqueID = UUID().uuidString
+        let annotation: [String: Any] = [
             "changeType": "new",
             "timestamp" : "2016-08-04T11:21:38.849-06:00",
             "annotationId" : uniqueID,
@@ -120,8 +120,7 @@ class BookmarkTests: XCTestCase {
                 "bookmark": bookmark
             ]
         ]
-        let annotations = [annotation]
-        return ["syncAnnotations": ["count": annotations.count, "changes": annotations]]
+        return ["syncAnnotations": ["count": 1, "changes": [annotation]]]
     }
     
 }

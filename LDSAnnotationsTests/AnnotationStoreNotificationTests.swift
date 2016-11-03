@@ -30,20 +30,20 @@ class AnnotationStoreNotificationTests: XCTestCase {
     func testAddAndUpdateNotebook() {
         let annotationStore = AnnotationStore()!
         
-        let addExpectation = expectationWithDescription("Notebook added")
+        let addExpectation = expectation(description: "Notebook added")
         let addObserver = annotationStore.notebookObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
+            if source == .local && notebooks.count == 1 {
                 addExpectation.fulfill()
             } else {
                 XCTFail()
             }
         }
-        var notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .Local)
+        var notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .local)
         annotationStore.notebookObservers.remove(addObserver)
         
-        let updateExpectation = expectationWithDescription("Notebook updated")
+        let updateExpectation = expectation(description: "Notebook updated")
         let updateObserver = annotationStore.notebookObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
+            if source == .local && notebooks.count == 1 {
                 updateExpectation.fulfill()
             } else {
                 XCTFail()
@@ -53,101 +53,101 @@ class AnnotationStoreNotificationTests: XCTestCase {
         try! annotationStore.updateNotebook(notebook)
         annotationStore.notebookObservers.remove(updateObserver)
         
-        waitForExpectationsWithTimeout(2, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
     
     func testAddAndUpdateAnnotation() {
         let annotationStore = AnnotationStore()!
         
-        let addExpectation = expectationWithDescription("Annotation added")
+        let addExpectation = expectation(description: "Annotation added")
         let addObserver = annotationStore.annotationObservers.add { source, annotations in
-            if source == .Local && annotations.count == 1 {
+            if source == .local && annotations.count == 1 {
                 addExpectation.fulfill()
             } else {
                 XCTFail()
             }
         }
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         annotationStore.annotationObservers.remove(addObserver)
         
-        let updateExpectation = expectationWithDescription("Annotation updated")
+        let updateExpectation = expectation(description: "Annotation updated")
         let updateObserver = annotationStore.annotationObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
+            if source == .local && notebooks.count == 1 {
                 updateExpectation.fulfill()
             } else {
                 XCTFail()
             }
         }
-        try! annotationStore.updateAnnotation(annotation, source: .Local)
+        try! annotationStore.updateAnnotation(annotation, source: .local)
         annotationStore.annotationObservers.remove(updateObserver)
         
-        waitForExpectationsWithTimeout(2, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
     
     func testAddAndUpdateAnnotationInTransactions() {
         let annotationStore = AnnotationStore()!
         
-        let addExpectation = expectationWithDescription("Annotation added")
+        let addExpectation = expectation(description: "Annotation added")
         let addObserver = annotationStore.annotationObservers.add { source, annotations in
-            if source == .Local && annotations.count == 1 {
+            if source == .local && annotations.count == 1 {
                 addExpectation.fulfill()
             } else {
                 XCTFail()
             }
         }
-        try! annotationStore.inTransaction(.Local) {
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        try! annotationStore.inTransaction(notificationSource: .local) {
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         }
         annotationStore.annotationObservers.remove(addObserver)
         
-        let updateExpectation = expectationWithDescription("Annotation updated")
+        let updateExpectation = expectation(description: "Annotation updated")
         let updateObserver = annotationStore.annotationObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
+            if source == .local && notebooks.count == 1 {
                 updateExpectation.fulfill()
             } else {
                 XCTFail()
             }
         }
-        try! annotationStore.inTransaction(.Local) {
+        try! annotationStore.inTransaction(notificationSource: .local) {
             let annotation = annotationStore.annotationWithID(1)!
-            try! annotationStore.updateAnnotation(annotation, source: .Local)
+            try! annotationStore.updateAnnotation(annotation, source: .local)
         }
         annotationStore.annotationObservers.remove(updateObserver)
         
-        waitForExpectationsWithTimeout(2, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
     
     func testAddAndUpdateAnnotationInOneTransaction() {
         let annotationStore = AnnotationStore()!
         
-        let expectation = self.expectationWithDescription("Annotation added")
+        let expectation = self.expectation(description: "Annotation added")
         let observer = annotationStore.annotationObservers.add { source, annotations in
-            if source == .Local && annotations.count == 1 {
+            if source == .local && annotations.count == 1 {
                 expectation.fulfill()
             } else {
                 XCTFail()
             }
         }
         
-        try! annotationStore.inTransaction(.Local) {
-            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
-            try! annotationStore.updateAnnotation(annotation, source: .Local)
+        try! annotationStore.inTransaction(notificationSource: .local) {
+            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+            try! annotationStore.updateAnnotation(annotation, source: .local)
         }
         
         annotationStore.annotationObservers.remove(observer)
         
-        waitForExpectationsWithTimeout(2, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
     }
     
     func testAddAnnotationNotebookNotification() {
         let annotationStore = AnnotationStore()!
 
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
-        let notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .Local)
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        let notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .local)
 
-        let addExpectation = expectationWithDescription("Notebook added")
+        let addExpectation = expectation(description: "Notebook added")
         let addObserver = annotationStore.notebookObservers.add { source, notebooks in
-            if source == .Local && notebooks.count == 1 {
+            if source == .local && notebooks.count == 1 {
                 addExpectation.fulfill()
             } else {
                 XCTFail()
@@ -156,7 +156,7 @@ class AnnotationStoreNotificationTests: XCTestCase {
         
         try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: 1)
         
-        waitForExpectationsWithTimeout(2, handler: nil)
+        waitForExpectations(timeout: 2, handler: nil)
         
         annotationStore.notebookObservers.remove(addObserver)
     }

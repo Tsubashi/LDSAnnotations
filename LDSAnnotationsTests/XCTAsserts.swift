@@ -22,14 +22,14 @@
 
 import XCTest
 
-func XCTAssertThrows<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertThrows<T>(_ expression: @autoclosure () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
     do {
         try expression()
         XCTFail("No error to catch! - \(message)", file: file, line: line)
     } catch {}
 }
 
-func XCTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertNoThrow<T>(_ expression: @autoclosure () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
     do {
         try expression()
     } catch let error {
@@ -37,7 +37,7 @@ func XCTAssertNoThrow<T>(@autoclosure expression: () throws -> T, _ message: Str
     }
 }
 
-func XCTAssertNoThrowEqual<T : Equatable>(@autoclosure expression1: () throws -> T, @autoclosure _ expression2: () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
+func XCTAssertNoThrowEqual<T : Equatable>(_ expression1: @autoclosure () throws -> T, _ expression2: @autoclosure () throws -> T, _ message: String = "", file: StaticString = #file, line: UInt = #line) {
     do {
         let result1 = try expression1()
         let result2 = try expression2()

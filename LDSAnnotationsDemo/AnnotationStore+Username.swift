@@ -25,9 +25,9 @@ import LDSAnnotations
 
 extension AnnotationStore {
     
-    class func annotationStoreForUsername(username: String) -> AnnotationStore? {
+    class func annotationStoreForUsername(_ username: String) -> AnnotationStore? {
         let storeName = String(format: "%@.sqlite", username)
-        guard let url = NSFileManager.privateDocumentsURL.URLByAppendingPathComponent(storeName) else { return nil }
+        let url = FileManager.privateDocumentsURL.appendingPathComponent(storeName)
         
         return AnnotationStore(path: url.path)
     }

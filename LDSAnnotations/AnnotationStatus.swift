@@ -43,7 +43,7 @@ extension AnnotationStatus: Value {
         return String.declaredDatatype
     }
     
-    public static func fromDatatypeValue(stringValue: String) -> AnnotationStatus {
+    public static func fromDatatypeValue(_ stringValue: String) -> AnnotationStatus {
         return AnnotationStatus(rawValue: stringValue) ?? .Active
     }
     

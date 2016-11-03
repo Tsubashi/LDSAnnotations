@@ -35,14 +35,14 @@ public struct Notebook: Equatable {
     public internal(set) var status: AnnotationStatus
     
     /// When the notebook was last modified in local time.
-    public internal(set) var lastModified: NSDate
+    public internal(set) var lastModified: Date
     
     /// Unique Identifier for a notebook across devices
     public var uniqueID: String
     
     var description: String?
     
-    init(id: Int64, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: NSDate) {
+    init(id: Int64, uniqueID: String, name: String, description: String?, status: AnnotationStatus, lastModified: Date) {
         self.id = id
         self.uniqueID = uniqueID
         self.name = name
@@ -51,8 +51,8 @@ public struct Notebook: Equatable {
         self.lastModified = lastModified
     }
     
-    func jsonObject(annotationStore: AnnotationStore) -> [String: AnyObject] {
-        var result: [String: AnyObject] = [
+    func jsonObject(_ annotationStore: AnnotationStore) -> [String: Any] {
+        var result: [String: Any] = [
             "@guid": uniqueID,
             "label": name,
             "timestamp": lastModified.formattedISO8601,
@@ -73,7 +73,7 @@ public struct Notebook: Equatable {
         return result
     }
     
-    func annotationNotebookJsonObject() -> [String: AnyObject] {
+    func annotationNotebookJsonObject() -> [String: Any] {
         // The Annotation Service requires we send a URI with the @guid in it in the format below. The 'x' used to be the person-id value, but the service automatically populates that  now, so we just put a placeholder there instead.
         return ["@uri": String(format: "/study-tools/folders/x/%@", uniqueID)]
     }

@@ -32,7 +32,7 @@ class AnnotationTagTable {
     static let annotationID = Expression<Int64>("annotation_id")
     static let tagID = Expression<Int64>("tag_id")
     
-    static func fromRow(row: Row) -> AnnotationTag {
+    static func fromRow(_ row: Row) -> AnnotationTag {
         return AnnotationTag(annotationID: row[annotationID], tagID: row[tagID])
     }
     
@@ -43,13 +43,13 @@ class AnnotationTagTable {
 public extension AnnotationStore {
 
     /// Adds a new annotation tag with 'annotationID' and 'tagID'.
-    public func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64) throws -> AnnotationTag {
-        return try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID, source: .Local)
+    public func addOrUpdateAnnotationTag(annotationID: Int64, tagID: Int64) throws -> AnnotationTag {
+        return try addOrUpdateAnnotationTag(annotationID: annotationID, tagID: tagID, source: .local)
     }
     
     // Removes tag from annotation, then marks annotation as trashed if that was the only related annotation object
-    public func removeTag(tagID tagID: Int64, fromAnnotation annotationID: Int64) throws {
-        return try removeTag(tagID: tagID, fromAnnotation: annotationID, source: .Local)
+    public func removeTag(tagID: Int64, fromAnnotation annotationID: Int64) throws {
+        return try removeTag(tagID: tagID, fromAnnotation: annotationID, source: .local)
     }
     
 }
@@ -67,13 +67,13 @@ extension AnnotationStore {
         })
     }
     
-    func addOrUpdateAnnotationTag(annotationID annotationID: Int64, tagID: Int64, source: NotificationSource) throws -> AnnotationTag {
+    @discardableResult func addOrUpdateAnnotationTag(annotationID: Int64, tagID: Int64, source: NotificationSource) throws -> AnnotationTag {
         guard annotationID > 0 && tagID > 0 else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add an annotationID or tagID that is == 0")
+            throw AnnotationError.errorWithCode(.requiredFieldMissing, failureReason: "Cannot add an annotationID or tagID that is == 0")
         }
         
-        return try inTransaction(source) {
-            try self.db.run(AnnotationTagTable.table.insert(or: .Replace,
+        return try inTransaction(notificationSource: source) {
+            try self.db.run(AnnotationTagTable.table.insert(or: .replace,
                 AnnotationTagTable.annotationID <- annotationID,
                 AnnotationTagTable.tagID <- tagID
             ))
@@ -84,21 +84,21 @@ extension AnnotationStore {
         }
     }
     
-    func removeTag(tagID tagID: Int64, fromAnnotation annotationID: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func removeTag(tagID: Int64, fromAnnotation annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
             try self.trashAnnotationIfEmptyWithID(annotationID, source: source)
         }
     }
     
-    func deleteTag(tagID tagID: Int64, fromAnnotation annotationID: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteTag(tagID: Int64, fromAnnotation annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID && AnnotationTagTable.tagID == tagID).delete())
         }
     }
     
-    func removeFromTagsAnnotationWithID(annotationID: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func removeFromTagsAnnotationWithID(_ annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == annotationID).delete())
         }
     }

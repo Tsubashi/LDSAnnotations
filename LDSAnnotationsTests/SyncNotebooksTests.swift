@@ -29,12 +29,12 @@ class SyncNotebooksTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         let session = createSession()
         var token: SyncToken?
-        resetAnnotations(annotationStore: annotationStore, session: session, token: &token)
+        token = resetAnnotations(annotationStore: annotationStore, session: session, token: token)
         
         // Add a notebook
         let notebook = try! annotationStore.addNotebook(name: "Test Notebook")
         
-        sync(annotationStore, session: session, token: &token, description: "Sync new folder") { uploadCount, downloadCount in
+        token = sync(annotationStore, session: session, token: token, description: "Sync new folder") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 1)
             XCTAssertEqual(downloadCount, 0)
         }
@@ -44,7 +44,7 @@ class SyncNotebooksTests: XCTestCase {
         modifiedNotebook.name = "Renamed"
         try! annotationStore.updateNotebook(modifiedNotebook)
         
-        sync(annotationStore, session: session, token: &token, description: "Sync updated folder") { uploadCount, downloadCount in
+        token = sync(annotationStore, session: session, token: token, description: "Sync updated folder") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 1)
             XCTAssertEqual(downloadCount, 0)
         }
@@ -54,24 +54,24 @@ class SyncNotebooksTests: XCTestCase {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
         var token1: SyncToken?
-        resetAnnotations(annotationStore: annotationStore1, session: session1, token: &token1)
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
         
         let annotationStore2 = AnnotationStore()!
         let session2 = createSession()
         var token2: SyncToken?
-        resetAnnotations(annotationStore: annotationStore2, session: session2, token: &token2)
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add a notebook to one annotation store
         let notebook = try! annotationStore1.addNotebook(name: "Test Notebook")
         
         // Upload the changes
-        sync(annotationStore1, session: session1, token: &token1, description: "Sync new folder") { uploadCount, downloadCount in
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync new folder") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 1)
             XCTAssertEqual(downloadCount, 0)
         }
         
         // Download the changes to another annotation store
-        sync(annotationStore2, session: session2, token: &token2, description: "Sync updated folder") { uploadCount, downloadCount in
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Sync updated folder") { uploadCount, downloadCount in
             XCTAssertEqual(uploadCount, 0)
             XCTAssertEqual(downloadCount, 1)
         }

@@ -22,14 +22,14 @@
 
 import Foundation
 
-extension NSMutableURLRequest {
+extension URLRequest {
     
-    func setAnnotationServiceHeadersWithSession(session: Session, clientUsername: String, clientPassword: String) throws {
-        guard let authData = "\(clientUsername):\(clientPassword)".dataUsingEncoding(NSUTF8StringEncoding) else {
-            throw Error.errorWithCode(.Unknown, failureReason: "Failed to encode authorization header")
+    mutating func setAnnotationServiceHeadersWithSession(_ session: Session, clientUsername: String, clientPassword: String) throws {
+        guard let authData = "\(clientUsername):\(clientPassword)".data(using: String.Encoding.utf8) else {
+            throw AnnotationError.errorWithCode(.unknown, failureReason: "Failed to encode authorization header")
         }
         
-        setValue("Basic \(authData.base64EncodedStringWithOptions([]))", forHTTPHeaderField: "Authorization")
+        setValue("Basic \(authData.base64EncodedString(options: []))", forHTTPHeaderField: "Authorization")
         
         setValue(session.userAgent, forHTTPHeaderField: "User-Agent")
         setValue(session.clientVersion, forHTTPHeaderField: "client-app-version")
@@ -37,10 +37,10 @@ extension NSMutableURLRequest {
         setValue("application/json;charset=UTF-8", forHTTPHeaderField: "Content-Type")
     }
     
-    func setBodyWithJSONObject(jsonObject: AnyObject) throws {
-        let data = try NSJSONSerialization.dataWithJSONObject(jsonObject, options: [])
-        HTTPBody = data
-        setValue("\(data.length)", forHTTPHeaderField: "Content-Length")
+    mutating func setBodyWithJSONObject(_ jsonObject: AnyObject) throws {
+        let data = try JSONSerialization.data(withJSONObject: jsonObject, options: [])
+        httpBody = data
+        setValue("\(data.count)", forHTTPHeaderField: "Content-Length")
     }
     
 }

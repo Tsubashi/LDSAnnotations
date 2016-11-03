@@ -26,16 +26,16 @@ import Swiftification
 /// Token which is returned from a successful sync and should be used for the next sync.
 public struct SyncToken {
     
-    let localSyncNotebooksDate: NSDate
-    let serverSyncNotebooksDate: NSDate
-    let localSyncAnnotationsDate: NSDate
-    let serverSyncAnnotationsDate: NSDate
+    let localSyncNotebooksDate: Date
+    let serverSyncNotebooksDate: Date
+    let localSyncAnnotationsDate: Date
+    let serverSyncAnnotationsDate: Date
     
     /// Constructs a token from an encoded string.
     public init?(rawValue: String) {
-        let scanner = NSScanner(string: rawValue)
+        let scanner = Scanner(string: rawValue)
         
-        if !scanner.scanString("1:", intoString: nil) {
+        if !scanner.scanString("1:", into: nil) {
             return nil
         }
         
@@ -43,9 +43,9 @@ public struct SyncToken {
         if !scanner.scanDouble(&localSyncNotebooksTimeInterval) {
             return nil
         }
-        localSyncNotebooksDate = NSDate(timeIntervalSince1970: localSyncNotebooksTimeInterval)
+        localSyncNotebooksDate = Date(timeIntervalSince1970: localSyncNotebooksTimeInterval)
         
-        if !scanner.scanString(":", intoString: nil) {
+        if !scanner.scanString(":", into: nil) {
             return nil
         }
         
@@ -53,9 +53,9 @@ public struct SyncToken {
         if !scanner.scanDouble(&serverSyncNotebooksTimeInterval) {
             return nil
         }
-        serverSyncNotebooksDate = NSDate(timeIntervalSince1970: serverSyncNotebooksTimeInterval)
+        serverSyncNotebooksDate = Date(timeIntervalSince1970: serverSyncNotebooksTimeInterval)
         
-        if !scanner.scanString(":", intoString: nil) {
+        if !scanner.scanString(":", into: nil) {
             return nil
         }
         
@@ -63,9 +63,9 @@ public struct SyncToken {
         if !scanner.scanDouble(&localSyncAnnotationsTimeInterval) {
             return nil
         }
-        localSyncAnnotationsDate = NSDate(timeIntervalSince1970: localSyncAnnotationsTimeInterval)
+        localSyncAnnotationsDate = Date(timeIntervalSince1970: localSyncAnnotationsTimeInterval)
         
-        if !scanner.scanString(":", intoString: nil) {
+        if !scanner.scanString(":", into: nil) {
             return nil
         }
         
@@ -73,10 +73,10 @@ public struct SyncToken {
         if !scanner.scanDouble(&serverSyncAnnotationsTimeInterval) {
             return nil
         }
-        serverSyncAnnotationsDate = NSDate(timeIntervalSince1970: serverSyncAnnotationsTimeInterval)
+        serverSyncAnnotationsDate = Date(timeIntervalSince1970: serverSyncAnnotationsTimeInterval)
     }
     
-    init(localSyncNotebooksDate: NSDate, serverSyncNotebooksDate: NSDate, localSyncAnnotationsDate: NSDate, serverSyncAnnotationsDate: NSDate) {
+    init(localSyncNotebooksDate: Date, serverSyncNotebooksDate: Date, localSyncAnnotationsDate: Date, serverSyncAnnotationsDate: Date) {
         self.localSyncNotebooksDate = localSyncNotebooksDate
         self.serverSyncNotebooksDate = serverSyncNotebooksDate
         self.localSyncAnnotationsDate = localSyncAnnotationsDate
@@ -89,7 +89,7 @@ public struct SyncToken {
     }
     
     /// Last sync date
-    public var lastLocalSyncDate: NSDate {
+    public var lastLocalSyncDate: Date {
         return localSyncNotebooksDate > localSyncAnnotationsDate ? localSyncNotebooksDate : localSyncAnnotationsDate
     }
     

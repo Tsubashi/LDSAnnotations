@@ -37,7 +37,7 @@ class HighlightTable {
     static let style = Expression<HighlightStyle?>("style")
     static let annotationID = Expression<Int64>("annotation_id")
     
-    static func fromRow(row: Row) -> Highlight {
+    static func fromRow(_ row: Row) -> Highlight {
         return Highlight(id: row[id],
             paragraphRange: ParagraphRange(paragraphAID: row[paragraphAID], startWordOffset: row[offsetStart], endWordOffset: row[offsetEnd]),
             colorName: row[colorName],
@@ -52,17 +52,17 @@ class HighlightTable {
 extension AnnotationStore {
     
     /// Returns list of highlights, and creates related annotation
-    public func addHighlights(docID docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> [Highlight] {
-        return try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: .Local)
+    public func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> [Highlight] {
+        return try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: .local)
     }
     
     /// Update highlight
-    public func updateHighlight(highlight: Highlight) throws -> Highlight {
-        return try updateHighlight(highlight, source: .Local)
+    public func updateHighlight(_ highlight: Highlight) throws -> Highlight {
+        return try updateHighlight(highlight, source: .local)
     }
     
     /// Returns list of highlights with annotationID
-    public func highlightsWithAnnotationID(annotationID: Int64) -> [Highlight] {
+    public func highlightsWithAnnotationID(_ annotationID: Int64) -> [Highlight] {
         do {
             return try db.prepare(HighlightTable.table.filter(HighlightTable.annotationID == annotationID)).map { HighlightTable.fromRow($0) }
         } catch {
@@ -71,7 +71,7 @@ extension AnnotationStore {
     }
     
     /// Returns list of highlights with annotationIDs
-    public func highlightsWithAnnotationIDsIn(annotationIDs: [Int64]) -> [Highlight] {
+    public func highlightsWithAnnotationIDsIn(_ annotationIDs: [Int64]) -> [Highlight] {
         do {
             return try db.prepare(HighlightTable.table.filter(annotationIDs.contains(HighlightTable.annotationID))).map { HighlightTable.fromRow($0) }
         } catch {
@@ -80,8 +80,8 @@ extension AnnotationStore {
     }
 
     /// Trash highlight with ID
-    public func trashHighlightWithID(id: Int64) throws {
-        return try trashAnnotationWithID(id, source: .Local)
+    public func trashHighlightWithID(_ id: Int64) throws {
+        return try trashAnnotationWithID(id, source: .local)
     }
     
 }
@@ -102,8 +102,8 @@ extension AnnotationStore {
         })
     }
     
-    func addHighlights(docID docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String, source: NotificationSource) throws -> [Highlight] {
-        return try inTransaction(source) {
+    @discardableResult func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String, source: NotificationSource) throws -> [Highlight] {
+        return try inTransaction(notificationSource: source) {
             // First create an annotation for these highlights
             let annotation = try self.addAnnotation(docID: docID, docVersion: docVersion, appSource: appSource, device: device, source: source)
             
@@ -116,8 +116,8 @@ extension AnnotationStore {
         }
     }
     
-    func addHighlight(paragraphRange paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle, annotationID: Int64, source: NotificationSource) throws -> Highlight {
-        return try inTransaction(source) {
+    @discardableResult func addHighlight(paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle, annotationID: Int64, source: NotificationSource) throws -> Highlight {
+        return try inTransaction(notificationSource: source) {
             let id = try self.db.run(HighlightTable.table.insert(
                 HighlightTable.paragraphAID <- paragraphRange.paragraphAID,
                 HighlightTable.offsetStart <- paragraphRange.startWordOffset,
@@ -134,12 +134,12 @@ extension AnnotationStore {
         }
     }
     
-    func updateHighlight(highlight: Highlight, source: NotificationSource) throws -> Highlight {
+    @discardableResult func updateHighlight(_ highlight: Highlight, source: NotificationSource) throws -> Highlight {
         guard highlight.annotationID != 0 else {
-            throw Error.errorWithCode(.RequiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
+            throw AnnotationError.errorWithCode(.requiredFieldMissing, failureReason: "Cannot add a highlight without a paragraphAID and an annotation ID.")
         }
         
-        return try inTransaction(source) {
+        return try inTransaction(notificationSource: source) {
             try self.db.run(HighlightTable.table.filter(HighlightTable.id == highlight.id).update(
                 HighlightTable.paragraphAID <- highlight.paragraphRange.paragraphAID,
                 HighlightTable.offsetStart <- highlight.paragraphRange.startWordOffset,
@@ -156,7 +156,7 @@ extension AnnotationStore {
         }
     }
     
-    func highlightWithID(id: Int64) -> Highlight? {
+    func highlightWithID(_ id: Int64) -> Highlight? {
         do {
             return try db.prepare(HighlightTable.table.filter(HighlightTable.id == id)).map { HighlightTable.fromRow($0) }.first
         } catch {
@@ -164,22 +164,22 @@ extension AnnotationStore {
         }
     }
     
-    func deleteHighlightWithID(id: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteHighlightWithID(_ id: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(HighlightTable.table.filter(HighlightTable.id == id).delete())
         }
     }
     
-    func deleteHighlightsWithAnnotationID(annotationID: Int64, source: NotificationSource) throws {
-        try inTransaction(source) {
+    func deleteHighlightsWithAnnotationID(_ annotationID: Int64, source: NotificationSource) throws {
+        try inTransaction(notificationSource: source) {
             try self.db.run(HighlightTable.table.filter(HighlightTable.annotationID == annotationID).delete())
         }
     }
     
-    func trashHighlightWithID(id: Int64, source: NotificationSource) throws {
+    func trashHighlightWithID(_ id: Int64, source: NotificationSource) throws {
         let annotationID = highlightWithID(id)?.annotationID
         
-        try inTransaction(source) {
+        try inTransaction(notificationSource: source) {
             try self.deleteHighlightWithID(id, source: source)
             
             if let annotationID = annotationID {

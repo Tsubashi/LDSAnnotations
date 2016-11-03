@@ -30,14 +30,14 @@ class AnnotationStoreTests: XCTestCase {
     
     func testAddNote() {
         let annotationStore = AnnotationStore()!
-        let expected = try! annotationStore.addNote(title: nil, content: "", annotationID: 1, source: .Local)
+        let expected = try! annotationStore.addNote(title: nil, content: "", annotationID: 1, source: .local)
         let actual = annotationStore.noteWithID(1)
         XCTAssertEqual(actual, expected)
     }
     
     func testAddBookmark() {
         let annotationStore = AnnotationStore()!
-        try! annotationStore.addBookmark(name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0, source: .Local)
+        try! annotationStore.addBookmark(name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0, source: .local)
         let expected = Bookmark(id: 1, name: "Test", paragraphAID: nil, displayOrder: 5, annotationID: 1, offset: 0)
         let actual = annotationStore.bookmarkWithID(1)
         XCTAssertEqual(actual, expected)
@@ -45,7 +45,7 @@ class AnnotationStoreTests: XCTestCase {
     
     func testAddLink() {
         let annotationStore = AnnotationStore()!
-        try! annotationStore.addLink(name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1, source: .Local)
+        try! annotationStore.addLink(name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1, source: .local)
         let expected = Link(id: 1, name: "Link", docID: "DocID", docVersion: 1, paragraphAIDs: ["ParagraphID"], annotationID: 1)
         let actual = annotationStore.linkWithID(1)
         XCTAssertEqual(actual, expected)
@@ -56,97 +56,97 @@ class AnnotationStoreTests: XCTestCase {
         
         var tags = [Tag]()
         var annotations = [Annotation]()
-        var date = NSDate()
+        var date = Date()
         
         for i in 0..<alphabet.count {
             for j in i..<alphabet.count {
-                let tag = try! annotationStore.addTag(name: alphabet[i], source: .Local)
+                let tag = try! annotationStore.addTag(name: alphabet[i], source: .local)
                 tags.append(tag)
                 
-                let annotation = try! annotationStore.addAnnotation(uniqueID: "\(i)_\(j)", docID: alphabet[i], docVersion: 1, lastModified: date, appSource: "Test", device: "iphone", source: .Local)
+                let annotation = try! annotationStore.addAnnotation(uniqueID: "\(i)_\(j)", docID: alphabet[i], docVersion: 1, lastModified: date, appSource: "Test", device: "iphone", source: .local)
                 annotations.append(annotation)
                 
-                try! annotationStore.addOrUpdateAnnotationTag(annotationID: annotation.id, tagID: tag.id, source: .Local)
+                try! annotationStore.addOrUpdateAnnotationTag(annotationID: annotation.id, tagID: tag.id, source: .local)
             }
             
-            date = date.dateByAddingTimeInterval(1)
+            date = date.addingTimeInterval(1)
         }
         
-        let byName = annotationStore.tags(orderBy: .Name)
+        let byName = annotationStore.tags(orderBy: .name)
         XCTAssertEqual(byName.map { $0.name }, alphabet)
         
-        let byNameWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .Name)
+        let byNameWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .name)
         XCTAssertEqual(byNameWithIDs.map { $0.name }, ["e", "j", "o"])
 
-        let actualMostRecent = annotationStore.tags(orderBy: .MostRecent).map { $0.name }
-        XCTAssert(actualMostRecent == Array(alphabet.reverse()), "Most recent tags ordered incorrectly")
+        let actualMostRecent = annotationStore.tags(orderBy: .mostRecent).map { $0.name }
+        XCTAssert(actualMostRecent == Array(alphabet.reversed()), "Most recent tags ordered incorrectly")
 
-        let actualMostRecentWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .MostRecent).map { $0.name }
+        let actualMostRecentWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .mostRecent).map { $0.name }
         XCTAssert(actualMostRecentWithIDs == ["o", "j", "e"], "Most recent tags with ids ordered incorrectly")
 
-        let byNumberOfAnnotations = annotationStore.tags(orderBy: .NumberOfAnnotations).map { $0.name }
+        let byNumberOfAnnotations = annotationStore.tags(orderBy: .numberOfAnnotations).map { $0.name }
         XCTAssertEqual(byNumberOfAnnotations, alphabet, "Tags ordered by number of annotations is ordered incorrectly")
         
-        let byNumberOfAnnotationsWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .NumberOfAnnotations).map { $0.name }
+        let byNumberOfAnnotationsWithIDs = annotationStore.tags(ids: [5, 10, 15], orderBy: .numberOfAnnotations).map { $0.name }
         XCTAssertEqual(byNumberOfAnnotationsWithIDs, ["e", "j", "o"], "Tags ordered by number of annotations is ordered incorrectly")
     }
     
     func testNotebooksOrderBy() {
         let annotationStore = AnnotationStore()!
         
-        var date = NSDate()
+        var date = Date()
         var notebooks = [Notebook]()
         for i in 0..<alphabet.count {
-            notebooks.append(try! annotationStore.addNotebook(uniqueID: "\(i)", name: alphabet[i], description: nil, status: .Active, lastModified: date, source: .Local))
-            date = date.dateByAddingTimeInterval(1)
+            notebooks.append(try! annotationStore.addNotebook(uniqueID: "\(i)", name: alphabet[i], description: nil, status: .Active, lastModified: date, source: .local))
+            date = date.addingTimeInterval(1)
         }
         
         var annotations = [Annotation]()
         
         for i in 0..<alphabet.count {
-            annotations.append(try! annotationStore.addAnnotation(uniqueID: "\(i)", docID: alphabet[i], docVersion: 1, status: .Active, created: nil, lastModified: NSDate(), appSource: "Test", device: "iphone", source: .Local))
+            annotations.append(try! annotationStore.addAnnotation(uniqueID: "\(i)", docID: alphabet[i], docVersion: 1, status: .Active, created: nil, lastModified: Date(), appSource: "Test", device: "iphone", source: .local))
         }
         
         for i in 1...alphabet.count {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 5, displayOrder: i, source: .Local)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 5, displayOrder: i, source: .local)
         }
         
         for i in 1...Int(alphabet.count / 2) {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 10, displayOrder: i, source: .Local)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 10, displayOrder: i, source: .local)
         }
         
         for i in 1...Int(alphabet.count / 3) {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 15, displayOrder: i, source: .Local)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 15, displayOrder: i, source: .local)
         }
         
         for i in 1...Int(alphabet.count / 5) {
-            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 20, displayOrder: i, source: .Local)
+            try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: Int64(i), notebookID: 20, displayOrder: i, source: .local)
         }
         
-        let byName = annotationStore.notebooks(orderBy: .Name)
+        let byName = annotationStore.notebooks(orderBy: .name)
         XCTAssertEqual(byName.map { $0.name }, alphabet)
         
-        let byNameWithIDs = annotationStore.notebooks(ids: [5, 10, 15], orderBy: .Name)
+        let byNameWithIDs = annotationStore.notebooks(ids: [5, 10, 15], orderBy: .name)
         XCTAssertEqual(byNameWithIDs.map { $0.name }, ["e", "j", "o"])
         
-        let actualMostRecent = annotationStore.notebooks(orderBy: .MostRecent).map { $0.name }
+        let actualMostRecent = annotationStore.notebooks(orderBy: .mostRecent).map { $0.name }
         XCTAssertEqual(actualMostRecent, ["z", "y", "x", "w", "v", "u", "s", "r", "q", "p", "n", "m", "l", "k", "i", "h", "g", "f", "d", "c", "b", "t", "o", "j", "e", "a"], "Most recent notebooks ordered incorrectly")
         
-        let actualMostRecentWithIDs = annotationStore.notebooks(ids: [5, 10, 15], orderBy: .MostRecent).map { $0.name }
+        let actualMostRecentWithIDs = annotationStore.notebooks(ids: [5, 10, 15], orderBy: .mostRecent).map { $0.name }
         XCTAssert(actualMostRecentWithIDs == ["o", "j", "e"], "Most recent notebooks with ids ordered incorrectly")
         
-        let byNumberOfAnnotations = annotationStore.notebooks(orderBy: .NumberOfAnnotations).map { $0.name }
+        let byNumberOfAnnotations = annotationStore.notebooks(orderBy: .numberOfAnnotations).map { $0.name }
         let expected = ["e", "j", "o", "t", "a", "b", "c", "d", "f", "g", "h", "i", "k", "l", "m", "n", "p", "q", "r", "s", "u", "v", "w", "x", "y", "z"]
         XCTAssertEqual(byNumberOfAnnotations, expected, "Notebooks ordered by number of annotations is ordered incorrectly")
         
-        let byNumberOfAnnotationsWithIDs = annotationStore.notebooks(ids: [5, 10, 15], orderBy: .NumberOfAnnotations).map { $0.name }
+        let byNumberOfAnnotationsWithIDs = annotationStore.notebooks(ids: [5, 10, 15], orderBy: .numberOfAnnotations).map { $0.name }
         XCTAssertEqual(byNumberOfAnnotationsWithIDs, ["e", "j", "o"], "Notebooks ordered by number of annotations is ordered incorrectly")
     }
     
     func testAnnotationWithID() {
         let annotationStore = AnnotationStore()!
         
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         
         XCTAssertEqual(annotation.uniqueID, annotationStore.annotationWithID(annotation.id)!.uniqueID, "Annotations should be the same")
     }
@@ -154,7 +154,7 @@ class AnnotationStoreTests: XCTestCase {
     func testCreateAndTrashTags() {
         let annotationStore = AnnotationStore()!
 
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         
         let tags = ["sally", "sells", "seashells", "by", "the", "seashore"].map { try! annotationStore.addTag(name: $0) }
         
@@ -162,14 +162,14 @@ class AnnotationStoreTests: XCTestCase {
             try! annotationStore.addOrUpdateAnnotationTag(annotationID: annotation.id, tagID: tag.id)
         }
         
-        XCTAssertEqual(tags.sort({ $0.name < $1.name }).map({ $0.id }), annotationStore.tagsWithAnnotationID(annotation.id).map({ $0.id }), "Loaded tags should equal inserted tags")
+        XCTAssertEqual(tags.sorted(by: { $0.name < $1.name }).map({ $0.id }), annotationStore.tagsWithAnnotationID(annotation.id).map({ $0.id }), "Loaded tags should equal inserted tags")
         
         // Verify tags are trashed correctly
         for tag in tags {
             // Verify annotation hasn't been marked as trashed yet because its not empty
             XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Active)
             
-            try! annotationStore.trashTagWithID(tag.id, source: .Local)
+            try! annotationStore.trashTagWithID(tag.id, source: .local)
 
             // Verify tag has been deleted
             XCTAssertNil(annotationStore.tagWithName(tag.name))
@@ -185,13 +185,13 @@ class AnnotationStoreTests: XCTestCase {
     func testCreateAndTrashLinks() {
         let annotationStore = AnnotationStore()!
         
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         
         let links = [
-            try! annotationStore.addLink(name: "Link1", docID: "13859831", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id, source: .Local),
-            try! annotationStore.addLink(name: "Link2", docID: "20056230", docVersion: 1, paragraphAIDs: ["1", "2"], annotationID: annotation.id, source: .Local),
-            try! annotationStore.addLink(name: "Link3", docID: "20056129", docVersion: 1, paragraphAIDs: ["1", "2", "3"], annotationID: annotation.id, source: .Local),
-            try! annotationStore.addLink(name: "Link4", docID: "20056278", docVersion: 1, paragraphAIDs: ["1", "2", "3", "4"], annotationID: annotation.id, source: .Local)
+            try! annotationStore.addLink(name: "Link1", docID: "13859831", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id, source: .local),
+            try! annotationStore.addLink(name: "Link2", docID: "20056230", docVersion: 1, paragraphAIDs: ["1", "2"], annotationID: annotation.id, source: .local),
+            try! annotationStore.addLink(name: "Link3", docID: "20056129", docVersion: 1, paragraphAIDs: ["1", "2", "3"], annotationID: annotation.id, source: .local),
+            try! annotationStore.addLink(name: "Link4", docID: "20056278", docVersion: 1, paragraphAIDs: ["1", "2", "3", "4"], annotationID: annotation.id, source: .local)
         ]
 
         XCTAssertEqual(links.map({ $0.id }), annotationStore.linksWithAnnotationID(annotation.id).map({ $0.id }), "Loaded links should match what was inserted")
@@ -217,7 +217,7 @@ class AnnotationStoreTests: XCTestCase {
     func testCreateAndTrashBookmark() {
         let annotationStore = AnnotationStore()!
         
-        let bookmark = try! annotationStore.addBookmark(name: "Bookmark1", paragraphAID: nil, displayOrder: 1, docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let bookmark = try! annotationStore.addBookmark(name: "Bookmark1", paragraphAID: nil, displayOrder: 1, docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         
         let annotation = annotationStore.annotationWithID(bookmark.annotationID)!
         
@@ -228,7 +228,7 @@ class AnnotationStoreTests: XCTestCase {
         // Verify annotation hasn't been marked as trashed yet because its not empty
         XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Active)
         
-        try! annotationStore.trashBookmarkWithID(bookmark.id, source: .Local)
+        try! annotationStore.trashBookmarkWithID(bookmark.id, source: .local)
         
         // Verify tag has been deleted
         XCTAssertNil(annotationStore.bookmarkWithID(bookmark.id))
@@ -288,17 +288,17 @@ class AnnotationStoreTests: XCTestCase {
         
         ["sally", "sells", "seashells", "by", "the", "seashore"].forEach { try! annotationStore.addTag(name: $0) }
         
-        XCTAssertEqual(annotationStore.tagsContainingString("sea").map({ $0.name }), ["seashells", "seashore"].sort(), "Tags containing string missing tags")
+        XCTAssertEqual(annotationStore.tagsContainingString("sea").map({ $0.name }), ["seashells", "seashore"].sorted(), "Tags containing string missing tags")
     }
     
     func testInsertingDuplicateTags() {
         let annotationStore = AnnotationStore()!
         
-        let names = ["sally", "sells", "seashells", "by", "the", "seashore"].sort()
+        let names = ["sally", "sells", "seashells", "by", "the", "seashore"].sorted()
         for name in names {
             try! annotationStore.addTag(name: name)
-            try! annotationStore.addTag(name: name.capitalizedStringWithLocale(nil))
-            try! annotationStore.addTag(name: name.uppercaseString)
+            try! annotationStore.addTag(name: name.capitalized(with: nil))
+            try! annotationStore.addTag(name: name.uppercased())
             try! annotationStore.addTag(name: name)
         }
        
@@ -324,10 +324,10 @@ class AnnotationStoreTests: XCTestCase {
     func testAnnotationWithLinkID() {
         let annotationStore = AnnotationStore()!
         
-        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         let links = [
-            try! annotationStore.addLink(name: "Link1", docID: "13859831", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id, source: .Local),
-            try! annotationStore.addLink(name: "Link2", docID: "20056230", docVersion: 1, paragraphAIDs: ["1", "2"], annotationID: annotation.id, source: .Local),
+            try! annotationStore.addLink(name: "Link1", docID: "13859831", docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id, source: .local),
+            try! annotationStore.addLink(name: "Link2", docID: "20056230", docVersion: 1, paragraphAIDs: ["1", "2"], annotationID: annotation.id, source: .local),
         ]
         
         for link in links {
@@ -335,10 +335,10 @@ class AnnotationStoreTests: XCTestCase {
             XCTAssertEqual(annotation.id, annotationStore.annotationWithLinkID(link.id)!.id, "Annotation did not load correctly from database")
         }
         
-        let annotation2 = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        let annotation2 = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         let links2 = [
-            try! annotationStore.addLink(name: "Link3", docID: "20056129", docVersion: 1, paragraphAIDs: ["1", "2", "3"], annotationID: annotation2.id, source: .Local),
-            try! annotationStore.addLink(name: "Link4", docID: "20056278", docVersion: 1, paragraphAIDs: ["1", "2", "3", "4"], annotationID: annotation2.id, source: .Local)
+            try! annotationStore.addLink(name: "Link3", docID: "20056129", docVersion: 1, paragraphAIDs: ["1", "2", "3"], annotationID: annotation2.id, source: .local),
+            try! annotationStore.addLink(name: "Link4", docID: "20056278", docVersion: 1, paragraphAIDs: ["1", "2", "3", "4"], annotationID: annotation2.id, source: .local)
         ]
         
         for link in links2 {
@@ -353,9 +353,9 @@ class AnnotationStoreTests: XCTestCase {
         let docID = "12345"
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         ]
         
         XCTAssertEqual(Set(annotations.map({ $0.uniqueID })), Set(annotationStore.annotations(docID: docID).map({ $0.uniqueID })))
@@ -383,10 +383,10 @@ class AnnotationStoreTests: XCTestCase {
         let docID3 = "3"
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: docID1, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: docID2, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            try! annotationStore.addAnnotation(docID: docID1, docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: docID2, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         ]
-        try! annotationStore.addAnnotation(docID: docID3, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+        try! annotationStore.addAnnotation(docID: docID3, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         
         XCTAssertEqual(Set(annotations.map({ $0.id })), Set(annotationStore.annotationIDsWithDocIDsIn([docID1, docID2])))
     }
@@ -413,7 +413,7 @@ class AnnotationStoreTests: XCTestCase {
         var tagNameToAnnotationIDs = [String: [Int64]]()
         
         for letter in alphabet {
-            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            let annotation = try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
             annotationIDs.append(annotation.id)
             
             for annotationID in annotationIDs {
@@ -436,7 +436,7 @@ class AnnotationStoreTests: XCTestCase {
         
         var annotations = [Annotation]()
         for _ in 0..<20 {
-            annotations.append(try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local))
+            annotations.append(try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local))
         }
         
         for limit in [1, 5, 10, 15, 20] {
@@ -454,7 +454,7 @@ class AnnotationStoreTests: XCTestCase {
         
         var annotations = [Annotation]()
         for _ in 0..<20 {
-            annotations.append(try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local))
+            annotations.append(try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local))
         }
         
         let idsAndModified = annotationStore.annotationIDsWithLastModified()
@@ -486,14 +486,14 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
         ]
         
-        for (displayOrder, annotation) in annotations.enumerate() {
+        for (displayOrder, annotation) in annotations.enumerated() {
             try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
@@ -506,18 +506,18 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
         ]
         
-        for (displayOrder, annotation) in annotations.enumerate() {
+        for (displayOrder, annotation) in annotations.enumerated() {
             try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
-        let reversedAnnotationIDs = Array(annotations.map { $0.id }.reverse())
+        let reversedAnnotationIDs = Array(annotations.map { $0.id }.reversed())
         try! annotationStore.reorderAnnotationIDs(reversedAnnotationIDs, notebookID: notebook.id)
 
         XCTAssertEqual(reversedAnnotationIDs, annotationStore.annotationIDsForNotebookWithID(notebook.id))
@@ -529,21 +529,21 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
         ]
         
-        for (displayOrder, annotation) in annotations.enumerate() {
+        for (displayOrder, annotation) in annotations.enumerated() {
             try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
         let firstAnnotationID = annotations.first!.id
-        try! annotationStore.removeAnnotation(annotationID: firstAnnotationID, fromNotebook: notebook.id, source: .Local)
+        try! annotationStore.removeAnnotation(annotationID: firstAnnotationID, fromNotebook: notebook.id, source: .local)
         // Verify annotation has been marked as .Trashed now that its empty
         XCTAssertTrue(annotationStore.annotationWithID(firstAnnotationID)?.status == .Trashed)
 
         let secondAnnotationID = annotations.last!.id
-        try! annotationStore.removeAnnotation(annotationID: secondAnnotationID, fromNotebook: notebook.id, source: .Local)
+        try! annotationStore.removeAnnotation(annotationID: secondAnnotationID, fromNotebook: notebook.id, source: .local)
         // Verify annotation has been marked as .Trashed now that its empty
         XCTAssertTrue(annotationStore.annotationWithID(secondAnnotationID)?.status == .Trashed)
     }
@@ -554,8 +554,8 @@ class AnnotationStoreTests: XCTestCase {
         let tag = try! annotationStore.addTag(name: "TestTag")
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
         ]
         
         for annotation in annotations {
@@ -579,9 +579,9 @@ class AnnotationStoreTests: XCTestCase {
         let docID = "12345"
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         ]
         
         XCTAssertEqual(Set(annotations.map({ $0.uniqueID })), Set(annotationStore.annotations(docID: docID).map({ $0.uniqueID })))
@@ -603,12 +603,12 @@ class AnnotationStoreTests: XCTestCase {
         
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
-        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, source: .Local)
+        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, source: .local)
         
         XCTAssertNotEqual(notebook.lastModified, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.lastModified, "Notebook last modified date should have changed")
         XCTAssertEqual(notebook.status.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should not have changed")
 
-        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, status: .Trashed, source: .Local)
+        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, status: .Trashed, source: .local)
         XCTAssertNotEqual(notebook.lastModified, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.lastModified, "Notebook last modified date should have changed")
         XCTAssertEqual(AnnotationStatus.Trashed.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should have been changed to .Trashed")
     }
@@ -619,11 +619,11 @@ class AnnotationStoreTests: XCTestCase {
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
         ]
         
-        for (displayOrder, annotation) in annotations.enumerate() {
+        for (displayOrder, annotation) in annotations.enumerated() {
             try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id, displayOrder: displayOrder)
         }
         
@@ -644,8 +644,8 @@ class AnnotationStoreTests: XCTestCase {
     func testDeleteNotebookWithID() {
         let annotationStore = AnnotationStore()!
         
-        let notebook = try! annotationStore.addNotebook(name: "TestNotebook", source: .Local)
-        try! annotationStore.deleteNotebookWithID(notebook.id, source: .Local)
+        let notebook = try! annotationStore.addNotebook(name: "TestNotebook", source: .local)
+        try! annotationStore.deleteNotebookWithID(notebook.id, source: .local)
         
         XCTAssertNil(annotationStore.notebookWithUniqueID(notebook.uniqueID))
     }
@@ -653,8 +653,8 @@ class AnnotationStoreTests: XCTestCase {
     func testDeleteTagWithID() {
         let annotationStore = AnnotationStore()!
         
-        let tag = try! annotationStore.addTag(name: "TestTag", source: .Local)
-        try! annotationStore.deleteTagWithID(tag.id, source: .Local)
+        let tag = try! annotationStore.addTag(name: "TestTag", source: .local)
+        try! annotationStore.deleteTagWithID(tag.id, source: .local)
         
         XCTAssertNil(annotationStore.tagWithName(tag.name))
         XCTAssertNil(annotationStore.tagWithID(tag.id))
@@ -747,30 +747,30 @@ class AnnotationStoreTests: XCTestCase {
         let annotationStore = AnnotationStore()!
         
         // One second ago, just to be safe
-        let before = NSDate(timeIntervalSinceNow: -1)
+        let before = Date(timeIntervalSinceNow: -1)
         
         let annotations = [
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local),
-            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .Local)
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local),
+            try! annotationStore.addAnnotation(docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
         ]
         
         if var trashed = annotations.first {
             // Make sure it includes trashed annotations
             trashed.status = .Trashed
-            try! annotationStore.updateAnnotation(trashed, source: .Local)
+            try! annotationStore.updateAnnotation(trashed, source: .local)
         }
         
         XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(), annotations.count)
         XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(lastModifiedAfter: before), annotations.count)
-        XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(lastModifiedAfter: NSDate()), 0)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedAnnotations(lastModifiedAfter: Date()), 0)
     }
     
     func testNumberOfNotebooks() {
         let annotationStore = AnnotationStore()!
         
         // One second ago, just to be safe
-        let before = NSDate(timeIntervalSinceNow: -1)
+        let before = Date(timeIntervalSinceNow: -1)
         
         let notebooks = [
             try! annotationStore.addNotebook(name: "Notebook1"),
@@ -786,7 +786,7 @@ class AnnotationStoreTests: XCTestCase {
         
         XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(), notebooks.count)
         XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(lastModifiedAfter: before), notebooks.count)
-        XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(lastModifiedAfter: NSDate()), 0)
+        XCTAssertEqual(annotationStore.numberOfUnsyncedNotebooks(lastModifiedAfter: Date()), 0)
     }
     
     func testRemovingNoteFromAnnotationWithClearHighlights() {
@@ -818,7 +818,7 @@ class AnnotationStoreTests: XCTestCase {
 extension String {
     
     subscript (i: Int) -> Character {
-        return self[self.startIndex.advancedBy(i)]
+        return self[self.characters.index(self.startIndex, offsetBy: i)]
     }
     
     subscript (i: Int) -> String {
@@ -826,8 +826,8 @@ extension String {
     }
     
     subscript (r: Range<Int>) -> String {
-        let start = startIndex.advancedBy(r.startIndex)
-        let end = start.advancedBy(r.endIndex - r.startIndex)
+        let start = characters.index(startIndex, offsetBy: r.lowerBound)
+        let end = characters.index(startIndex, offsetBy: r.upperBound - r.lowerBound)
         return self[Range(start ..< end)]
     }
     

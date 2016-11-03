@@ -24,9 +24,9 @@ import Foundation
 
 struct SyncNotebooksResult {
 
-    let localSyncNotebooksDate: NSDate
-    let serverSyncNotebooksDate: NSDate
+    let localSyncNotebooksDate: Date
+    let serverSyncNotebooksDate: Date
     let changes: SyncNotebooksChanges
-    let deserializationErrors: [ErrorType]
+    let deserializationErrors: [Error]
 
 }

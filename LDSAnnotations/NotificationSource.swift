@@ -25,9 +25,9 @@ import Foundation
 public enum NotificationSource {
     
     /// The notification was caused by a sync.
-    case Sync
+    case sync
     
     /// The notification was caused by a local modification.
-    case Local
+    case local
     
 }

@@ -27,7 +27,7 @@ class SessionNotificationsTests: XCTestCase {
 
     func testInitialStatus() {
         let session = createSession()
-        XCTAssertEqual(session.status, Session.Status.None)
+        XCTAssertEqual(session.status, Session.Status.none)
     }
     
     func testSyncSuccessfulNotifications() {
@@ -40,17 +40,17 @@ class SessionNotificationsTests: XCTestCase {
             statuses.append(status)
         }
         
-        sync(annotationStore, session: session, token: &token, description: "Initial sync") { _, _ in
-            XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncSuccessful])
+        token = sync(annotationStore, session: session, token: token, description: "Initial sync") { _, _ in
+            XCTAssertEqual(statuses, [Session.Status.syncInProgress, Session.Status.syncSuccessful])
         }
         
         // Clear statuses
         statuses.removeAll()
         
         // Add a notebook
-        let notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .Local)
-        sync(annotationStore, session: session, token: &token, description: "Sync new folder") { uploadCount, downloadCount in
-            XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncSuccessful])
+        let notebook = try! annotationStore.addNotebook(name: "Test Notebook", source: .local)
+        token = sync(annotationStore, session: session, token: token, description: "Sync new folder") { uploadCount, downloadCount in
+            XCTAssertEqual(statuses, [Session.Status.syncInProgress, Session.Status.syncSuccessful])
         }
 
         // Clear statuses
@@ -59,10 +59,10 @@ class SessionNotificationsTests: XCTestCase {
         // Update the notebook
         var modifiedNotebook = notebook
         modifiedNotebook.name = "Renamed"
-        try! annotationStore.updateNotebook(modifiedNotebook, source: .Local)
+        try! annotationStore.updateNotebook(modifiedNotebook, source: .local)
         
-        sync(annotationStore, session: session, token: &token, description: "Sync updated folder") { uploadCount, downloadCount in
-            XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncSuccessful])
+        token = sync(annotationStore, session: session, token: token, description: "Sync updated folder") { uploadCount, downloadCount in
+            XCTAssertEqual(statuses, [Session.Status.syncInProgress, Session.Status.syncSuccessful])
         }
 
         session.statusObservers.remove(observer)
@@ -71,15 +71,14 @@ class SessionNotificationsTests: XCTestCase {
     func testSyncFailedNotifications() {
         let annotationStore = AnnotationStore()!
         let session = createSession(useIncorrectPassword: true)
-        var token: SyncToken?
         
         var statuses: [Session.Status] = []
         let observer = session.statusObservers.add { status in
             statuses.append(status)
         }
 
-        sync(annotationStore, session: session, token: &token, description: "Initial sync", allowSyncFailure: true) { _, _ in
-            XCTAssertEqual(statuses, [Session.Status.SyncInProgress, Session.Status.SyncFailed])
+        _ = sync(annotationStore, session: session, token: nil, description: "Initial sync", allowSyncFailure: true) { _, _ in
+            XCTAssertEqual(statuses, [Session.Status.syncInProgress, Session.Status.syncFailed])
         }
         
         session.statusObservers.remove(observer)
