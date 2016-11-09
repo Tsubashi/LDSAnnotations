@@ -424,8 +424,8 @@ class SyncAnnotationsTests: XCTestCase {
     }
 
     func verifyEqual(annotationStore1: AnnotationStore, annotationStore2: AnnotationStore) {
-        let annotations1 = annotationStore1.annotations().filter { $0.status == .Active }
-        let annotations2 = annotationStore2.annotations().filter { $0.status == .Active }
+        let annotations1 = annotationStore1.annotations().filter { $0.status == .active }
+        let annotations2 = annotationStore2.annotations().filter { $0.status == .active }
         XCTAssertEqual(annotations1.count, annotations2.count)
         
         let annotationHighlights1 = annotations1.map { (uniqueID: $0.uniqueID, highlights: annotationStore1.highlightsWithAnnotationID($0.id)) }
@@ -452,8 +452,8 @@ class SyncAnnotationsTests: XCTestCase {
         let annotationBookmarks2 = annotations2.map { (uniqueID: $0.uniqueID, bookmark: annotationStore2.bookmarkWithAnnotationID($0.id)) }
         XCTAssertEqual(annotationBookmarks1.count, annotationBookmarks2.count)
         
-        let notebooks1 = annotationStore1.notebooks().filter { $0.status == .Active }
-        let notebooks2 = annotationStore1.notebooks().filter { $0.status == .Active }
+        let notebooks1 = annotationStore1.notebooks().filter { $0.status == .active }
+        let notebooks2 = annotationStore1.notebooks().filter { $0.status == .active }
         XCTAssertEqual(notebooks1.count, notebooks2.count)
         
         let notebookAnnotations1 = notebooks1.map { (uniqueID: $0.uniqueID, annotations: annotationStore1.annotationsWithNotebookID($0.id)) }

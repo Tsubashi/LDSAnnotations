@@ -152,7 +152,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                 "timestamp": annotation.lastModified.formattedISO8601,
             ]
             
-            if annotation.status == .Active {
+            if annotation.status == .active {
                 result["annotation"] = annotation.jsonObject(annotationStore: annotationStore)
             }
             
@@ -303,11 +303,11 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                         }
                         
                         switch changeType {
-                        case .New:
+                        case .new:
                             let docID = rawAnnotation["@docId"] as? String
                             let docVersion = (rawAnnotation["@contentVersion"] as? String).flatMap { Int($0) }
                             let created = (rawAnnotation["created"] as? String).flatMap { Date.parseFormattedISO8601($0) }
-                            let status = (rawAnnotation["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
+                            let status = (rawAnnotation["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .active
                             let device = rawAnnotation["device"] as? String ?? "iphone"
                             
                             let databaseAnnotation: Annotation
@@ -485,7 +485,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                             }
                             
                             self.downloadAnnotationCount += 1
-                        case .Trash, .Delete:
+                        case .trash, .delete:
                             if let existingAnnotationID = annotationByUniqueID[uniqueID]?.id {
                                 // Don't store trashed or deleted annotations, just delete them from the db
                                 try self.annotationStore.deleteAnnotationWithID(existingAnnotationID, source: self.source)
@@ -505,7 +505,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
         
         
         // Cleanup any annotations with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
-        let annotationsToDelete = annotationStore.allAnnotations(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .Active }
+        let annotationsToDelete = annotationStore.allAnnotations(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .active }
         for annotation in annotationsToDelete {
             try annotationStore.deleteAnnotationWithID(annotation.id, source: self.source)
         }

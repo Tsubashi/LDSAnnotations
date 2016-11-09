@@ -38,13 +38,13 @@ class NotebooksViewController: UIViewController {
         automaticallyAdjustsScrollViewInsets = false
         
         switch status {
-        case .Active:
+        case .active:
             title = "Notebooks"
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(add))
-        case .Trashed:
+        case .trashed:
             title = "Trashed Notebooks"
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .plain, target: self, action: #selector(deleteAll))
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted notebooks are not supported")
         }
     }
@@ -103,11 +103,11 @@ class NotebooksViewController: UIViewController {
     
     func reloadData() {
         switch status {
-        case .Active:
+        case .active:
             notebooks = annotationStore.notebooks().sorted { $0.name < $1.name }
-        case .Trashed:
+        case .trashed:
             notebooks = annotationStore.trashedNotebooks().sorted { $0.name < $1.name }
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted notebooks are not supported")
         }
     }
@@ -213,11 +213,11 @@ extension NotebooksViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         switch status {
-        case .Active:
+        case .active:
             return "Trash"
-        case .Trashed:
+        case .trashed:
             return "Delete"
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted notebooks are not supported")
         }
     }
@@ -226,19 +226,19 @@ extension NotebooksViewController: UITableViewDataSource {
         if editingStyle == .delete {
             let notebook = notebooks[indexPath.row]
             switch notebook.status {
-            case .Active:
+            case .active:
                 do {
                     try annotationStore.trashNotebooks([notebook])
                 } catch {
                     NSLog("Failed to trash notebook: %@", "\(error)")
                 }
-            case .Trashed:
+            case .trashed:
                 do {
                     try annotationStore.deleteNotebooks([notebook])
                 } catch {
                     NSLog("Failed to trash notebook: %@", "\(error)")
                 }
-            case .Deleted:
+            case .deleted:
                 fatalError("Deleted notebooks are not supported")
             }
         }
@@ -254,7 +254,7 @@ extension NotebooksViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: false)
         
         switch status {
-        case .Active:
+        case .active:
             let notebook = notebooks[indexPath.row]
             
             let alertController = UIAlertController(title: "Rename Notebook", message: "Enter the new name for your notebook.", preferredStyle: .alert)
@@ -274,14 +274,14 @@ extension NotebooksViewController: UITableViewDelegate {
             alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             
             present(alertController, animated: true, completion: nil)
-        case .Trashed:
+        case .trashed:
             let notebook = notebooks[indexPath.row]
             do {
                 try annotationStore.restoreNotebooks([notebook])
             } catch {
                 NSLog("Failed to restore notebook: %@", "\(error)")
             }
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted notebooks are not supported")
         }
     }

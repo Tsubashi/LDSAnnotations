@@ -96,7 +96,7 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                 "timestamp": notebook.lastModified.formattedISO8601,
             ]
             
-            if notebook.status == .Active {
+            if notebook.status == .active {
                 result["folder"] = notebook.jsonObject(annotationStore)
             }
             
@@ -138,7 +138,7 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                         notebookAnnotationIDs[uniqueID] = annotationUniqueIDs ?? []
                         
                         switch changeType {
-                        case .New:
+                        case .new:
                             guard let rawLastModified = rawNotebook["timestamp"] as? String, let lastModified = Date.parseFormattedISO8601(rawLastModified) else {
                                 throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing last modified date")
                             }
@@ -147,7 +147,7 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                             }
                             
                             let description = rawNotebook["desc"] as? String
-                            let status = (rawNotebook["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .Active
+                            let status = (rawNotebook["@status"] as? String).flatMap { AnnotationStatus(rawValue: $0) } ?? .active
                             
                             let downloadedNotebook: Notebook
                             if var existingNotebook = self.annotationStore.notebookWithUniqueID(uniqueID) {
@@ -168,7 +168,7 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                                 let displayOrder = annotationUniqueIDs?.index(of: annotationUniqueID) ?? .max
                                 try self.annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: downloadedNotebook.id, displayOrder: displayOrder, source: self.source)
                             }
-                        case .Trash, .Delete:
+                        case .trash, .delete:
                             if let existingNotebookID = self.annotationStore.notebookWithUniqueID(uniqueID)?.id {
                                 // Don't store trashed or deleted notebooks, just delete them from the db
                                 try self.annotationStore.deleteNotebookWithID(existingNotebookID, source: self.source)
@@ -184,7 +184,7 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
         }
         
         // Cleanup any notebooks with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
-        let notebooksToDelete = annotationStore.allNotebooks(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .Active }
+        let notebooksToDelete = annotationStore.allNotebooks(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .active }
         for notebook in notebooksToDelete {
             try annotationStore.deleteNotebookWithID(notebook.id, source: source)
         }

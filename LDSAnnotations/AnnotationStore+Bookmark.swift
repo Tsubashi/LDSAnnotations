@@ -52,19 +52,19 @@ class BookmarkTable {
 public extension AnnotationStore {
 
     /// Returns a bookmark, and creates related annotation object
-    public func addBookmark(name: String?, paragraphAID: String?, displayOrder: Int, docID: String, docVersion: Int, appSource: String, device: String) throws -> Bookmark {
+    @discardableResult public func addBookmark(name: String?, paragraphAID: String?, displayOrder: Int, docID: String, docVersion: Int, appSource: String, device: String) throws -> Bookmark {
         return try addBookmark(name: name, paragraphAID: paragraphAID, displayOrder: displayOrder, docID: docID, docVersion: docVersion, appSource: appSource, device: device, source: .local)
     }
     
     /// Returns a bookmark after updating it
-    public func updateBookmark(_ bookmark: Bookmark, docID: String? = nil) throws -> Bookmark {
+    @discardableResult public func updateBookmark(_ bookmark: Bookmark, docID: String? = nil) throws -> Bookmark {
         return try updateBookmark(bookmark, docID: docID, source: .local)
     }
     
     /// Returns a bookmarks with docID, and/or paragraphAID
     public func bookmarks(docID: String? = nil, paragraphAID: String? = nil) -> [Bookmark] {
         do {
-            var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active).order(BookmarkTable.displayOrder ?? Int.max)
+            var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .active).order(BookmarkTable.displayOrder ?? Int.max)
             
             if let docID = docID {
                 query = query.filter(AnnotationTable.docID == docID)

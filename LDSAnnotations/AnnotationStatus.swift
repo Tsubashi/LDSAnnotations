@@ -27,13 +27,13 @@ import SQLite
 public enum AnnotationStatus: String {
     
     /// An active annotation.
-    case Active = ""
+    case active = ""
     
     /// A trashed annotation is not normally shown to the user, but can still be accessed. A trashed annotation can become active again.
-    case Trashed = "trashed"
+    case trashed = "trashed"
     
     /// A deleted annotation is considered annihilated.
-    case Deleted = "deleted"
+    case deleted = "deleted"
 
 }
 
@@ -44,7 +44,7 @@ extension AnnotationStatus: Value {
     }
     
     public static func fromDatatypeValue(_ stringValue: String) -> AnnotationStatus {
-        return AnnotationStatus(rawValue: stringValue) ?? .Active
+        return AnnotationStatus(rawValue: stringValue) ?? .active
     }
     
     public var datatypeValue: String {

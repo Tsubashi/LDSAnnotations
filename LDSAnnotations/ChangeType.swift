@@ -24,18 +24,18 @@ import Foundation
 
 enum ChangeType: String {
     
-    case New = "new"
-    case Trash = "trash"
-    case Delete = "delete"
+    case new = "new"
+    case trash = "trash"
+    case delete = "delete"
     
     init(status: AnnotationStatus) {
         switch status {
-        case .Active:
-            self = .New
-        case .Trashed:
-            self = .Trash
-        case .Deleted:
-            self = .Delete
+        case .active:
+            self = .new
+        case .trashed:
+            self = .trash
+        case .deleted:
+            self = .delete
         }
     }
     

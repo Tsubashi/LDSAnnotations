@@ -37,12 +37,12 @@ class AnnotationsViewController: UIViewController {
         automaticallyAdjustsScrollViewInsets = false
         
         switch status {
-        case .Active:
+        case .active:
             title = "Annotations"
-        case .Trashed:
+        case .trashed:
             title = "Trashed Annotations"
             navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Delete All", style: .plain, target: self, action: #selector(deleteAll))
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted annotations are not supported")
         }
     }
@@ -101,11 +101,11 @@ class AnnotationsViewController: UIViewController {
     
     func reloadData() {
         switch status {
-        case .Active:
+        case .active:
             annotations = annotationStore.annotations().sorted { $0.lastModified > $1.lastModified }
-        case .Trashed:
+        case .trashed:
             annotations = annotationStore.trashedAnnotations().sorted { $0.lastModified > $1.lastModified }
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted annotations are not supported")
         }
     }
@@ -186,11 +186,11 @@ extension AnnotationsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         switch status {
-        case .Active:
+        case .active:
             return "Trash"
-        case .Trashed:
+        case .trashed:
             return "Delete"
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted annotations are not supported")
         }
     }
@@ -199,19 +199,19 @@ extension AnnotationsViewController: UITableViewDataSource {
         if editingStyle == .delete {
             let annotation = annotations[indexPath.row]
             switch annotation.status {
-            case .Active:
+            case .active:
                 do {
                     try annotationStore.trashAnnotations([annotation])
                 } catch {
                     NSLog("Failed to trash annotation: %@", "\(error)")
                 }
-            case .Trashed:
+            case .trashed:
                 do {
                     try annotationStore.deleteAnnotations([annotation])
                 } catch {
                     NSLog("Failed to trash annotation: %@", "\(error)")
                 }
-            case .Deleted:
+            case .deleted:
                 fatalError("Deleted annotations are not supported")
             }
         }
@@ -222,10 +222,10 @@ extension AnnotationsViewController: UITableViewDataSource {
 extension AnnotationsViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch status {
-        case .Active:
+        case .active:
             let annotation = annotations[indexPath.row]
             navigationController?.pushViewController(AnnotationViewController(annotation: annotation, annotationStore: annotationStore), animated: true)
-        case .Trashed:
+        case .trashed:
             tableView.deselectRow(at: indexPath, animated: false)
             
             let annotation = annotations[indexPath.row]
@@ -234,7 +234,7 @@ extension AnnotationsViewController: UITableViewDelegate {
             } catch {
                 NSLog("Failed to restore annotation: %@", "\(error)")
             }
-        case .Deleted:
+        case .deleted:
             fatalError("Deleted annotations are not supported")
         }
     }

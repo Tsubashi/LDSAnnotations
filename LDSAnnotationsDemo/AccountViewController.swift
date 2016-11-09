@@ -223,19 +223,19 @@ extension AccountViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         switch sections[indexPath.section].rows[indexPath.row] {
         case .notebooks:
-            let viewController = NotebooksViewController(annotationStore: annotationStore, status: .Active)
+            let viewController = NotebooksViewController(annotationStore: annotationStore, status: .active)
             
             navigationController?.pushViewController(viewController, animated: true)
         case .annotations:
-            let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .Active)
+            let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .active)
             
             navigationController?.pushViewController(viewController, animated: true)
         case .trashedNotebooks:
-            let viewController = NotebooksViewController(annotationStore: annotationStore, status: .Trashed)
+            let viewController = NotebooksViewController(annotationStore: annotationStore, status: .trashed)
             
             navigationController?.pushViewController(viewController, animated: true)
         case .trashedAnnotations:
-            let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .Trashed)
+            let viewController = AnnotationsViewController(annotationStore: annotationStore, status: .trashed)
             
             navigationController?.pushViewController(viewController, animated: true)
         }

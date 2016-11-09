@@ -97,14 +97,14 @@ class AnnotationStoreTests: XCTestCase {
         var date = Date()
         var notebooks = [Notebook]()
         for i in 0..<alphabet.count {
-            notebooks.append(try! annotationStore.addNotebook(uniqueID: "\(i)", name: alphabet[i], description: nil, status: .Active, lastModified: date, source: .local))
+            notebooks.append(try! annotationStore.addNotebook(uniqueID: "\(i)", name: alphabet[i], description: nil, status: .active, lastModified: date, source: .local))
             date = date.addingTimeInterval(1)
         }
         
         var annotations = [Annotation]()
         
         for i in 0..<alphabet.count {
-            annotations.append(try! annotationStore.addAnnotation(uniqueID: "\(i)", docID: alphabet[i], docVersion: 1, status: .Active, created: nil, lastModified: Date(), appSource: "Test", device: "iphone", source: .local))
+            annotations.append(try! annotationStore.addAnnotation(uniqueID: "\(i)", docID: alphabet[i], docVersion: 1, status: .active, created: nil, lastModified: Date(), appSource: "Test", device: "iphone", source: .local))
         }
         
         for i in 1...alphabet.count {
@@ -167,7 +167,7 @@ class AnnotationStoreTests: XCTestCase {
         // Verify tags are trashed correctly
         for tag in tags {
             // Verify annotation hasn't been marked as trashed yet because its not empty
-            XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Active)
+            XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .active)
             
             try! annotationStore.trashTagWithID(tag.id, source: .local)
 
@@ -178,8 +178,8 @@ class AnnotationStoreTests: XCTestCase {
             XCTAssertTrue(annotationStore.annotationsWithTagID(tag.id).isEmpty)
         }
 
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .trashed)
     }
     
     func testCreateAndTrashLinks() {
@@ -199,7 +199,7 @@ class AnnotationStoreTests: XCTestCase {
         // Verify links are trashed correctly
         for link in links {
             // Verify annotation hasn't been marked as trashed yet because its not empty
-            XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Active)
+            XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .active)
             
             try! annotationStore.trashLinkWithID(link.id)
             
@@ -210,8 +210,8 @@ class AnnotationStoreTests: XCTestCase {
             XCTAssertNil(annotationStore.annotationWithLinkID(link.id))
         }
         
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .trashed)
     }
     
     func testCreateAndTrashBookmark() {
@@ -226,7 +226,7 @@ class AnnotationStoreTests: XCTestCase {
         // Verify bookmark is trashed correctly
         
         // Verify annotation hasn't been marked as trashed yet because its not empty
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Active)
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .active)
         
         try! annotationStore.trashBookmarkWithID(bookmark.id, source: .local)
         
@@ -236,8 +236,8 @@ class AnnotationStoreTests: XCTestCase {
         // Verify no annotations are associated with tag
         XCTAssertNil(annotationStore.annotationWithBookmarkID(bookmark.id))
         
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .trashed)
     }
     
     func testBookmarksWithDocID() {
@@ -268,7 +268,7 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(note, annotationStore.noteWithAnnotationID(note.annotationID)!, "Loaded note should match what was inserted")
         
         // Verify annotation hasn't been marked as trashed yet because its not empty
-        XCTAssertTrue(annotation.status == .Active)
+        XCTAssertTrue(annotation.status == .active)
         
         try! annotationStore.trashNoteWithID(note.id)
         
@@ -279,7 +279,7 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertNil(annotationStore.annotationWithNoteID(note.id))
         
         // Verify annotation still has highlights and is still active
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Active)
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .active)
         XCTAssertTrue(!annotationStore.highlightsWithAnnotationID(annotation.id).isEmpty)
     }
     
@@ -539,13 +539,13 @@ class AnnotationStoreTests: XCTestCase {
         
         let firstAnnotationID = annotations.first!.id
         try! annotationStore.removeAnnotation(annotationID: firstAnnotationID, fromNotebook: notebook.id, source: .local)
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(firstAnnotationID)?.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(firstAnnotationID)?.status == .trashed)
 
         let secondAnnotationID = annotations.last!.id
         try! annotationStore.removeAnnotation(annotationID: secondAnnotationID, fromNotebook: notebook.id, source: .local)
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(secondAnnotationID)?.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(secondAnnotationID)?.status == .trashed)
     }
 
     func testDeleteAnnotationTag() {
@@ -564,13 +564,13 @@ class AnnotationStoreTests: XCTestCase {
         
         let firstAnnotationID = annotations.first!.id
         try! annotationStore.removeTag(tagID: tag.id, fromAnnotation: firstAnnotationID)
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(firstAnnotationID)!.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(firstAnnotationID)!.status == .trashed)
         
         let secondAnnotationID = annotations.last!.id
         try! annotationStore.removeTag(tagID: tag.id, fromAnnotation: secondAnnotationID)
-        // Verify annotation has been marked as .Trashed now that its empty
-        XCTAssertTrue(annotationStore.annotationWithID(secondAnnotationID)!.status == .Trashed)
+        // Verify annotation has been marked as .trashed now that its empty
+        XCTAssertTrue(annotationStore.annotationWithID(secondAnnotationID)!.status == .trashed)
     }
     
     func testAddHighlights() {
@@ -608,9 +608,9 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertNotEqual(notebook.lastModified, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.lastModified, "Notebook last modified date should have changed")
         XCTAssertEqual(notebook.status.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should not have changed")
 
-        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, status: .Trashed, source: .local)
+        try! annotationStore.updateLastModifiedDate(notebookID: notebook.id, status: .trashed, source: .local)
         XCTAssertNotEqual(notebook.lastModified, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.lastModified, "Notebook last modified date should have changed")
-        XCTAssertEqual(AnnotationStatus.Trashed.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should have been changed to .Trashed")
+        XCTAssertEqual(AnnotationStatus.trashed.rawValue, annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status.rawValue, "Notebook status should have been changed to .trashed")
     }
     
     func testTrashEmptyNotebookWithID() {
@@ -628,7 +628,7 @@ class AnnotationStoreTests: XCTestCase {
         }
         
         try! annotationStore.trashNotebookWithID(notebook.id)
-        XCTAssertTrue(annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status == .Trashed)
+        XCTAssertTrue(annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status == .trashed)
         XCTAssertEqual(0, annotationStore.annotationsWithNotebookID(notebook.id).count)
     }
 
@@ -637,7 +637,7 @@ class AnnotationStoreTests: XCTestCase {
         
         let notebook = try! annotationStore.addNotebook(name: "TestNotebook")
         try! annotationStore.trashNotebookWithID(notebook.id)
-        XCTAssertTrue(annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status == .Trashed)
+        XCTAssertTrue(annotationStore.notebookWithUniqueID(notebook.uniqueID)!.status == .trashed)
     }
 
     
@@ -682,7 +682,7 @@ class AnnotationStoreTests: XCTestCase {
         
         try! annotationStore.trashAnnotationWithID(annotation.id)
      
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)!.status == .Trashed)
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)!.status == .trashed)
         XCTAssertNil(annotationStore.linkWithID(link.id))
         XCTAssertNil(annotationStore.noteWithID(note.id))
         XCTAssertTrue(annotationStore.highlightsWithAnnotationID(annotation.id).isEmpty)
@@ -693,7 +693,7 @@ class AnnotationStoreTests: XCTestCase {
         let bookmarkAnnotation = annotationStore.annotationWithID(bookmark.annotationID)!
      
         try! annotationStore.trashAnnotationWithID(bookmarkAnnotation.id)
-        XCTAssertTrue(annotationStore.annotationWithID(bookmarkAnnotation.id)!.status == .Trashed)
+        XCTAssertTrue(annotationStore.annotationWithID(bookmarkAnnotation.id)!.status == .trashed)
         XCTAssertNil(annotationStore.bookmarkWithID(bookmark.id))
     }
     
@@ -757,7 +757,7 @@ class AnnotationStoreTests: XCTestCase {
         
         if var trashed = annotations.first {
             // Make sure it includes trashed annotations
-            trashed.status = .Trashed
+            trashed.status = .trashed
             try! annotationStore.updateAnnotation(trashed, source: .local)
         }
         
@@ -780,7 +780,7 @@ class AnnotationStoreTests: XCTestCase {
         
         if var trashed = notebooks.first {
             // Make sure it includes trashed notebooks
-            trashed.status = .Trashed
+            trashed.status = .trashed
             try! annotationStore.updateNotebook(trashed)
         }
         
@@ -799,7 +799,7 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertEqual(note, annotationStore.noteWithAnnotationID(note.annotationID)!, "Loaded note should match what was inserted")
         
         // Verify annotation hasn't been marked as trashed yet because its not empty
-        XCTAssertTrue(annotation.status == .Active)
+        XCTAssertTrue(annotation.status == .active)
         
         try! annotationStore.trashNoteWithID(note.id)
         
@@ -810,7 +810,7 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertNil(annotationStore.annotationWithNoteID(note.id))
         
         // Verify annotation is trashed
-        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .Trashed)
+        XCTAssertTrue(annotationStore.annotationWithID(annotation.id)?.status == .trashed)
     }
     
 }

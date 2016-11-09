@@ -74,7 +74,7 @@ public struct Annotation: Equatable {
         if let docVersion = docVersion {
             result["@contentVersion"] = docVersion
         }
-        if status != .Active {
+        if status != .active {
             result["@status"] = status.rawValue
         }
         if let created = created {
@@ -92,11 +92,11 @@ public struct Annotation: Equatable {
         }
 
         // Derive the annotation type, this is a required field
-        var type: AnnotationType = .Journal
+        var type: AnnotationType = .journal
         
         if let bookmark = annotationStore.bookmarkWithAnnotationID(id) {
             // If the annotation has a bookmark, it should never have highlights, tags, links, etc
-            type = .Bookmark
+            type = .bookmark
             result["bookmark"] = bookmark.jsonObject()
         } else {
             let notebooks = annotationStore.notebooksWithAnnotationID(id)
@@ -107,7 +107,7 @@ public struct Annotation: Equatable {
             let highlights = annotationStore.highlightsWithAnnotationID(id)
             if !highlights.isEmpty {
                 result["highlights"] = ["highlight": highlights.map({ $0.jsonObject() })]
-                type = .Highlight
+                type = .highlight
             }
             
             let tags = annotationStore.tagsWithAnnotationID(id)
@@ -118,7 +118,7 @@ public struct Annotation: Equatable {
             let links = annotationStore.linksWithAnnotationID(id)
             if !links.isEmpty {
                 result["refs"] = ["ref": links.map({ $0.jsonObject() })]
-                type = .Link // If there are 1 or more links, it MUST be a .Link type
+                type = .link // If there are 1 or more links, it MUST be a .link type
             }
         }
         
@@ -150,10 +150,10 @@ public func == (lhs: Annotation, rhs: Annotation) -> Bool {
 
 private enum AnnotationType: String {
 
-    case Bookmark = "bookmark"
-    case Highlight = "highlight"
-    case Journal = "journal"
-    case Link = "reference"
+    case bookmark = "bookmark"
+    case highlight = "highlight"
+    case journal = "journal"
+    case link = "reference"
     
 }
 

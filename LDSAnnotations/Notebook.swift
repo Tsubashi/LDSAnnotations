@@ -61,7 +61,7 @@ public struct Notebook: Equatable {
         if let description = description {
             result["desc"] = description
         }
-        if status != .Active {
+        if status != .active {
             result["@status"] = status.rawValue
         }
         

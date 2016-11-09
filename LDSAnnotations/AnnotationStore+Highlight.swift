@@ -52,12 +52,12 @@ class HighlightTable {
 extension AnnotationStore {
     
     /// Returns list of highlights, and creates related annotation
-    public func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> [Highlight] {
+    @discardableResult public func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> [Highlight] {
         return try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: .local)
     }
     
     /// Update highlight
-    public func updateHighlight(_ highlight: Highlight) throws -> Highlight {
+    @discardableResult public func updateHighlight(_ highlight: Highlight) throws -> Highlight {
         return try updateHighlight(highlight, source: .local)
     }
     

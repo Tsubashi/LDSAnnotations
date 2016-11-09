@@ -64,18 +64,18 @@ public extension AnnotationStore {
     
     /// Returns the number of active annotations.
     public func annotationCount() -> Int {
-        return (try? db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Active).count)) ?? 0
+        return (try? db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .active).count)) ?? 0
     }
     
     /// Returns the number of trashed annotations.
     public func trashedAnnotationCount() -> Int {
-        return (try? db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .Trashed).count)) ?? 0
+        return (try? db.scalar(AnnotationTable.table.filter(AnnotationTable.status == .trashed).count)) ?? 0
     }
     
     /// Returns an unordered list of trashed annotations.
     public func trashedAnnotations() -> [Annotation] {
         do {
-            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .Trashed)).map { AnnotationTable.fromRow($0) }
+            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .trashed)).map { AnnotationTable.fromRow($0) }
         } catch {
             return []
         }
@@ -88,7 +88,7 @@ public extension AnnotationStore {
     
     /// Returns a list of active annotations ordered by last modified.
     public func annotations(docID: String? = nil, paragraphAIDs: [String]? = nil) -> [Annotation] {
-        var query = AnnotationTable.table.select(distinct: AnnotationTable.table[*]).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified.desc)
+        var query = AnnotationTable.table.select(distinct: AnnotationTable.table[*]).filter(AnnotationTable.status == .active).order(AnnotationTable.lastModified.desc)
         
         if let docID = docID {
             query = query.filter(AnnotationTable.docID == docID)
@@ -108,7 +108,7 @@ public extension AnnotationStore {
     /// Returns all annotation IDs associated with the given docIDs
     public func annotationIDsWithDocIDsIn(_ docIDs: [String]) -> [Int64] {
         do {
-            return try db.prepare(AnnotationTable.table.select(AnnotationTable.id).filter(docIDs.contains(AnnotationTable.docID)).filter(AnnotationTable.status == .Active)).map { $0[AnnotationTable.id] }
+            return try db.prepare(AnnotationTable.table.select(AnnotationTable.id).filter(docIDs.contains(AnnotationTable.docID)).filter(AnnotationTable.status == .active)).map { $0[AnnotationTable.id] }
         } catch {
             return []
         }
@@ -117,7 +117,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotation IDs associated with notebookID, ordered by display order
     public func annotationIDsForNotebookWithID(_ notebookID: Int64) -> [Int64] {
         do {
-            return try db.prepare(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID && AnnotationTable.status == .Active).join(AnnotationTable.table, on: AnnotationTable.id == AnnotationNotebookTable.annotationID).order(AnnotationNotebookTable.displayOrder)).map { $0[AnnotationNotebookTable.annotationID] }
+            return try db.prepare(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID && AnnotationTable.status == .active).join(AnnotationTable.table, on: AnnotationTable.id == AnnotationNotebookTable.annotationID).order(AnnotationNotebookTable.displayOrder)).map { $0[AnnotationNotebookTable.annotationID] }
         } catch {
             return []
         }
@@ -126,7 +126,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotation IDs associated with tagID, ordered by last modified descending
     public func annotationIDsForTagWithID(_ tagID: Int64) -> [Int64] {
         do {
-            return try db.prepare(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID && AnnotationTable.status == .Active).join(AnnotationTable.table, on: AnnotationTagTable.annotationID == AnnotationTable.id).order(AnnotationTable.lastModified.desc)).map { $0[AnnotationTagTable.annotationID] }
+            return try db.prepare(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID && AnnotationTable.status == .active).join(AnnotationTable.table, on: AnnotationTagTable.annotationID == AnnotationTable.id).order(AnnotationTable.lastModified.desc)).map { $0[AnnotationTagTable.annotationID] }
         } catch {
             return []
         }
@@ -135,7 +135,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotation IDs for active annotations associated with tagID, ordered by last modified descending
     public func annotationIDs(limit: Int? = nil) -> [Int64] {
         do {
-            var query = AnnotationTable.table.select(AnnotationTable.id).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
+            var query = AnnotationTable.table.select(AnnotationTable.id).filter(AnnotationTable.status == .active).order(AnnotationTable.lastModified)
             if let limit = limit {
                 query = query.limit(limit)
             }
@@ -148,7 +148,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotation IDs for active annotations associated with tagID, ordered by last modified descending
     public func annotationIDsWithLastModified() -> [(Int64, Date)] {
         do {
-            let query = AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.lastModified).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)
+            let query = AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.lastModified).filter(AnnotationTable.status == .active).order(AnnotationTable.lastModified)
             return try db.prepare(query).map { ($0[AnnotationTable.id], $0[AnnotationTable.lastModified]) }
         } catch {
             return []
@@ -158,7 +158,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotations that are linked to the docID
     public func annotationsLinkedToDocID(_ docID: String) -> [Annotation] {
         do {
-            return try db.prepare(AnnotationTable.table.select(AnnotationTable.table[*]).join(LinkTable.table.filter(LinkTable.table[LinkTable.docID] == docID), on: LinkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .Active).order(AnnotationTable.lastModified)).map { AnnotationTable.fromRow($0) }
+            return try db.prepare(AnnotationTable.table.select(AnnotationTable.table[*]).join(LinkTable.table.filter(LinkTable.table[LinkTable.docID] == docID), on: LinkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .active).order(AnnotationTable.lastModified)).map { AnnotationTable.fromRow($0) }
         } catch {
             return []
         }
@@ -167,7 +167,7 @@ public extension AnnotationStore {
     /// Returns a list of active annotations in notebookID, ordered by display order
     public func annotationsWithNotebookID(_ id: Int64) -> [Annotation] {
         do {
-            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .Active).join(AnnotationNotebookTable.table, on: AnnotationTable.id == AnnotationNotebookTable.annotationID).filter(AnnotationNotebookTable.notebookID == id).order(AnnotationNotebookTable.displayOrder.asc)).map { AnnotationTable.fromRow($0) }
+            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .active).join(AnnotationNotebookTable.table, on: AnnotationTable.id == AnnotationNotebookTable.annotationID).filter(AnnotationNotebookTable.notebookID == id).order(AnnotationNotebookTable.displayOrder.asc)).map { AnnotationTable.fromRow($0) }
         } catch {
             return []
         }
@@ -175,7 +175,7 @@ public extension AnnotationStore {
     
     /// Returns a the number of active annotations in notebook with ID
     public func numberOfAnnotations(notebookID: Int64? = nil) -> Int {
-        var query = AnnotationTable.table.filter(AnnotationTable.status == .Active)
+        var query = AnnotationTable.table.filter(AnnotationTable.status == .active)
         if let notebookID = notebookID {
             query = query.join(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == notebookID), on: AnnotationTable.id == AnnotationNotebookTable.annotationID)
         }
@@ -229,7 +229,7 @@ public extension AnnotationStore {
     
     /// Returns a the number of active annotations with tag ID
     public func numberOfAnnotationsWithTagID(_ tagID: Int64) -> Int {
-        return (try? db.scalar(AnnotationTable.table.select(AnnotationTable.table[*]).filter(AnnotationTable.status == .Active).join(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID), on: AnnotationTable.id == AnnotationTagTable.annotationID).count)) ?? 0
+        return (try? db.scalar(AnnotationTable.table.select(AnnotationTable.table[*]).filter(AnnotationTable.status == .active).join(AnnotationTagTable.table.filter(AnnotationTagTable.tagID == tagID), on: AnnotationTable.id == AnnotationTagTable.annotationID).count)) ?? 0
     }
     
     /// Creates a duplicate annotation, and duplicates all related annotation objects except for notebooks
@@ -337,7 +337,7 @@ extension AnnotationStore {
     }
 
     /// Adds a new annotation.
-    func addAnnotation(uniqueID: String? = nil, docID: String?, docVersion: Int?, status: AnnotationStatus = .Active, created: Date? = nil, lastModified: Date? = nil, appSource: String, device: String, source: NotificationSource) throws -> Annotation {
+    func addAnnotation(uniqueID: String? = nil, docID: String?, docVersion: Int?, status: AnnotationStatus = .active, created: Date? = nil, lastModified: Date? = nil, appSource: String, device: String, source: NotificationSource) throws -> Annotation {
         let uniqueID = uniqueID ?? UUID().uuidString
         let created = created ?? Date()
         let lastModified = lastModified ?? created
@@ -359,7 +359,7 @@ extension AnnotationStore {
                 try self.notifyModifiedAnnotationsWithIDs([id], source: source)
             }
             
-            return Annotation(id: id, uniqueID: uniqueID, docID: docID, docVersion: docVersion, status: .Active, created: created, lastModified: lastModified, appSource: appSource, device: device)
+            return Annotation(id: id, uniqueID: uniqueID, docID: docID, docVersion: docVersion, status: .active, created: created, lastModified: lastModified, appSource: appSource, device: device)
         }
     }
     
@@ -416,12 +416,12 @@ extension AnnotationStore {
             
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
-                if annotation.status == .Deleted {
+                if annotation.status == .deleted {
                     throw AnnotationError.errorWithCode(.unknown, failureReason: "Attempted to trash a annotation that is not active and not trashed (i.e. deleted).")
                 }
                 
                 try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
-                    AnnotationTable.status <- .Trashed,
+                    AnnotationTable.status <- .trashed,
                     AnnotationTable.lastModified <- lastModified
                 ))
                 
@@ -434,7 +434,7 @@ extension AnnotationStore {
     
     func deletedAnnotations(lastModifiedOnOrBefore: Date) -> [Annotation] {
         do {
-            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .Deleted && AnnotationTable.lastModified <= lastModifiedOnOrBefore)).map { AnnotationTable.fromRow($0) }
+            return try db.prepare(AnnotationTable.table.filter(AnnotationTable.status == .deleted && AnnotationTable.lastModified <= lastModifiedOnOrBefore)).map { AnnotationTable.fromRow($0) }
         } catch {
             return []
         }
@@ -448,7 +448,7 @@ extension AnnotationStore {
             try self.deleteBookmarksWithAnnotationID(id, source: source)
             try self.removeFromNotebooksAnnotationWithID(id, source: source)
             try self.removeFromTagsAnnotationWithID(id, source: source)
-            try self.updateLastModifiedDate(annotationID: id, status: .Trashed, source: source)
+            try self.updateLastModifiedDate(annotationID: id, status: .trashed, source: source)
         }
     }
     
@@ -462,7 +462,7 @@ extension AnnotationStore {
                 try self.db.scalar(NoteTable.table.filter(NoteTable.annotationID == id).count)
             ].any { $0 > 0 }
             
-            try self.updateLastModifiedDate(annotationID: id, status: notEmpty ? nil : .Trashed, source: source)
+            try self.updateLastModifiedDate(annotationID: id, status: notEmpty ? nil : .trashed, source: source)
         }
     }
     
@@ -486,12 +486,12 @@ extension AnnotationStore {
             
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
-                if annotation.status == .Active {
+                if annotation.status == .active {
                     throw AnnotationError.errorWithCode(.unknown, failureReason: "Attempted to delete a annotation that is not trashed and not deleted.")
                 }
                 
                 try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
-                    AnnotationTable.status <- .Deleted,
+                    AnnotationTable.status <- .deleted,
                     AnnotationTable.lastModified <- lastModified
                 ))
                 
@@ -511,7 +511,7 @@ extension AnnotationStore {
             // Fetch the current status of the annotations
             for annotation in self.allAnnotations(ids: annotations.flatMap { $0.id }) {
                 try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
-                    AnnotationTable.status <- .Active,
+                    AnnotationTable.status <- .active,
                     AnnotationTable.lastModified <- lastModified
                 ))
                 

@@ -48,12 +48,12 @@ public extension AnnotationStore {
 
     /// Returns the number of active notebooks.
     public func notebookCount() -> Int {
-        return (try? db.scalar(NotebookTable.table.filter(NotebookTable.status == .Active).count)) ?? 0
+        return (try? db.scalar(NotebookTable.table.filter(NotebookTable.status == .active).count)) ?? 0
     }
 
     /// Adds a new notebook with `name`.
     @discardableResult public func addNotebook(name: String, description: String? = nil) throws -> Notebook {
-        return try addNotebook(uniqueID: nil, name: name, description: description, status: .Active, lastModified: nil, source: .local)
+        return try addNotebook(uniqueID: nil, name: name, description: description, status: .active, lastModified: nil, source: .local)
     }
     
     public func trashNotebookWithID(_ id: Int64) throws {
@@ -62,7 +62,7 @@ public extension AnnotationStore {
 
     /// Returns the number of trashed notebooks.
     public func trashedNotebookCount() -> Int {
-        return (try? db.scalar(NotebookTable.table.filter(NotebookTable.status == .Trashed).count)) ?? 0
+        return (try? db.scalar(NotebookTable.table.filter(NotebookTable.status == .trashed).count)) ?? 0
     }
 
     /// Saves any changes to `notebook` and updates the `lastModified`.
@@ -74,7 +74,7 @@ public extension AnnotationStore {
     public func notebooks(ids: [Int64]? = nil, orderBy: OrderBy = .name) -> [Notebook] {
         guard orderBy != .numberOfAnnotations else { return notebooksOrderedByCount(ids: ids) }
         
-        var query = NotebookTable.table.filter(NotebookTable.status == .Active)
+        var query = NotebookTable.table.filter(NotebookTable.status == .active)
         if let ids = ids {
             query = query.filter(ids.contains(NotebookTable.id))
         }
@@ -173,7 +173,7 @@ public extension AnnotationStore {
     /// Returns an unordered list of trashed notebooks.
     public func trashedNotebooks() -> [Notebook] {
         do {
-            return try db.prepare(NotebookTable.table.filter(NotebookTable.status == .Trashed)).map { NotebookTable.fromRow($0) }
+            return try db.prepare(NotebookTable.table.filter(NotebookTable.status == .trashed)).map { NotebookTable.fromRow($0) }
         } catch {
             return []
         }
@@ -211,7 +211,7 @@ extension AnnotationStore {
         })
     }
     
-    @discardableResult func addNotebook(uniqueID: String? = nil, name: String, description: String? = nil, status: AnnotationStatus = .Active, lastModified: Date? = nil, source: NotificationSource) throws -> Notebook {
+    @discardableResult func addNotebook(uniqueID: String? = nil, name: String, description: String? = nil, status: AnnotationStatus = .active, lastModified: Date? = nil, source: NotificationSource) throws -> Notebook {
         guard !name.isEmpty else {
             throw AnnotationError.errorWithCode(.requiredFieldMissing, failureReason: "Cannot add a notebook without a name.")
         }
@@ -259,7 +259,7 @@ extension AnnotationStore {
     
     func deletedNotebooks(lastModifiedOnOrBefore: Date) -> [Notebook] {
         do {
-            return try db.prepare(NotebookTable.table.filter(NotebookTable.lastModified <= lastModifiedOnOrBefore && NotebookTable.status == .Deleted)).map { NotebookTable.fromRow($0) }
+            return try db.prepare(NotebookTable.table.filter(NotebookTable.lastModified <= lastModifiedOnOrBefore && NotebookTable.status == .deleted)).map { NotebookTable.fromRow($0) }
         } catch {
             return []
         }
@@ -279,7 +279,7 @@ extension AnnotationStore {
             return try db.prepare(statement).flatMap { bindings in
                 guard let id = bindings[0] as? Int64, let uniqueID = bindings[1] as? String, let name = bindings[2] as? String, let lastModifiedString = bindings[5] as? String, let lastModifiedDate = dateFormatter.date(from: lastModifiedString) else { return nil }
                 
-                return Notebook(id: id, uniqueID: uniqueID, name: name, description: bindings[3] as? String, status: .Active, lastModified: lastModifiedDate)
+                return Notebook(id: id, uniqueID: uniqueID, name: name, description: bindings[3] as? String, status: .active, lastModified: lastModifiedDate)
             }
         } catch {
             return []
@@ -314,7 +314,7 @@ extension AnnotationStore {
             try self.db.run(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.notebookID == id).delete())
             
             // Update lastmodified date and mark as trashed
-            try self.updateLastModifiedDate(notebookID: id, status: .Trashed, source: source)
+            try self.updateLastModifiedDate(notebookID: id, status: .trashed, source: source)
             
             // Mark any annotations associated with this notebook as changed (for sync)
             try annotationIDs.forEach { try self.updateLastModifiedDate(annotationID: $0, source: source) }
@@ -338,12 +338,12 @@ extension AnnotationStore {
             
             // Fetch the current status of the notebooks
             for notebook in self.allNotebooks(ids: notebooks.flatMap { $0.id }) {
-                if notebook.status != .Active && notebook.status != .Trashed {
+                if notebook.status != .active && notebook.status != .trashed {
                     throw AnnotationError.errorWithCode(.unknown, failureReason: "Attempted to trash a notebook that is not active or trashed.")
                 }
                 
                 try self.db.run(NotebookTable.table.filter(NotebookTable.id == notebook.id).update(
-                    NotebookTable.status <- .Trashed,
+                    NotebookTable.status <- .trashed,
                     NotebookTable.lastModified <- lastModified
                 ))
                 
@@ -363,12 +363,12 @@ extension AnnotationStore {
             
             // Fetch the current status of the notebooks
             for notebook in self.allNotebooks(ids: notebooks.flatMap { $0.id }) {
-                if notebook.status != .Trashed && notebook.status != .Deleted {
+                if notebook.status != .trashed && notebook.status != .deleted {
                     throw AnnotationError.errorWithCode(.unknown, failureReason: "Attempted to delete a notebook that is not trashed or deleted.")
                 }
                 
                 try self.db.run(NotebookTable.table.filter(NotebookTable.id == notebook.id).update(
-                    NotebookTable.status <- .Deleted,
+                    NotebookTable.status <- .deleted,
                     NotebookTable.lastModified <- lastModified
                 ))
                 
@@ -389,7 +389,7 @@ extension AnnotationStore {
             // Fetch the current status of the notebooks
             for notebook in self.allNotebooks(ids: notebooks.flatMap { $0.id }) {
                 try self.db.run(NotebookTable.table.filter(NotebookTable.id == notebook.id).update(
-                    NotebookTable.status <- .Active,
+                    NotebookTable.status <- .active,
                     NotebookTable.lastModified <- lastModified
                 ))
                 
