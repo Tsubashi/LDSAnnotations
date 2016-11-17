@@ -12,7 +12,6 @@
 		117898B11D8342EA00FC2777 /* SyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 117898B01D8342EA00FC2777 /* SyncOperation.swift */; };
 		62D7BDEA8988C62655386B21 /* Pods_LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */; };
 		C0F4661ACDB75A9524871D89 /* Pods_LDSAnnotations_LDSAnnotationsTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1EA770A28615F5691ADAD66C /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */; };
-		D403E25E1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */; };
 		D40ADDD01D0F0BEE004FA7F5 /* OrderBy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */; };
 		D40F0A221C975368002D61EA /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A211C975368002D61EA /* Annotation.swift */; };
 		D40F0A261C976507002D61EA /* Highlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A251C976507002D61EA /* Highlight.swift */; };
@@ -27,7 +26,6 @@
 		D48FD6A31C9B0C640089EA68 /* AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */; };
 		D48FD6A51C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */; };
 		D49E240A1D0072D100052511 /* AccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E24091D0072D100052511 /* AccountController.swift */; };
-		D49E240D1D0072ED00052511 /* SessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49E240C1D0072ED00052511 /* SessionController.swift */; };
 		D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */; };
 		D4A90CE21C986FB40010F8F2 /* SyncAnnotationsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */; };
 		D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */; };
@@ -93,7 +91,6 @@
 		65F994EE353FC548E0829F5A /* Pods_LDSAnnotations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LDSAnnotations.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		665C48DC0014C1BF3A79EFD5 /* Pods-LDSAnnotations.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations.release.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.release.xcconfig"; sourceTree = "<group>"; };
 		BFBB32924C908E5E60760FC4 /* Pods-LDSAnnotations.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LDSAnnotations.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.debug.xcconfig"; sourceTree = "<group>"; };
-		D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionControllerNotificationTests.swift; sourceTree = "<group>"; };
 		D40ADDCF1D0F0BEE004FA7F5 /* OrderBy.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OrderBy.swift; sourceTree = "<group>"; };
 		D40F0A211C975368002D61EA /* Annotation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		D40F0A251C976507002D61EA /* Highlight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Highlight.swift; sourceTree = "<group>"; };
@@ -108,7 +105,6 @@
 		D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationNotebook.swift; sourceTree = "<group>"; };
 		D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationNotebook.swift"; sourceTree = "<group>"; };
 		D49E24091D0072D100052511 /* AccountController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountController.swift; sourceTree = "<group>"; };
-		D49E240C1D0072ED00052511 /* SessionController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionController.swift; sourceTree = "<group>"; };
 		D4A90CDF1C986F5D0010F8F2 /* SyncAnnotationsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SyncAnnotationsOperation.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		D4A90CE11C986FB40010F8F2 /* SyncAnnotationsResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncAnnotationsResult.swift; sourceTree = "<group>"; };
 		D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Notebook.swift"; sourceTree = "<group>"; };
@@ -204,7 +200,6 @@
 			isa = PBXGroup;
 			children = (
 				D49E24091D0072D100052511 /* AccountController.swift */,
-				D49E240C1D0072ED00052511 /* SessionController.swift */,
 			);
 			name = Account;
 			sourceTree = "<group>";
@@ -220,7 +215,6 @@
 				D95F19D41CD8E4C3008618AA /* HighlightTests.swift */,
 				D90A3CE01C95C6FE0060094B /* Info.plist */,
 				D95392CF1D02611200CB4921 /* LinkTests.swift */,
-				D403E25D1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift */,
 				D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */,
 				D4AB10FA1D5134D8001C3C0E /* SyncAnnotationsTests.swift */,
 				D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */,
@@ -539,7 +533,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D95392D01D02611200CB4921 /* LinkTests.swift in Sources */,
-				D403E25E1D54D5EA00B2FC40 /* SessionControllerNotificationTests.swift in Sources */,
 				D4AB10FB1D5134D8001C3C0E /* SyncAnnotationsTests.swift in Sources */,
 				11228F861DC92ED900DF14B5 /* AnnotationStoreMergeTests.swift in Sources */,
 				D95F19B51CD66F09008618AA /* AnnotationStoreTests.swift in Sources */,
@@ -594,7 +587,6 @@
 				D4ACFD3C1C99ECF1008CEF22 /* AnnotationTag.swift in Sources */,
 				D48FD6A31C9B0C640089EA68 /* AnnotationNotebook.swift in Sources */,
 				D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */,
-				D49E240D1D0072ED00052511 /* SessionController.swift in Sources */,
 				D9C470991C60317E00EDCD69 /* Error.swift in Sources */,
 				D94305791C5C237B00FA14B6 /* Session.swift in Sources */,
 				D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */,
@@ -629,7 +621,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.crosswaterbridge.LDSAnnotationsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -642,7 +633,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.crosswaterbridge.LDSAnnotationsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -690,7 +680,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0.1;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -734,7 +724,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 2.3;
+				SWIFT_VERSION = 3.0.1;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -759,7 +749,6 @@
 				PRODUCT_NAME = LDSAnnotations;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -779,7 +768,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.crosswaterbridge.LDSAnnotations;
 				PRODUCT_NAME = LDSAnnotations;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

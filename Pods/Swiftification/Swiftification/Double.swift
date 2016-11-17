@@ -20,28 +20,13 @@
 // THE SOFTWARE.
 //
 
-import XCTest
-@testable import LDSAnnotations
+import Foundation
 
-class SessionControllerNotificationTests: XCTestCase {
-
-    func testSessionAddedNotification() {
-        let expectation = self.expectation(description: "Notification Received")
-
-        let testSession = createSession()
-
-        let sessionController = SessionController.sharedController
-        let observer = sessionController.sessionAddedObservers.add { session in
-            expectation.fulfill()
-            XCTAssertEqual(session, testSession)
-        }
-        
-        sessionController.addSession(testSession, withUsername: testSession.username)
-        
-        waitForExpectations(timeout: 30, handler: nil)
-        
-        sessionController.sessionAddedObservers.remove(observer)
-        sessionController.removeSession(forUsername: testSession.username)
+public extension Double {
+    /// Random Double between min and max (inclusive).
+    static func random(min: Double = 0, max: Double = DBL_MAX) -> Double {
+        let diff = max - min
+        let rand = Double(arc4random() % (UInt32(RAND_MAX) + 1))
+        return ((rand / Double(RAND_MAX)) * diff) + min
     }
-    
 }

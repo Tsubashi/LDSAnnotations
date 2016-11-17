@@ -144,7 +144,7 @@ extension AccountsViewController {
     
     func addAccountWithUsername(_ username: String, password: String) {
         
-        let session = SessionController.sharedController.session(forUsername: username) ?? Session(username: username, password: password)
+        let session = Session(username: username, password: password)
         session.authenticate { error in
             if let error = error {
                 NSLog("Failed to authenticate account: \(error)")
@@ -157,8 +157,6 @@ extension AccountsViewController {
                 }
             } else {
                 DispatchQueue.main.async {
-                    SessionController.sharedController.addSession(session, withUsername: username)
-                    
                     do {
                         try AccountController.sharedController.addOrUpdateAccount(withUsername: username, password: password)
                     } catch {
