@@ -258,6 +258,16 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertTrue(annotationStore.bookmarks(paragraphAID: paragraphAID).first == bookmark)
     }
     
+    func testBookmarksHideChapterBookmarks() {
+        let annotationStore = AnnotationStore()!
+        
+        let paragraphBookmark = try! annotationStore.addBookmark(name: "Bookmark1", paragraphAID: "12345", displayOrder: 1, docID: "20056057",  docVersion: 1, appSource: "Test", device: "iphone")
+        let chapterBookmark = try! annotationStore.addBookmark(name: "Bookmark2", paragraphAID: nil, displayOrder: 1, docID: "20056057",  docVersion: 1, appSource: "Test", device: "iphone")
+        
+        XCTAssertTrue(Set(annotationStore.bookmarks().map({ $0.id })) == Set([paragraphBookmark, chapterBookmark].map({ $0.id })))
+        XCTAssertTrue(Set(annotationStore.bookmarks(hideChapterBookmarks: true).map({ $0.id })) == Set([paragraphBookmark].map({ $0.id })))
+    }
+    
     func testCreateAndTrashNote() {
         let annotationStore = AnnotationStore()!
         
