@@ -6,7 +6,7 @@ PODS:
   - SQLite.swift (0.11.0):
     - SQLite.swift/standard (= 0.11.0)
   - SQLite.swift/standard (0.11.0)
-  - Swiftification (9.0.0)
+  - Swiftification (9.1.0)
 
 DEPENDENCIES:
   - Locksmith
@@ -18,8 +18,8 @@ SPEC CHECKSUMS:
   Locksmith: 310b4cc5031af5728bf4db5d4de547a5100c6a3b
   ProcedureKit: 554ca98c4d5a22ed134f12b5d929944b2abd62bf
   SQLite.swift: 9a26273607d3077a2e5a8d33486e9989f8404c7d
-  Swiftification: c18c937ba96b58cb78e8c19f8734f48a483b6479
+  Swiftification: 5ab668789606ff59e62f413e98c695029953e8b5
 
 PODFILE CHECKSUM: d5ff36e50899c6193b692b2493da6c6f447a18d4
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.2.0.beta.1
