@@ -62,7 +62,7 @@ public extension AnnotationStore {
     }
     
     /// Returns a bookmarks with docID, and/or paragraphAID
-    public func bookmarks(docID: String? = nil, paragraphAID: String? = nil, hideChapterBookmarks: Bool = false) -> [Bookmark] {
+    public func bookmarks(docID: String? = nil, paragraphAID: String? = nil, requireParagraphAID: Bool = false) -> [Bookmark] {
         do {
             var query = BookmarkTable.table.select(BookmarkTable.table[*]).join(AnnotationTable.table.select(AnnotationTable.id, AnnotationTable.status, AnnotationTable.docID), on: BookmarkTable.annotationID == AnnotationTable.table[AnnotationTable.id]).filter(AnnotationTable.status == .active).order(BookmarkTable.displayOrder ?? Int.max)
             
@@ -72,7 +72,7 @@ public extension AnnotationStore {
             
             if let paragraphAID = paragraphAID {
                 query = query.filter(BookmarkTable.paragraphAID == paragraphAID)
-            } else if hideChapterBookmarks {
+            } else if requireParagraphAID {
                 query = query.filter(BookmarkTable.paragraphAID != nil)
             }
             
