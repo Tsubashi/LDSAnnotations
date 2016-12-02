@@ -162,7 +162,7 @@ public struct AnyCapability<Status: AuthorizationStatus>: CapabilityProtocol {
  A generic procedure which will get the current authorization
  status for AnyCapability<Status>.
  */
-public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Procedure, OutputProcedure {
+public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Procedure, ResultInjection {
 
     /// the StatusResponse is a tuple for the capabilities availability and status
     public typealias StatusResponse = (Bool, Status)
@@ -170,13 +170,18 @@ public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Proce
     /// the Completion is a closure which receives a StatusResponse
     public typealias Completion = (StatusResponse) -> Void
 
+    public typealias Requirement = Void
+    public typealias Result = StatusResponse
+
     /**
      After the procedure has executed, this property will be set
      to the result.
 
      - returns: a StatusResponse
      */
-    public var output: Pending<ProcedureResult<StatusResponse>> = .pending
+    public var result: PendingValue<StatusResponse> = .pending
+
+    public var requirement: PendingValue<Void> = .ready(())
 
     fileprivate let capability: AnyCapability<Status>
     fileprivate let completion: Completion?
@@ -196,7 +201,7 @@ public class GetAuthorizationStatusProcedure<Status: AuthorizationStatus>: Proce
 
     public override func execute() {
         determineStatus { status in
-            self.output = .ready(.success(status))
+            self.result = .ready(status)
             self.completion?(status)
             self.finish()
         }
@@ -244,24 +249,24 @@ public class AuthorizedFor<Status: AuthorizationStatus>: Condition {
 
     fileprivate let capability: AnyCapability<Status>
 
-    public init<Base>(_ base: Base, category: String? = nil) where Base: CapabilityProtocol, Status == Base.Status {
+    public init<Base>(_ base: Base) where Base: CapabilityProtocol, Status == Base.Status {
         capability = AnyCapability(base)
         super.init()
-        mutuallyExclusiveCategory = category ?? String(describing: type(of: base))
+        mutuallyExclusive = true
         add(dependency: AuthorizeCapabilityProcedure(base))
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         guard capability.isAvailable() else {
-            completion(.failure(ProcedureKitError.capabilityUnavailable())); return
+            completion(.failed(ProcedureKitError.capabilityUnavailable())); return
         }
 
         capability.getAuthorizationStatus { [requirement = self.capability.requirement] status in
             if status.meets(requirement: requirement) {
-                completion(.success(true))
+                completion(.satisfied)
             }
             else {
-                completion(.failure(ProcedureKitError.capabilityUnauthorized()))
+                completion(.failed(ProcedureKitError.capabilityUnauthorized()))
             }
         }
     }

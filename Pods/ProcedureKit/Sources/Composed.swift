@@ -4,9 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-import Dispatch
-
 open class ComposedProcedure<T: Operation>: GroupProcedure {
 
     public private(set) var operation: T
@@ -15,9 +12,9 @@ open class ComposedProcedure<T: Operation>: GroupProcedure {
         self.init(operation: composed)
     }
 
-    public init(dispatchQueue: DispatchQueue? = nil, operation: T) {
+    public init(operation: T) {
         self.operation = operation
-        super.init(dispatchQueue: dispatchQueue, operations: [operation])
+        super.init(operations: [operation])
     }
 }
 
@@ -27,8 +24,8 @@ open class GatedProcedure<T: Operation>: ComposedProcedure<T> {
         self.init(operation: composed, gate: gate)
     }
 
-    public init(dispatchQueue: DispatchQueue? = nil, operation: T, gate: @escaping ThrowingBoolBlock) {
-        super.init(dispatchQueue: dispatchQueue, operation: operation)
+    public init(operation: T, gate: @escaping ThrowingBoolBlock) {
+        super.init(operation: operation)
         add(condition: IgnoredCondition(BlockCondition(block: gate)))
     }
 }

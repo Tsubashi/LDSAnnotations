@@ -4,9 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-import Dispatch
-
 /**
  Log Severity
 
@@ -145,7 +142,7 @@ public class LogManager: LogManagerProtocol {
 
     var logger: LoggerBlockType {
         get { return loggerLock.read { _logger } }
-        set { loggerLock.write_sync { self._logger = newValue } }
+        set { loggerLock.write { self._logger = newValue } }
     }
 
     init() {
@@ -327,23 +324,23 @@ internal struct LoggerContext: LoggerProtocol {
     }
 }
 
-public struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
+internal struct _Logger<M: LogManagerProtocol>: LoggerProtocol {
 
     typealias Manager = M
 
-    public var severity: LogSeverity
+    var severity: LogSeverity
 
-    public var enabled: Bool
+    var enabled: Bool
 
-    public var logger: LoggerBlockType
+    var logger: LoggerBlockType
 
-    public var operationName: String? = nil
+    var operationName: String? = nil
 
-    public init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
+    init(severity: LogSeverity = Manager.severity, enabled: Bool = Manager.enabled, logger: @escaping LoggerBlockType = Manager.logger) {
         self.severity = severity
         self.enabled = enabled
         self.logger = logger
     }
 }
 
-public typealias Logger = _Logger<LogManager>
+internal typealias Logger = _Logger<LogManager>

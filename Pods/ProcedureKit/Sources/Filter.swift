@@ -18,9 +18,9 @@ open class FilterProcedure<Element>: ReduceProcedure<Element, Array<Element>> {
     }
 }
 
-public extension OutputProcedure where Self.Output: Sequence {
+public extension ProcedureProtocol where Self: ResultInjection, Self.Result: Sequence {
 
-    func filter(includeElement: @escaping (Output.Iterator.Element) throws -> Bool) -> FilterProcedure<Output.Iterator.Element> {
-        return FilterProcedure(isIncluded: includeElement).injectResult(from: self) { AnySequence(Array($0)) }
+    func filter(includeElement: @escaping (Result.Iterator.Element) throws -> Bool) -> FilterProcedure<Result.Iterator.Element> {
+        return injectRequirement(FilterProcedure(isIncluded: includeElement))
     }
 }

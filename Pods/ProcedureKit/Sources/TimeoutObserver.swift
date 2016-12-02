@@ -4,9 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-import Dispatch
-
 /**
  An observer which will automatically cancel (with an error)
  if it doesn't finish before a time interval is expired.

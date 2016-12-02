@@ -4,7 +4,6 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
 import Dispatch
 
 // MARK: - Queue

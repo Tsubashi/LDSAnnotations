@@ -4,25 +4,45 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
+/**
+ The result of a Condition. Either the condition is satisfied,
+ indicated by `.satisfied` or it has failed. In the failure
+ case, an `Error` must be associated with the result.
+ */
+public enum ConditionResult {
 
-public typealias ConditionResult = ProcedureResult<Bool>
+    /// Indicates that the condition is pending
+    case pending
+
+    /// Indicates that the condition is satisfied
+    case satisfied
+
+    /// Indicates that the condition failed, but can be ignored
+    case ignored
+
+    /// Indicates that the condition failed with an associated error.
+    case failed(Error)
+}
+
+public extension ConditionResult {
+
+    var error: Error? {
+        guard case .failed(let error) = self else { return nil }
+        return error
+    }
+}
 
 public protocol ConditionProtocol: ProcedureProtocol {
 
-    var mutuallyExclusiveCategory: String? { get }
+    var mutuallyExclusive: Bool { get set }
 
     func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void)
 }
 
-public extension ConditionProtocol {
-
-    var isMutuallyExclusive: Bool {
-        return mutuallyExclusiveCategory != nil
-    }
+internal extension ConditionProtocol {
 
     var category: String {
-        return mutuallyExclusiveCategory ?? String(describing: type(of: self))
+        return String(describing: type(of: self))
     }
 }
 
@@ -30,33 +50,14 @@ public extension ConditionProtocol {
 
 public extension ProcedureKitError {
 
-    public struct FailedConditions: Error {
-        public let errors: [Error]
-
-        internal init(errors: [Error]) {
-            self.errors = errors
-        }
-
-        internal func append(error: Error) -> FailedConditions {
-            var errors = self.errors
-            if let failedConditions = error as? FailedConditions {
-                errors.append(contentsOf: failedConditions.errors)
-            }
-            else {
-                errors.append(error)
-            }
-            return FailedConditions(errors: errors)
-        }
-    }
-
     public struct FalseCondition: Error {
         internal init() { }
     }
 }
 
-open class Condition: Procedure, ConditionProtocol, OutputProcedure {
+open class Condition: Procedure, ConditionProtocol {
 
-    public var mutuallyExclusiveCategory: String? = nil
+    public var mutuallyExclusive: Bool = false
 
     internal weak var procedure: Procedure? = nil {
         didSet {
@@ -66,7 +67,7 @@ open class Condition: Procedure, ConditionProtocol, OutputProcedure {
         }
     }
 
-    public var output: Pending<ConditionResult> = .pending
+    public var result: ConditionResult = .pending
 
     open override func execute() {
         guard let procedure = procedure else {
@@ -78,41 +79,38 @@ open class Condition: Procedure, ConditionProtocol, OutputProcedure {
     }
 
     open func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
-        let reason = "Condition must be subclassed, and \(#function) overridden."
-        let result: ConditionResult = .failure(ProcedureKitError.programmingError(reason: reason))
-        output = .ready(result)
-        completion(result)
+        completion(.failed(ProcedureKitError.programmingError(reason: "Condition must be subclassed, and \(#function) overridden.")))
     }
 
     internal func finish(withConditionResult conditionResult: ConditionResult) {
-        output = .ready(conditionResult)
+        result = conditionResult
         finish(withError: conditionResult.error)
     }
 }
 
 public class TrueCondition: Condition {
 
-    public init(name: String = "TrueCondition", mutuallyExclusiveCategory: String? = nil) {
+    public init(name: String = "TrueCondition", mutuallyExclusive: Bool = false) {
         super.init()
         self.name = name
-        self.mutuallyExclusiveCategory = mutuallyExclusiveCategory
+        self.mutuallyExclusive = mutuallyExclusive
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
-        completion(.success(true))
+        completion(.satisfied)
     }
 }
 
 public class FalseCondition: Condition {
 
-    public init(name: String = "FalseCondition", mutuallyExclusiveCategory: String? = nil) {
+    public init(name: String = "FalseCondition", mutuallyExclusive: Bool = false) {
         super.init()
         self.name = name
-        self.mutuallyExclusiveCategory = mutuallyExclusiveCategory
+        self.mutuallyExclusive = mutuallyExclusive
     }
 
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
-        completion(.failure(ProcedureKitError.FalseCondition()))
+        completion(.failed(ProcedureKitError.FalseCondition()))
     }
 }
 
@@ -125,7 +123,7 @@ public class FalseCondition: Condition {
  - see: NegatedCondition
  - see: SilentCondition
  */
-open class ComposedCondition<C: Condition>: Condition, InputProcedure {
+open class ComposedCondition<C: Condition>: Condition {
 
     /**
      The composed condition.
@@ -138,7 +136,7 @@ open class ComposedCondition<C: Condition>: Condition, InputProcedure {
         return super.directDependencies.union(condition.directDependencies)
     }
 
-    public var input: Pending<ConditionResult> = .pending
+    public var requirement: ConditionResult = .pending
 
     override var procedure: Procedure? {
         didSet {
@@ -154,20 +152,16 @@ open class ComposedCondition<C: Condition>: Condition, InputProcedure {
     public init(_ condition: C) {
         self.condition = condition
         super.init()
-        mutuallyExclusiveCategory = condition.mutuallyExclusiveCategory
+        mutuallyExclusive = condition.mutuallyExclusive
         name = condition.name
         inject(dependency: condition) { procedure, condition, _ in
-            procedure.input = condition.output
+            procedure.requirement = condition.result
         }
     }
 
     /// Override of public function
     open override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
-        guard let result = input.value else {
-            completion(.failure(ProcedureKitError.requirementNotSatisfied()))
-            return
-        }
-        completion(result)
+        completion(requirement)
     }
 
     override func remove(directDependency: Operation) {
@@ -187,8 +181,8 @@ public class IgnoredCondition<C: Condition>: ComposedCondition<C> {
     /// Override of public function
     public override func evaluate(procedure: Procedure, completion: @escaping (ConditionResult) -> Void) {
         super.evaluate(procedure: procedure) { composedResult in
-            if case .failure(_) = composedResult {
-                completion(.success(false))
+            if case .failed(_) = composedResult {
+                completion(.ignored)
             }
             else {
                 completion(composedResult)

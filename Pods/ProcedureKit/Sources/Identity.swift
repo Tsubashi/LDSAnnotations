@@ -4,14 +4,8 @@
 //  Copyright © 2016 ProcedureKit. All rights reserved.
 //
 
-import Foundation
-
 public protocol Identifiable {
     var identifier: UUID { get }
-}
-
-public func ==<T: Identifiable> (lhs: T, rhs: T) -> Bool {
-    return lhs.identifier == rhs.identifier
 }
 
 public extension Procedure {
