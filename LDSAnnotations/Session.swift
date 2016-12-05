@@ -58,6 +58,14 @@ public class Session: NSObject {
     let domain: String
     let trustPolicy: TrustPolicy
     
+    static let sessionCookieName = "ObSSOCookie"
+    var sessionCookieValue: String?
+    
+    public var obSSOCookieHeader: (name: String, value: String)? {
+        guard let sessionCookieValue = sessionCookieValue else { return nil }
+        return (name: "Cookie", value: String(format: "%@=%@", Session.sessionCookieName, sessionCookieValue))
+    }
+    
     public private(set) var status: Status = .none {
         didSet {
             statusObservers.notify(status)
@@ -135,15 +143,16 @@ public class Session: NSObject {
                     switch result {
                     case let .success(token, _, _):
                         self.status = .syncSuccessful
-                        
-                        // Trigger next sync if one is queued
-                        if self.syncQueued {
-                            self.syncQueued = false
-                            self.sync(annotationStore: annotationStore, token: token, completion: completion)
-                        }
                     case .error:
                         self.status = .syncFailed
                     }
+
+                    // Trigger next sync if one is queued
+                    if self.syncQueued {
+                        self.syncQueued = false
+                        self.sync(annotationStore: annotationStore, token: token, completion: completion)
+                    }
+
                     completion(result)
                 }
             }
@@ -166,6 +175,9 @@ extension Session {
         
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
+        if let obSSOCookieHeader = obSSOCookieHeader {
+            request.addValue(obSSOCookieHeader.value, forHTTPHeaderField: obSSOCookieHeader.name)
+        }
         
         do {
             try request.setAnnotationServiceHeadersWithSession(self, clientUsername: clientUsername, clientPassword: clientPassword)

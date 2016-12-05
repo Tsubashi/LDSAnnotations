@@ -94,6 +94,7 @@ class AuthenticateOperation: Procedure {
             let cookies = HTTPCookie.cookies(withResponseHeaderFields: responseHeaderFields, for: responseURL)
             if cookies.contains(where: { $0.name == "ObFormLoginCookie" && $0.value == "done" }) {
                 self.session.lastSuccessfulAuthenticationDate = authenticationDate
+                self.session.sessionCookieValue = cookies.find(where: { $0.name == Session.sessionCookieName })?.value
                 self.finish()
                 return
             }
