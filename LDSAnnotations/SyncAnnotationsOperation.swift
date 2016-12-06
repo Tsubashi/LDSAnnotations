@@ -116,8 +116,8 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
         session.put("/ws/annotation/v1.4/Services/rest/sync/annotations-ids?xver=2", payload: payload) { response in
             switch response {
             case .success(let payload):
-                let errorsJSON = (payload["syncAnnotationsIds"] as? [String: Any])?["errors"]
-                if let errorsJSON = errorsJSON as? [[String: Any]], !errorsJSON.isEmpty {
+                let syncAnnotationsIds = payload["syncAnnotationsIds"] as? [String: Any]
+                if let errorsJSON = syncAnnotationsIds?["errors"] as? [[String: Any]], !errorsJSON.isEmpty {
                     // Server returned errors, fail
                     
                     let errors = errorsJSON.map { AnnotationError.errorWithCode(.syncFailed, failureReason: String(format: "Failed to sync annotation with unique ID \"%@\": %@", $0["id"] as? String ?? "Unknown", $0["msg"] as? String ?? "Unknown")) }
@@ -125,11 +125,23 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                     
                 } else {
                     // No errors, sync is good
-                    
-                    do {
-                        try self.requestVersionedAnnotations(payload, onOrBefore: localSyncDate)
-                    } catch let error as NSError {
-                        self.finish(withError: error)
+                    if (syncAnnotationsIds?["syncIds"] as? [[String: Any]])?.isEmpty == true, let rawServerSyncDate = syncAnnotationsIds?["before"] as? String, let serverSyncDate = Date.parseFormattedISO8601(rawServerSyncDate) {
+                        // If there are no syncIds, don't bother requesting versioned annotations, nothing has changed
+                        do {
+                            self.serverSyncAnnotationsDate = serverSyncDate
+                            try self.annotationStore.inTransaction(notificationSource: self.source) {
+                                try self.applyServerChanges(payload, onOrBefore: localSyncDate)
+                            }
+                            self.finish()
+                        } catch let error as NSError {
+                            self.finish(withError: error)
+                        }
+                    } else {
+                        do {
+                            try self.requestVersionedAnnotations(payload, onOrBefore: localSyncDate)
+                        } catch let error as NSError {
+                            self.finish(withError: error)
+                        }
                     }
                 }
             case .failure(let payload):
@@ -237,10 +249,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
     }
     
     func applyServerChanges(_ payload: [String: Any], onOrBefore: Date) throws {
-        guard let syncAnnotations = payload["syncAnnotations"] as? [String: Any] else {
-            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing syncAnnotations")
-        }
-        
+        let syncAnnotations = payload["syncAnnotations"] as? [String: Any] ?? [:]
         let notebookAnnotationIDs = requirement.value?.changes.notebookAnnotationIDs
         
         if let remoteChanges = syncAnnotations["changes"] as? [[String: Any]] {
@@ -502,7 +511,6 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
             try annotationStore.notifyModifiedAnnotationsWithIDs(changedAnnotationIDs, source: source)
             try annotationStore.notifyModifiedNotebooksWithIDs(changedNotebookIDs, source: source)
         }
-        
         
         // Cleanup any annotations with the 'trashed' or 'deleted' status after they've been sync'ed successfully, there's no benefit to storing them locally anymore
         let annotationsToDelete = annotationStore.allAnnotations(lastModifiedOnOrBefore: onOrBefore).filter { $0.status != .active }

@@ -140,8 +140,11 @@ public class Session: NSObject {
             
             let syncOperation = SyncOperation(session: self, annotationStore: annotationStore, token: token) { result in
                 self.dataQueue.async {
+                    var syncToken = token
+                    
                     switch result {
                     case let .success(token, _, _):
+                        syncToken = token
                         self.status = .syncSuccessful
                     case .error:
                         self.status = .syncFailed
@@ -150,7 +153,7 @@ public class Session: NSObject {
                     // Trigger next sync if one is queued
                     if self.syncQueued {
                         self.syncQueued = false
-                        self.sync(annotationStore: annotationStore, token: token, completion: completion)
+                        self.sync(annotationStore: annotationStore, token: syncToken, completion: completion)
                     }
 
                     completion(result)
