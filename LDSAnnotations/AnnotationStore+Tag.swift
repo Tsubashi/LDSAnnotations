@@ -123,7 +123,7 @@ public extension AnnotationStore {
     /// Returns a tag with name (case insensitive)
     public func tagWithName(_ name: String) -> Tag? {
         do {
-            return try db.pluck(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercased())).map { TagTable.fromRow($0) }
+            return try db.pluck(TagTable.table.filter(TagTable.name == name)).map { TagTable.fromRow($0) }
         } catch {
             return nil
         }
@@ -133,7 +133,7 @@ public extension AnnotationStore {
     public func tagsContainingString(_ string: String) -> [Tag] {
         do {
             let likeClause = String(format: "%%%@%%", string.lowercased())
-            return try db.prepare(TagTable.table.filter(TagTable.name.lowercaseString.like(likeClause)).order(TagTable.name)).map { TagTable.fromRow($0) }
+            return try db.prepare(TagTable.table.filter(TagTable.name.like(likeClause)).order(TagTable.name)).map { TagTable.fromRow($0) }
         } catch {
             return []
         }
@@ -153,7 +153,7 @@ extension AnnotationStore {
     func createTagTable() throws {
         try db.run(TagTable.table.create(ifNotExists: true) { builder in
             builder.column(TagTable.id, primaryKey: true)
-            builder.column(TagTable.name, unique: true)
+            builder.column(TagTable.name, unique: true, collate: .nocase)
         })
     }
     
@@ -164,7 +164,7 @@ extension AnnotationStore {
         
         return try inTransaction(notificationSource: source) {
             let tag: Tag
-            if let existingTag = try self.db.prepare(TagTable.table.filter(TagTable.name.lowercaseString == name.lowercased()).limit(1)).map({ TagTable.fromRow($0) }).first {
+            if let existingTag = try self.db.prepare(TagTable.table.filter(TagTable.name == name).limit(1)).map({ TagTable.fromRow($0) }).first {
                 // Tag already exists with this name
                 tag = existingTag
             } else {
