@@ -365,18 +365,16 @@ extension AnnotationStore {
     
     /// Saves any changes to `annotation` and updates the `lastModified`.
     @discardableResult func updateAnnotation(_ annotation: Annotation, source: NotificationSource) throws -> Annotation {
-        var modifiedAnnotation = annotation
-        modifiedAnnotation.lastModified = Date()
         
         return try inTransaction(notificationSource: source) {
             try self.db.run(AnnotationTable.table.filter(AnnotationTable.id == annotation.id).update(
-                AnnotationTable.uniqueID <- modifiedAnnotation.uniqueID,
-                AnnotationTable.docID <- modifiedAnnotation.docID,
-                AnnotationTable.docVersion <- modifiedAnnotation.docVersion,
-                AnnotationTable.status <- modifiedAnnotation.status,
-                AnnotationTable.lastModified <- modifiedAnnotation.lastModified,
-                AnnotationTable.appSource <- modifiedAnnotation.appSource,
-                AnnotationTable.device <- modifiedAnnotation.device
+                AnnotationTable.uniqueID <- annotation.uniqueID,
+                AnnotationTable.docID <- annotation.docID,
+                AnnotationTable.docVersion <- annotation.docVersion,
+                AnnotationTable.status <- annotation.status,
+                AnnotationTable.lastModified <- annotation.lastModified,
+                AnnotationTable.appSource <- annotation.appSource,
+                AnnotationTable.device <- annotation.device
             ))
             
             // Sync notifies once at the end
@@ -384,7 +382,7 @@ extension AnnotationStore {
                 try self.notifyModifiedAnnotationsWithIDs([annotation.id], source: source)
             }
             
-            return modifiedAnnotation
+            return annotation
         }
     }
     
