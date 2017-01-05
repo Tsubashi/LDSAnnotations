@@ -27,13 +27,13 @@ import SQLite
 public enum HighlightStyle: String {
     
     /// Plain block highlight style
-    case Highlight = ""
+    case highlight = ""
     
     /// Underline style
-    case Underline = "red-underline"
+    case underline = "red-underline"
     
     /// Clear style
-    case Clear = "clear"
+    case clear = "clear"
     
 }
 
@@ -44,7 +44,7 @@ extension HighlightStyle: Value {
     }
     
     public static func fromDatatypeValue(_ stringValue: String) -> HighlightStyle {
-        return HighlightStyle(rawValue: stringValue) ?? .Highlight
+        return HighlightStyle(rawValue: stringValue) ?? .highlight
     }
     
     public var datatypeValue: String {

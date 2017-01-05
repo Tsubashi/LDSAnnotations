@@ -33,7 +33,7 @@ class SetBox<T>: NSObject where T: Hashable {
 /// A local annotation store backed by a SQLite database.
 public class AnnotationStore {
     
-    private static let currentVersion = 1
+    private static let currentVersion = 2
     
     let db: Connection
     
@@ -133,6 +133,15 @@ public class AnnotationStore {
                     try self.createAnnotationNotebookTable()
                     
                     self.databaseVersion = 1
+                }
+            } catch {}
+        }
+        if fromVersion < 2 {
+            do {
+                try db.transaction {
+                    try self.db.run(TagTable.table.createIndex([TagTable.name], ifNotExists: true))
+                    
+                    self.databaseVersion = 2
                 }
             } catch {}
         }

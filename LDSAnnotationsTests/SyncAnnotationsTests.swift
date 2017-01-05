@@ -36,7 +36,7 @@ class SyncAnnotationsTests: XCTestCase {
         var token2: SyncToken?
         token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
 
-        var note = try! annotationStore1.addNote("BeforeTitle", content: "BeforeContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        var note = try! annotationStore1.addNote("BeforeTitle", content: "BeforeContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         
         // Upload the changes
         token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
@@ -115,7 +115,7 @@ class SyncAnnotationsTests: XCTestCase {
         token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
-        let highlights = try! annotationStore1.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "2"), ParagraphRange(paragraphAID: "3")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let highlights = try! annotationStore1.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "2"), ParagraphRange(paragraphAID: "3")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         let highlight1 = highlights.first!
         let highlight2 = highlights.last!
         
@@ -163,7 +163,7 @@ class SyncAnnotationsTests: XCTestCase {
         token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
-        let link1 = try! annotationStore1.addLink(name: "Link1", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["2"], fromDocID: "13859831", fromDocVersion: 1, fromParagraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let link1 = try! annotationStore1.addLink(name: "Link1", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["2"], fromDocID: "13859831", fromDocVersion: 1, fromParagraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         let link2 = try! annotationStore1.addLink(name: "Link2", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["3"], annotationID: link1.annotationID)
         
         // Upload the changes
@@ -210,7 +210,7 @@ class SyncAnnotationsTests: XCTestCase {
         token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
-        let annotationID = try! annotationStore1.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone").first!.annotationID
+        let annotationID = try! annotationStore1.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone").first!.annotationID
         let tag1 = try! annotationStore1.addTag(name: "Tag1", annotationID: annotationID)
         let tag2 = try! annotationStore1.addTag(name: "Tag2", annotationID: annotationID)
         
@@ -366,7 +366,7 @@ class SyncAnnotationsTests: XCTestCase {
         token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
         
         // Add an annotation to one annotation store
-        let note = try! annotationStore1.addNote("NoteTitle", content: "NoteContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let note = try! annotationStore1.addNote("NoteTitle", content: "NoteContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         
         // Upload the changes
         token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")

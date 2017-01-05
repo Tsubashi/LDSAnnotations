@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		006E33F2D4BBF271402C802F0EED9A32 /* Dictionary_Initializers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70C27C591C04A1968189E63279F9CD72 /* Dictionary_Initializers.swift */; };
+		055B509D3373927F516EF21AE16BE135 /* Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32701CBC0774FCC8A91F1C8256358923 /* Blob.swift */; };
 		05936D4FD445C13E8ABE845C35BD31BD /* Reduce.swift in Sources */ = {isa = PBXBuildFile; fileRef = B65F310B4D2F1DA717CC898ECA585D73 /* Reduce.swift */; };
-		06950DBB81502CF959021299A7C6937D /* CustomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC06DE788E509620A6525BD25F8BE1A /* CustomFunctions.swift */; };
-		0D30B7040CBFC8B6A744748FEB1ABFC7 /* SQLite-Bridging.h in Headers */ = {isa = PBXBuildFile; fileRef = 5F96AF1BFD7A327E89974323DD7D5A29 /* SQLite-Bridging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0871B3774D77D0C472351127B942B42C /* RTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DAA9FEE2F2D7CD85398F26C134BD1CA /* RTree.swift */; };
 		115047C28B2D4E6DCD99A696FC0A6253 /* Retry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F33F06215AF2BA86E0C6110C735E1B72 /* Retry.swift */; };
 		149AE7DF3E506A32DBF590A29F673C03 /* SQLite.swift-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = F0966645036BD5792ADD21EF7BCCFB8D /* SQLite.swift-dummy.m */; };
 		19025DB607BCC72374F781DC49A3F916 /* Collection+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F2A7A01A819239ECF0F63A7797EC43 /* Collection+ProcedureKit.swift */; };
@@ -20,45 +20,48 @@
 		20C0F03A45CE8968DBEA06B5CB429F50 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = 952120DF96CF270801E2846F35B135CD /* String.swift */; };
 		20CE395B1FE73402FDEA0CD9B933804C /* Pods-LDSAnnotations-LDSAnnotationsDemo-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 3AE953A77D6D699649A66B9728E8AD33 /* Pods-LDSAnnotations-LDSAnnotationsDemo-dummy.m */; };
 		224466C613CE7C41319482D98B0CC3CE /* Operation+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FD41AD860A3B439F36A98099055021B /* Operation+ProcedureKit.swift */; };
+		254D616D57374C0CB1AA9AA9ADE53E4E /* Collation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF1D874B0A22F1058E061DCBC61789D /* Collation.swift */; };
 		27D889D317A485E463FE504E54F451FF /* Locksmith.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C32B95B5DB62E142431B7CD141F0EAC /* Locksmith.swift */; };
 		27FBAA0CDB0B34CC2CD21DBC6799D765 /* Repeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F932EE0BE6FBC1A540ABA0F1C490552 /* Repeat.swift */; };
-		2843A43C2096B3AE8DB9778A662460FD /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D259F773F3276E233005DB894516997 /* Schema.swift */; };
 		2AF465F8C934A712A7B92D06FC05C812 /* NSAttributedString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655269ED9257079AA8B87F9F86DBFD6C /* NSAttributedString.swift */; };
 		2D53FF685B21B54684764201B20195CE /* Map.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5464ADAE83D049E6CE2F4844AF1B30C0 /* Map.swift */; };
 		2E1C50B5D6D47AE341F81F6667C06703 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = A94F42223762D83F035C7F9AE5A1E3F5 /* Block.swift */; };
 		2FC044E1A7D1932D5A74DF027B9B286D /* Identity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FDEC69FE13C0A5A5AA4D68652A61864 /* Identity.swift */; };
 		341D1902C1BD364C94AD541D663F0F6C /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B080F7882225CDE5CD8EE5AAE1A5CA65 /* Errors.swift */; };
-		352D34473E06B2DCF28607E69F8E6F1E /* Collation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 457DFF4144D85476E1AB76BFB6E7704F /* Collation.swift */; };
 		3C3DDDCE33C4140FB403BFEF5C7E4D07 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAFD15069DBFFAF7E7CD48183E2D230C /* Security.framework */; };
-		3F6E5D994B314C69426E7A26AF7F7C46 /* FTS5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D951481AB8CFACFCC381CA7026673C1 /* FTS5.swift */; };
+		3E131A914AE9DA9E0570D9CA6D194F95 /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = E251CD215393A6001B57BF1170015C8E /* FTS4.swift */; };
+		3FDF0502BCFAE0906D976C9423C629B7 /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = F506DE579036F05B2FE0E58CB7DE6E49 /* Schema.swift */; };
 		40D2808D41B26EA9759920F2EF14F091 /* SQLite.swift-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E63F7798E158EA398CBA604D33468B /* SQLite.swift-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4281BA5283F404FFA7B306B491CDAE38 /* Support.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8251E1FFE178BE8E30994AB01E17811E /* Support.swift */; };
 		4327D350BC618D39C1C5205CB533BAA8 /* Pods-LDSAnnotations-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 0FE442AAE725570D6D64001C7CE72795 /* Pods-LDSAnnotations-dummy.m */; };
 		47BA682E8799DE6B4A76153BE130CB72 /* MutualExclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6533AF6A8995C1A6C2424E2A12DF3BA /* MutualExclusion.swift */; };
-		4C2DBDB481B52104263F95FBC8F5FF8C /* Setter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C07FF10E7F306F32BEA147F75114CAE /* Setter.swift */; };
+		48C9228C8F5FDB864B29723A27CEF477 /* Foundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEB12F1DFA3659536BC4B668CB6E717 /* Foundation.swift */; };
 		4EC4EB34C2463094707A8B76676895A0 /* Logging.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA94FA9B3E6BC4A3633E7E3A29562F59 /* Logging.swift */; };
-		51C9C6E702AE795A07A3A8AD80D0CD52 /* AggregateFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62A8B7125D281A12212D0D947E0FA3B /* AggregateFunctions.swift */; };
-		586C14F31D6A5BD5AB45887B8D3D3F9F /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = F98080946BC0BCBD77CB1132725CFEA8 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		524F6146F25682382F9BD9318603D31B /* Setter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A77F59212FE234311337CCAC666D8403 /* Setter.swift */; };
+		56916AF0E04B96E94388DE725F1692A2 /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047845191991E7703A92E55CC00DC376 /* Statement.swift */; };
 		58FD5584CF4A982F1F1397DEAFCCBAEE /* NoFailedDependenciesCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 378A87A603CC2BAFEA6D1F57A5E59B50 /* NoFailedDependenciesCondition.swift */; };
-		59BE3F796084B879515F6FD1C73A8378 /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CABFA1A385DB334CBE126F645E4E282 /* Operators.swift */; };
 		5E372D40FE848C867DF3F90B8D1ED1ED /* SilentCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CFB559C11CA04E1C69A4A5070DF9B5 /* SilentCondition.swift */; };
+		634852F8B309B67630CF23AEA5957E19 /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7E3BCA0BB69EC85B8D439F27882D74B /* Query.swift */; };
+		695C5404AAE64FBE2809D54DB69CBE9C /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA9F6EF16F6A74C4CC0EAF26623ACDD /* Helpers.swift */; };
+		69F6789CABBDF0E580E9002658D5332E /* FTS5.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA4DC565AADEB3ED82B74C43B51BD74 /* FTS5.swift */; };
 		6A0CE4CEB9D73C88C9916F80E9B452B3 /* Pods-LDSAnnotations-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9A34DF6ABD7D4D284E75E9B35F2D18D3 /* Pods-LDSAnnotations-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6A3F7EA0D73431EC76C1A5DD92A8C196 /* SQLite-Bridging.h in Headers */ = {isa = PBXBuildFile; fileRef = 8247F55FF625307386A7A5816E858D2D /* SQLite-Bridging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6CDBC6A854B4B73BCF2EC007D87F9A70 /* SQLite.h in Headers */ = {isa = PBXBuildFile; fileRef = 666C37086520182862BA824F2B321B21 /* SQLite.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6D1B4609F57C14DD2BA608EA259578CE /* BlockCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4EB0A7851FCA0CDE6F95B5248AA59E /* BlockCondition.swift */; };
 		7815380AC81BB9D91267D950659969F1 /* Pods-LDSAnnotations-LDSAnnotationsDemo-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 6BB9DE2D72E935C2DA00108AE76A5EFD /* Pods-LDSAnnotations-LDSAnnotationsDemo-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		78B2338EFDF22FFA6575BA90469BEB29 /* Locksmith-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = A63E9A8A96989A4435B34C4AA656EA3A /* Locksmith-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7B72BD75C426DD8FE7FDD4C8C67B1042 /* Foundation.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC94C982FB1996E880938898582A3067 /* Foundation.swift */; };
 		7B838A82C699992B4C7BAAB22BD7FBED /* AnyObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CD49DA6CD1006274E23B10760306E3 /* AnyObserver.swift */; };
 		7FB478A4CC39A55EBF2A0C25B0DC9188 /* NegatedCondition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D3E90A53DB84C48DF0640363DC347B /* NegatedCondition.swift */; };
 		7FBDA22BC8E282470B033630D9E5210F /* LocksmithSecurityClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5164816CF7FCF8837EAC2637EB3989D /* LocksmithSecurityClass.swift */; };
+		802BF76BE5FAE8784A5F32D359F9773E /* AggregateFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B1701103D80378CBDF40354DE664B3C /* AggregateFunctions.swift */; };
 		814064A402C68636B0457FFA56D900BC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
 		8231338C3F2655A28D0562BB4BABACEC /* ProcedureObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F5DEB04AAD4D81E97F02DB40BF08C1 /* ProcedureObserver.swift */; };
 		83ED56BC49C8C08F4B43D9046FD99907 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
-		851342BE1B732DE4F30ECC4BEB623F4D /* Blob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09789328C2934B07043F08D28E1D33AF /* Blob.swift */; };
 		88F7E89BA01237F96C32A296364BF766 /* Condition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB7972208B89DC9BBC30FE06E0E17FF /* Condition.swift */; };
 		8A3E2BC71E5B38A28259C5992CF405CD /* ObserverSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85CC5F6CE0C6F5FFD3E10CDC635674B7 /* ObserverSet.swift */; };
-		8C53C069AD0B9BEB3AAA998E05C85680 /* CoreFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E79685227A5B4E1122BFA26BB31138 /* CoreFunctions.swift */; };
 		8D3BB10C30B780347AAB0ECB7895FF2F /* LocksmithError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 659638C2ADECC424117F5BD3BA5CD54F /* LocksmithError.swift */; };
 		8E855AB0C08BFA5454C1BDB70DDFD8CB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
+		8F8F343257ABB6E252B7222535D52DCA /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3755924588BF543BA858639193F90B11 /* Operators.swift */; };
 		8FA9B26AA518B65A03682A1781E2B4D1 /* Locksmith.h in Headers */ = {isa = PBXBuildFile; fileRef = A1CF90D60A3431439C871035DD7CCDF9 /* Locksmith.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8FE47EAD349903738E338D0F7112675E /* CaseCountable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F648E5F2D5EB8281C01AAF834ED3EAA6 /* CaseCountable.swift */; };
 		918CE5762D13C1CF5583CE651835F043 /* Transform.swift in Sources */ = {isa = PBXBuildFile; fileRef = 205170D08286D9CDF1915F833957663B /* Transform.swift */; };
@@ -66,41 +69,38 @@
 		9659012D9977CAC620C8A0EC6C146FD0 /* Pods-LDSAnnotations-LDSAnnotationsTests-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 351595B119E1A6F506A36D68974175FE /* Pods-LDSAnnotations-LDSAnnotationsTests-dummy.m */; };
 		9EF0CE969A87EC67EF82813B0EB99B27 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
 		9F72E004AEDE5E86DC7FDAF9A1FC1BCC /* TimeoutObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C6ACB1E5DA13725AA55278B182FD62 /* TimeoutObserver.swift */; };
-		A0122FA3DA0C398D2E56230C845FCC40 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 699DC5CDAFCEBD17E830A8B430D011EF /* Helpers.swift */; };
 		A02669A9C5FCB4377B585B9F551D29F4 /* ProcedureProcotol.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE1D543CE358B54278B2781DAB11FD2 /* ProcedureProcotol.swift */; };
 		A1BF3C7767029ACB09446551E4872649 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
 		A6D777007D436971E10E1450AC3807BC /* BlockObservers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67AF789D5282D999922B0B168B89089C /* BlockObservers.swift */; };
 		AD9934F33F0AA327237F56342EC93C90 /* Swiftification-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B41D2818733683EBEE684236EC56120 /* Swiftification-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AEB89415E1F645FCB293AA6FD4FF181A /* ProcedureKit-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = ECD1ABB7F3217787F13E46302FE75173 /* ProcedureKit-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		AFC6F928E978673BC75578C122D3147A /* Any.swift in Sources */ = {isa = PBXBuildFile; fileRef = 279BF59A6487B60A20A7224E81496813 /* Any.swift */; };
-		AFD75A5E9786CE6CF4F4D5CBE311D3FF /* SQLite-Bridging.m in Sources */ = {isa = PBXBuildFile; fileRef = A8E9D816A670FAF67C3FEC0DDD057954 /* SQLite-Bridging.m */; };
 		AFE5A905A7071D51D62AF6BF41C79573 /* Int.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE07DBDFCFB89BE2CC8ABE19DBFF81F2 /* Int.swift */; };
 		B1EBFBD8DB3A5865BE397638FB5B4FC2 /* Composed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9407E0E9B12C8D44A3637907D3388BB5 /* Composed.swift */; };
 		B5A41618FDDC5A749102913C8DF12CEE /* Sequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F828E99FDED1CCC7DF8981B8955056B /* Sequence.swift */; };
 		B737B2CFDFAA4D6C986AC8560FA2CA4E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
 		B875F14E78DB15D8C4D65BB69E55BA04 /* Locksmith-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = FE61B7F78114FA8F8777F8AEAD8ABE0D /* Locksmith-dummy.m */; };
+		B936A5FF6CAF6DD855D26989C9AAC84A /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7825803E2164F6F8A8CBAD13E2DC63B6 /* Expression.swift */; };
 		BA1597A58874E16EB27A2222D47D262A /* Capability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122823800020F5BAAC035233E7098A57 /* Capability.swift */; };
 		BADAC5807EC7426E1FC5BD21C97BBB60 /* Pods-LDSAnnotations-LDSAnnotationsTests-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 9899AB5AF991A93ED42EA74F314D6211 /* Pods-LDSAnnotations-LDSAnnotationsTests-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BC1358A119F5290FAF05924F337A65F2 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10FD6A2271A175C963225566C2FDCE7 /* Double.swift */; };
-		BC381DBD18351023D620E78BFAEBB7A5 /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61EE64ABF40EE5F03ECB529397C1BAC3 /* Connection.swift */; };
 		BCB7A8EEB4E5985F660EC16D68856CCE /* ResultInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59237D7699CD78CB0C2832059961CA55 /* ResultInjection.swift */; };
-		BFA6642696FAB81AAC4CEEC9D625D357 /* fts3_tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD47E0B40B4D7C0DBC6F772B3FD74B /* fts3_tokenizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		C079ACCE657AEF952D6B13A589C612F4 /* Memoize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E84FC1519BC9DA2753D5ABB8E668EC /* Memoize.swift */; };
-		C43AEF6717AEC757749CB63331047C3F /* Query.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97CAB878DB67A8A70F91468422D157A9 /* Query.swift */; };
-		C5EF5C73EF0189EEDD04F0C4679AE868 /* Statement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C5F03C933EDDAAB8E464010B541E339 /* Statement.swift */; };
+		C5277D3F3ADDC71F5D4504BB13A8BA35 /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF76B6C3538FA887C288EB049B6B034 /* Value.swift */; };
 		CAA418DF1176F5AA55E12FBAB8860CED /* LocksmithInternetProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44F268D16AEF6A497B86FD85C1813DE0 /* LocksmithInternetProtocol.swift */; };
-		CAE5F9D4EF115D0A8C73C37ADADFB26D /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F33B43057E59483110EBCCD73EAECC1 /* Expression.swift */; };
 		CD64199E3523D6645B6A264C07D153AB /* Filter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB71A566ED3F1FF1EE46A10A9EA3E0B /* Filter.swift */; };
 		D134206821B3E9EAB6A6DE1EA5131CE4 /* ProcedureKit-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = A0900663DCCDC81936F8F0D5835EE41F /* ProcedureKit-dummy.m */; };
 		D512F6B8D63123522315449294F21440 /* DispatchQueue+ProcedureKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33108F668C98DA633886010D7D2522AE /* DispatchQueue+ProcedureKit.swift */; };
+		D84556382F10734C5ED6813D60ED23DC /* CustomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32BDF202B8AFF7FE6E8AF37CA3466E6F /* CustomFunctions.swift */; };
 		DBB89BA8F2C137492EE17C8AE00002B5 /* Delay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FF84BFC0E6E6D046734962FECF2051A /* Delay.swift */; };
 		E26E43A4FC44C40AAD0DA23B8C78E23D /* Swiftification-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = C8414865200BB8817D318F0D012022CF /* Swiftification-dummy.m */; };
-		E2D0BF64C9B224C1B6C31FFC31FDDB52 /* RTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63DA3077FBC1821C44375190701A02D7 /* RTree.swift */; };
 		E5858AA3A7872A9354DDD99E555816C7 /* Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558121B102FBF431B90B343F38CB808D /* Dictionary.swift */; };
+		E69EACFCC44DB6FBE2EC21ACCCB15087 /* fts3_tokenizer.h in Headers */ = {isa = PBXBuildFile; fileRef = F37BE06783DE1C757073A44889E72DF5 /* fts3_tokenizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E6A17E652A754A4B1808F2B3FC412135 /* ProcedureQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5582768A1139061F481AA4E8762692C0 /* ProcedureQueue.swift */; };
 		E6D2F2B6D4519B7A320709F418CF8D5B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */; };
-		F42C234AE47144B24E1C0AFB48B98D9C /* FTS4.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5005FD1EC63281CDBEA582311BB0BA69 /* FTS4.swift */; };
-		FB42204D834CE595EB6D0DD0F74DBFFC /* Value.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50846CB3D9357AF365DCA1BC6F5E91B6 /* Value.swift */; };
+		E99179DD8F4942ED465091C0D0E2D3A8 /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B37BB8F7B5BEC8DA6A4C3C9863EC8CD /* Connection.swift */; };
+		F4AE7988B83A3AC8038DC8E5DC913741 /* SQLite-Bridging.m in Sources */ = {isa = PBXBuildFile; fileRef = 5285060FD13F73316AB9807A199AAEE4 /* SQLite-Bridging.m */; };
+		F86ECDBF5EF8C538E02085B9DA057D65 /* CoreFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28F6882ADA8CA08EE1F0A62DF721D7A /* CoreFunctions.swift */; };
 		FFFCE057BD090EC0E25A4D4CCB78397E /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA04BDA0587ED113B8F6BBE78DCDEA8A /* Array.swift */; };
 /* End PBXBuildFile section */
 
@@ -193,17 +193,15 @@
 
 /* Begin PBXFileReference section */
 		0451775EE06E4D1D4F24680FC3EE1146 /* Pods-LDSAnnotations-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LDSAnnotations-acknowledgements.markdown"; sourceTree = "<group>"; };
-		09789328C2934B07043F08D28E1D33AF /* Blob.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blob.swift; path = SQLite/Core/Blob.swift; sourceTree = "<group>"; };
-		0C07FF10E7F306F32BEA147F75114CAE /* Setter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Setter.swift; path = SQLite/Typed/Setter.swift; sourceTree = "<group>"; };
-		0F33B43057E59483110EBCCD73EAECC1 /* Expression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Expression.swift; path = SQLite/Typed/Expression.swift; sourceTree = "<group>"; };
+		047845191991E7703A92E55CC00DC376 /* Statement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Statement.swift; path = Sources/SQLite/Core/Statement.swift; sourceTree = "<group>"; };
 		0FE442AAE725570D6D64001C7CE72795 /* Pods-LDSAnnotations-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LDSAnnotations-dummy.m"; sourceTree = "<group>"; };
 		1008929D895FA8AE95438EB639E323F4 /* Pods_LDSAnnotations_LDSAnnotationsTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_LDSAnnotations_LDSAnnotationsTests.framework; path = "Pods-LDSAnnotations-LDSAnnotationsTests.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		122823800020F5BAAC035233E7098A57 /* Capability.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Capability.swift; path = Sources/Capability.swift; sourceTree = "<group>"; };
 		17F2A7A01A819239ECF0F63A7797EC43 /* Collection+ProcedureKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Collection+ProcedureKit.swift"; path = "Sources/Collection+ProcedureKit.swift"; sourceTree = "<group>"; };
 		18A1B3044018611AE3EE7886183F2EDB /* LocksmithInternetAuthenticationType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocksmithInternetAuthenticationType.swift; path = Source/LocksmithInternetAuthenticationType.swift; sourceTree = "<group>"; };
 		18C9D1EA8D13B0F2878921C68DD19E16 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1B37BB8F7B5BEC8DA6A4C3C9863EC8CD /* Connection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Connection.swift; path = Sources/SQLite/Core/Connection.swift; sourceTree = "<group>"; };
 		1C82B392293CBB34798978ABA07AC9A2 /* Pods-LDSAnnotations-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-LDSAnnotations-acknowledgements.plist"; sourceTree = "<group>"; };
-		1D259F773F3276E233005DB894516997 /* Schema.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Schema.swift; path = SQLite/Typed/Schema.swift; sourceTree = "<group>"; };
 		1E4EB0A7851FCA0CDE6F95B5248AA59E /* BlockCondition.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BlockCondition.swift; path = Sources/BlockCondition.swift; sourceTree = "<group>"; };
 		1F932EE0BE6FBC1A540ABA0F1C490552 /* Repeat.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Repeat.swift; path = Sources/Repeat.swift; sourceTree = "<group>"; };
 		1FD41AD860A3B439F36A98099055021B /* Operation+ProcedureKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Operation+ProcedureKit.swift"; path = "Sources/Operation+ProcedureKit.swift"; sourceTree = "<group>"; };
@@ -213,52 +211,50 @@
 		279BF59A6487B60A20A7224E81496813 /* Any.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Any.swift; path = Sources/Any.swift; sourceTree = "<group>"; };
 		2B41D2818733683EBEE684236EC56120 /* Swiftification-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Swiftification-umbrella.h"; sourceTree = "<group>"; };
 		2FDEC69FE13C0A5A5AA4D68652A61864 /* Identity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Identity.swift; path = Sources/Identity.swift; sourceTree = "<group>"; };
+		32701CBC0774FCC8A91F1C8256358923 /* Blob.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Blob.swift; path = Sources/SQLite/Core/Blob.swift; sourceTree = "<group>"; };
+		32BDF202B8AFF7FE6E8AF37CA3466E6F /* CustomFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomFunctions.swift; path = Sources/SQLite/Typed/CustomFunctions.swift; sourceTree = "<group>"; };
 		33108F668C98DA633886010D7D2522AE /* DispatchQueue+ProcedureKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "DispatchQueue+ProcedureKit.swift"; path = "Sources/DispatchQueue+ProcedureKit.swift"; sourceTree = "<group>"; };
 		34CD49DA6CD1006274E23B10760306E3 /* AnyObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AnyObserver.swift; path = Sources/AnyObserver.swift; sourceTree = "<group>"; };
 		351595B119E1A6F506A36D68974175FE /* Pods-LDSAnnotations-LDSAnnotationsTests-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LDSAnnotations-LDSAnnotationsTests-dummy.m"; sourceTree = "<group>"; };
+		3755924588BF543BA858639193F90B11 /* Operators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Operators.swift; path = Sources/SQLite/Typed/Operators.swift; sourceTree = "<group>"; };
 		378A87A603CC2BAFEA6D1F57A5E59B50 /* NoFailedDependenciesCondition.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NoFailedDependenciesCondition.swift; path = Sources/NoFailedDependenciesCondition.swift; sourceTree = "<group>"; };
 		3AE953A77D6D699649A66B9728E8AD33 /* Pods-LDSAnnotations-LDSAnnotationsDemo-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-LDSAnnotations-LDSAnnotationsDemo-dummy.m"; sourceTree = "<group>"; };
 		3CB7972208B89DC9BBC30FE06E0E17FF /* Condition.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Condition.swift; path = Sources/Condition.swift; sourceTree = "<group>"; };
 		440640449FD0008294ADACCAB66507CF /* Procedure.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Procedure.swift; path = Sources/Procedure.swift; sourceTree = "<group>"; };
 		44F268D16AEF6A497B86FD85C1813DE0 /* LocksmithInternetProtocol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocksmithInternetProtocol.swift; path = Source/LocksmithInternetProtocol.swift; sourceTree = "<group>"; };
-		457DFF4144D85476E1AB76BFB6E7704F /* Collation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Collation.swift; path = SQLite/Typed/Collation.swift; sourceTree = "<group>"; };
 		4593AC8F26DCC977AF75DB61CF19D1FF /* Pods-LDSAnnotations.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LDSAnnotations.debug.xcconfig"; sourceTree = "<group>"; };
+		4B1701103D80378CBDF40354DE664B3C /* AggregateFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AggregateFunctions.swift; path = Sources/SQLite/Typed/AggregateFunctions.swift; sourceTree = "<group>"; };
+		4CA9F6EF16F6A74C4CC0EAF26623ACDD /* Helpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helpers.swift; path = Sources/SQLite/Helpers.swift; sourceTree = "<group>"; };
 		4D120A5936BB1E581C34CFF33435CF08 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		4D951481AB8CFACFCC381CA7026673C1 /* FTS5.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FTS5.swift; path = SQLite/Extensions/FTS5.swift; sourceTree = "<group>"; };
-		5005FD1EC63281CDBEA582311BB0BA69 /* FTS4.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FTS4.swift; path = SQLite/Extensions/FTS4.swift; sourceTree = "<group>"; };
-		50846CB3D9357AF365DCA1BC6F5E91B6 /* Value.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Value.swift; path = SQLite/Core/Value.swift; sourceTree = "<group>"; };
+		5285060FD13F73316AB9807A199AAEE4 /* SQLite-Bridging.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "SQLite-Bridging.m"; path = "Sources/SQLiteObjc/SQLite-Bridging.m"; sourceTree = "<group>"; };
 		531A76A57E213544F83C62D3C523838A /* Pods-LDSAnnotations-LDSAnnotationsDemo-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LDSAnnotations-LDSAnnotationsDemo-acknowledgements.markdown"; sourceTree = "<group>"; };
 		5464ADAE83D049E6CE2F4844AF1B30C0 /* Map.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Map.swift; path = Sources/Map.swift; sourceTree = "<group>"; };
 		558121B102FBF431B90B343F38CB808D /* Dictionary.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Dictionary.swift; path = Swiftification/Dictionary.swift; sourceTree = "<group>"; };
 		5582768A1139061F481AA4E8762692C0 /* ProcedureQueue.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProcedureQueue.swift; path = Sources/ProcedureQueue.swift; sourceTree = "<group>"; };
 		571CB986209A62DD4B0643A1ABE5EEF6 /* Group.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Group.swift; path = Sources/Group.swift; sourceTree = "<group>"; };
 		59237D7699CD78CB0C2832059961CA55 /* ResultInjection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ResultInjection.swift; path = Sources/ResultInjection.swift; sourceTree = "<group>"; };
-		5CABFA1A385DB334CBE126F645E4E282 /* Operators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Operators.swift; path = SQLite/Typed/Operators.swift; sourceTree = "<group>"; };
-		5DC06DE788E509620A6525BD25F8BE1A /* CustomFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CustomFunctions.swift; path = SQLite/Typed/CustomFunctions.swift; sourceTree = "<group>"; };
 		5F828E99FDED1CCC7DF8981B8955056B /* Sequence.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Sequence.swift; path = Swiftification/Sequence.swift; sourceTree = "<group>"; };
-		5F96AF1BFD7A327E89974323DD7D5A29 /* SQLite-Bridging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "SQLite-Bridging.h"; path = "SQLite/Core/SQLite-Bridging.h"; sourceTree = "<group>"; };
 		5FD037514E4969BEC71774A33033E204 /* Pods-LDSAnnotations-LDSAnnotationsTests-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LDSAnnotations-LDSAnnotationsTests-resources.sh"; sourceTree = "<group>"; };
 		614E40B1BD54A7C8A79805573595004D /* ProcedureKit.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = ProcedureKit.modulemap; sourceTree = "<group>"; };
-		61EE64ABF40EE5F03ECB529397C1BAC3 /* Connection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Connection.swift; path = SQLite/Core/Connection.swift; sourceTree = "<group>"; };
 		62D6FF45D8CFC1B73D46FECE8BBF6596 /* Pods-LDSAnnotations-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LDSAnnotations-resources.sh"; sourceTree = "<group>"; };
-		63DA3077FBC1821C44375190701A02D7 /* RTree.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RTree.swift; path = SQLite/Extensions/RTree.swift; sourceTree = "<group>"; };
 		6485C9F163C13EF865C798F40904DBFD /* Pods-LDSAnnotations-LDSAnnotationsDemo.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-LDSAnnotations-LDSAnnotationsDemo.modulemap"; sourceTree = "<group>"; };
 		64D23AC0E41D47F3A0FDC7CA1A188E3E /* Pods-LDSAnnotations-LDSAnnotationsDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LDSAnnotations-LDSAnnotationsDemo.release.xcconfig"; sourceTree = "<group>"; };
 		655269ED9257079AA8B87F9F86DBFD6C /* NSAttributedString.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NSAttributedString.swift; path = Swiftification/NSAttributedString.swift; sourceTree = "<group>"; };
 		659638C2ADECC424117F5BD3BA5CD54F /* LocksmithError.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocksmithError.swift; path = Source/LocksmithError.swift; sourceTree = "<group>"; };
+		666C37086520182862BA824F2B321B21 /* SQLite.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SQLite.h; path = Sources/SQLite/SQLite.h; sourceTree = "<group>"; };
 		66CACEFE1C8B849F053033C49D1581D6 /* ProcedureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = ProcedureKit.framework; path = ProcedureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		66FD47E0B40B4D7C0DBC6F772B3FD74B /* fts3_tokenizer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = fts3_tokenizer.h; path = SQLite/Core/fts3_tokenizer.h; sourceTree = "<group>"; };
 		67AF789D5282D999922B0B168B89089C /* BlockObservers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BlockObservers.swift; path = Sources/BlockObservers.swift; sourceTree = "<group>"; };
 		6995F49D48E58B0D9680B6AA877D0ED7 /* Pods-LDSAnnotations.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LDSAnnotations.release.xcconfig"; sourceTree = "<group>"; };
-		699DC5CDAFCEBD17E830A8B430D011EF /* Helpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Helpers.swift; path = SQLite/Helpers.swift; sourceTree = "<group>"; };
 		69E84FC1519BC9DA2753D5ABB8E668EC /* Memoize.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Memoize.swift; path = Swiftification/Memoize.swift; sourceTree = "<group>"; };
 		6BB9DE2D72E935C2DA00108AE76A5EFD /* Pods-LDSAnnotations-LDSAnnotationsDemo-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-LDSAnnotations-LDSAnnotationsDemo-umbrella.h"; sourceTree = "<group>"; };
-		6C5F03C933EDDAAB8E464010B541E339 /* Statement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Statement.swift; path = SQLite/Core/Statement.swift; sourceTree = "<group>"; };
 		6CF12D9380ED09EAB63940E374476005 /* Pods-LDSAnnotations-LDSAnnotationsDemo-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-LDSAnnotations-LDSAnnotationsDemo-acknowledgements.plist"; sourceTree = "<group>"; };
+		6EF1D874B0A22F1058E061DCBC61789D /* Collation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Collation.swift; path = Sources/SQLite/Typed/Collation.swift; sourceTree = "<group>"; };
 		70C27C591C04A1968189E63279F9CD72 /* Dictionary_Initializers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Dictionary_Initializers.swift; path = Source/Dictionary_Initializers.swift; sourceTree = "<group>"; };
+		7825803E2164F6F8A8CBAD13E2DC63B6 /* Expression.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Expression.swift; path = Sources/SQLite/Typed/Expression.swift; sourceTree = "<group>"; };
 		7976361FD1AE66AAD62B4A79E3D86C82 /* Swiftification-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Swiftification-prefix.pch"; sourceTree = "<group>"; };
 		7C65C31FAA5E8E4122CA1A95B7466758 /* Pods-LDSAnnotations-LDSAnnotationsTests-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-LDSAnnotations-LDSAnnotationsTests-acknowledgements.markdown"; sourceTree = "<group>"; };
 		82287EBB3254C59A01DE303EDE94C06A /* Locksmith-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Locksmith-prefix.pch"; sourceTree = "<group>"; };
+		8247F55FF625307386A7A5816E858D2D /* SQLite-Bridging.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = "SQLite-Bridging.h"; path = "Sources/SQLiteObjc/include/SQLite-Bridging.h"; sourceTree = "<group>"; };
 		8251E1FFE178BE8E30994AB01E17811E /* Support.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Support.swift; path = Sources/Support.swift; sourceTree = "<group>"; };
 		83E0CF0D31EDDDE2C9C97989735A6448 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		85CC5F6CE0C6F5FFD3E10CDC635674B7 /* ObserverSet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ObserverSet.swift; path = Swiftification/ObserverSet.swift; sourceTree = "<group>"; };
@@ -266,30 +262,32 @@
 		892026CD58D3F31B0C2C5A02E7FF573A /* Pods-LDSAnnotations.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-LDSAnnotations.modulemap"; sourceTree = "<group>"; };
 		8A058A0236EDE8EB84B5EE67276553C2 /* Locksmith.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = Locksmith.modulemap; sourceTree = "<group>"; };
 		8C32B95B5DB62E142431B7CD141F0EAC /* Locksmith.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Locksmith.swift; path = Source/Locksmith.swift; sourceTree = "<group>"; };
+		8CA4DC565AADEB3ED82B74C43B51BD74 /* FTS5.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FTS5.swift; path = Sources/SQLite/Extensions/FTS5.swift; sourceTree = "<group>"; };
+		8DAA9FEE2F2D7CD85398F26C134BD1CA /* RTree.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RTree.swift; path = Sources/SQLite/Extensions/RTree.swift; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		9407E0E9B12C8D44A3637907D3388BB5 /* Composed.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Composed.swift; path = Sources/Composed.swift; sourceTree = "<group>"; };
 		952120DF96CF270801E2846F35B135CD /* String.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = String.swift; path = Swiftification/String.swift; sourceTree = "<group>"; };
 		9675893E85F0FCE9123BBC96B3DD8A18 /* Pods_LDSAnnotations_LDSAnnotationsDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_LDSAnnotations_LDSAnnotationsDemo.framework; path = "Pods-LDSAnnotations-LDSAnnotationsDemo.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		96F9C8071A0B0AEBEB692B7A9F7728FE /* Pods-LDSAnnotations-LDSAnnotationsTests.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-LDSAnnotations-LDSAnnotationsTests.modulemap"; sourceTree = "<group>"; };
-		97CAB878DB67A8A70F91468422D157A9 /* Query.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Query.swift; path = SQLite/Typed/Query.swift; sourceTree = "<group>"; };
 		9899AB5AF991A93ED42EA74F314D6211 /* Pods-LDSAnnotations-LDSAnnotationsTests-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-LDSAnnotations-LDSAnnotationsTests-umbrella.h"; sourceTree = "<group>"; };
-		99E79685227A5B4E1122BFA26BB31138 /* CoreFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreFunctions.swift; path = SQLite/Typed/CoreFunctions.swift; sourceTree = "<group>"; };
 		9A34DF6ABD7D4D284E75E9B35F2D18D3 /* Pods-LDSAnnotations-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-LDSAnnotations-umbrella.h"; sourceTree = "<group>"; };
 		9C9138ACFD416B85F0F4E3F3D6F9C7EB /* Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9EB71A566ED3F1FF1EE46A10A9EA3E0B /* Filter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Filter.swift; path = Sources/Filter.swift; sourceTree = "<group>"; };
 		A0900663DCCDC81936F8F0D5835EE41F /* ProcedureKit-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "ProcedureKit-dummy.m"; sourceTree = "<group>"; };
 		A1CF90D60A3431439C871035DD7CCDF9 /* Locksmith.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Locksmith.h; path = Source/Locksmith.h; sourceTree = "<group>"; };
-		A62A8B7125D281A12212D0D947E0FA3B /* AggregateFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AggregateFunctions.swift; path = SQLite/Typed/AggregateFunctions.swift; sourceTree = "<group>"; };
 		A63E9A8A96989A4435B34C4AA656EA3A /* Locksmith-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Locksmith-umbrella.h"; sourceTree = "<group>"; };
-		A8E9D816A670FAF67C3FEC0DDD057954 /* SQLite-Bridging.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = "SQLite-Bridging.m"; path = "SQLite/Core/SQLite-Bridging.m"; sourceTree = "<group>"; };
+		A77F59212FE234311337CCAC666D8403 /* Setter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Setter.swift; path = Sources/SQLite/Typed/Setter.swift; sourceTree = "<group>"; };
 		A94F42223762D83F035C7F9AE5A1E3F5 /* Block.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Block.swift; path = Sources/Block.swift; sourceTree = "<group>"; };
 		B07B19E9E0855852B3BA57E02C2F884D /* SQLite.swift.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = SQLite.swift.modulemap; sourceTree = "<group>"; };
 		B080F7882225CDE5CD8EE5AAE1A5CA65 /* Errors.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Errors.swift; path = Sources/Errors.swift; sourceTree = "<group>"; };
+		B28F6882ADA8CA08EE1F0A62DF721D7A /* CoreFunctions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CoreFunctions.swift; path = Sources/SQLite/Typed/CoreFunctions.swift; sourceTree = "<group>"; };
 		B466E95CF4E83F562DD1D1B9DE8BC2E2 /* SQLite.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = SQLite.framework; path = SQLite.swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4690263E3C2DD3C24DEAC554FFBD486 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		B65F310B4D2F1DA717CC898ECA585D73 /* Reduce.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Reduce.swift; path = Sources/Reduce.swift; sourceTree = "<group>"; };
+		B7E3BCA0BB69EC85B8D439F27882D74B /* Query.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Query.swift; path = Sources/SQLite/Typed/Query.swift; sourceTree = "<group>"; };
 		BA04BDA0587ED113B8F6BBE78DCDEA8A /* Array.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Array.swift; path = Swiftification/Array.swift; sourceTree = "<group>"; };
 		BA9C724278B4D302BB129C521808B3EF /* Swiftification.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Swiftification.xcconfig; sourceTree = "<group>"; };
+		BCF76B6C3538FA887C288EB049B6B034 /* Value.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Value.swift; path = Sources/SQLite/Core/Value.swift; sourceTree = "<group>"; };
 		BFCD00D19C174BB47835BEFBD1FB604B /* Pods-LDSAnnotations-LDSAnnotationsTests-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LDSAnnotations-LDSAnnotationsTests-frameworks.sh"; sourceTree = "<group>"; };
 		C320B3E4E2FD6DDDCAA39EE92736D949 /* ProcedureKit-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "ProcedureKit-prefix.pch"; sourceTree = "<group>"; };
 		C3DE56E51077174D272B414607B2B483 /* LocksmithAccessibleOption.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LocksmithAccessibleOption.swift; path = Source/LocksmithAccessibleOption.swift; sourceTree = "<group>"; };
@@ -306,9 +304,11 @@
 		D89033D2B795BCF86607CEDA16426BAF /* Pods-LDSAnnotations-LDSAnnotationsDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-LDSAnnotations-LDSAnnotationsDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		D8E16BB2CDF35A59FAEC5BB0EF52E6C0 /* SQLite.swift.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = SQLite.swift.xcconfig; sourceTree = "<group>"; };
 		DA839596BAF7F9A7220CD1A90E342D7B /* ProcedureKit.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = ProcedureKit.xcconfig; sourceTree = "<group>"; };
+		DCEB12F1DFA3659536BC4B668CB6E717 /* Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Foundation.swift; path = Sources/SQLite/Foundation.swift; sourceTree = "<group>"; };
 		DDA8F13147A29B51A9E8DF869A25B1B8 /* Pods_LDSAnnotations.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_LDSAnnotations.framework; path = "Pods-LDSAnnotations.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE07DBDFCFB89BE2CC8ABE19DBFF81F2 /* Int.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Int.swift; path = Swiftification/Int.swift; sourceTree = "<group>"; };
 		DE30CA36A96B00D00366EA8AC0D9674B /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E251CD215393A6001B57BF1170015C8E /* FTS4.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FTS4.swift; path = Sources/SQLite/Extensions/FTS4.swift; sourceTree = "<group>"; };
 		E6D3E90A53DB84C48DF0640363DC347B /* NegatedCondition.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NegatedCondition.swift; path = Sources/NegatedCondition.swift; sourceTree = "<group>"; };
 		E7F5DEB04AAD4D81E97F02DB40BF08C1 /* ProcedureObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProcedureObserver.swift; path = Sources/ProcedureObserver.swift; sourceTree = "<group>"; };
 		E9231618491FC7756CE003072373C5F8 /* Locksmith.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Locksmith.xcconfig; sourceTree = "<group>"; };
@@ -319,13 +319,13 @@
 		F0966645036BD5792ADD21EF7BCCFB8D /* SQLite.swift-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "SQLite.swift-dummy.m"; sourceTree = "<group>"; };
 		F10FD6A2271A175C963225566C2FDCE7 /* Double.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Double.swift; path = Swiftification/Double.swift; sourceTree = "<group>"; };
 		F33F06215AF2BA86E0C6110C735E1B72 /* Retry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Retry.swift; path = Sources/Retry.swift; sourceTree = "<group>"; };
+		F37BE06783DE1C757073A44889E72DF5 /* fts3_tokenizer.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = fts3_tokenizer.h; path = Sources/SQLiteObjc/fts3_tokenizer.h; sourceTree = "<group>"; };
+		F506DE579036F05B2FE0E58CB7DE6E49 /* Schema.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Schema.swift; path = Sources/SQLite/Typed/Schema.swift; sourceTree = "<group>"; };
 		F648E5F2D5EB8281C01AAF834ED3EAA6 /* CaseCountable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CaseCountable.swift; path = Swiftification/CaseCountable.swift; sourceTree = "<group>"; };
 		F674B158A510128EC718AB75365B3B45 /* Locksmith.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Locksmith.framework; path = Locksmith.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F98080946BC0BCBD77CB1132725CFEA8 /* SQLite.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = SQLite.h; path = SQLite/SQLite.h; sourceTree = "<group>"; };
 		FA690E23C9D1AEA42BD7046271DD7CA1 /* Pods-LDSAnnotations-LDSAnnotationsTests-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-LDSAnnotations-LDSAnnotationsTests-acknowledgements.plist"; sourceTree = "<group>"; };
 		FA94FA9B3E6BC4A3633E7E3A29562F59 /* Logging.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Logging.swift; path = Sources/Logging.swift; sourceTree = "<group>"; };
 		FAE1D543CE358B54278B2781DAB11FD2 /* ProcedureProcotol.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ProcedureProcotol.swift; path = Sources/ProcedureProcotol.swift; sourceTree = "<group>"; };
-		FC94C982FB1996E880938898582A3067 /* Foundation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Foundation.swift; path = SQLite/Foundation.swift; sourceTree = "<group>"; };
 		FE61B7F78114FA8F8777F8AEAD8ABE0D /* Locksmith-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Locksmith-dummy.m"; sourceTree = "<group>"; };
 		FF0C53E9963D3B20F0EF1DC5E0A47182 /* Pods-LDSAnnotations-LDSAnnotationsDemo-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-LDSAnnotations-LDSAnnotationsDemo-resources.sh"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -453,7 +453,7 @@
 		55267A92FD145E531016AF80CAB35F6F /* SQLite.swift */ = {
 			isa = PBXGroup;
 			children = (
-				EB52BB8F7768DB0B736E875E5B05A9B1 /* standard */,
+				BF03F46E9B295616995CB3CE8A04EB7B /* standard */,
 				B84F7FC96D5878A2E9A9EB95E1FCF0BC /* Support Files */,
 			);
 			name = SQLite.swift;
@@ -572,6 +572,35 @@
 			path = "../Target Support Files/SQLite.swift";
 			sourceTree = "<group>";
 		};
+		BF03F46E9B295616995CB3CE8A04EB7B /* standard */ = {
+			isa = PBXGroup;
+			children = (
+				4B1701103D80378CBDF40354DE664B3C /* AggregateFunctions.swift */,
+				32701CBC0774FCC8A91F1C8256358923 /* Blob.swift */,
+				6EF1D874B0A22F1058E061DCBC61789D /* Collation.swift */,
+				1B37BB8F7B5BEC8DA6A4C3C9863EC8CD /* Connection.swift */,
+				B28F6882ADA8CA08EE1F0A62DF721D7A /* CoreFunctions.swift */,
+				32BDF202B8AFF7FE6E8AF37CA3466E6F /* CustomFunctions.swift */,
+				7825803E2164F6F8A8CBAD13E2DC63B6 /* Expression.swift */,
+				DCEB12F1DFA3659536BC4B668CB6E717 /* Foundation.swift */,
+				F37BE06783DE1C757073A44889E72DF5 /* fts3_tokenizer.h */,
+				E251CD215393A6001B57BF1170015C8E /* FTS4.swift */,
+				8CA4DC565AADEB3ED82B74C43B51BD74 /* FTS5.swift */,
+				4CA9F6EF16F6A74C4CC0EAF26623ACDD /* Helpers.swift */,
+				3755924588BF543BA858639193F90B11 /* Operators.swift */,
+				B7E3BCA0BB69EC85B8D439F27882D74B /* Query.swift */,
+				8DAA9FEE2F2D7CD85398F26C134BD1CA /* RTree.swift */,
+				F506DE579036F05B2FE0E58CB7DE6E49 /* Schema.swift */,
+				A77F59212FE234311337CCAC666D8403 /* Setter.swift */,
+				666C37086520182862BA824F2B321B21 /* SQLite.h */,
+				8247F55FF625307386A7A5816E858D2D /* SQLite-Bridging.h */,
+				5285060FD13F73316AB9807A199AAEE4 /* SQLite-Bridging.m */,
+				047845191991E7703A92E55CC00DC376 /* Statement.swift */,
+				BCF76B6C3538FA887C288EB049B6B034 /* Value.swift */,
+			);
+			name = standard;
+			sourceTree = "<group>";
+		};
 		BFBF1270D5350B86A09463DB723AAF20 /* Standard */ = {
 			isa = PBXGroup;
 			children = (
@@ -645,35 +674,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		EB52BB8F7768DB0B736E875E5B05A9B1 /* standard */ = {
-			isa = PBXGroup;
-			children = (
-				A62A8B7125D281A12212D0D947E0FA3B /* AggregateFunctions.swift */,
-				09789328C2934B07043F08D28E1D33AF /* Blob.swift */,
-				457DFF4144D85476E1AB76BFB6E7704F /* Collation.swift */,
-				61EE64ABF40EE5F03ECB529397C1BAC3 /* Connection.swift */,
-				99E79685227A5B4E1122BFA26BB31138 /* CoreFunctions.swift */,
-				5DC06DE788E509620A6525BD25F8BE1A /* CustomFunctions.swift */,
-				0F33B43057E59483110EBCCD73EAECC1 /* Expression.swift */,
-				FC94C982FB1996E880938898582A3067 /* Foundation.swift */,
-				66FD47E0B40B4D7C0DBC6F772B3FD74B /* fts3_tokenizer.h */,
-				5005FD1EC63281CDBEA582311BB0BA69 /* FTS4.swift */,
-				4D951481AB8CFACFCC381CA7026673C1 /* FTS5.swift */,
-				699DC5CDAFCEBD17E830A8B430D011EF /* Helpers.swift */,
-				5CABFA1A385DB334CBE126F645E4E282 /* Operators.swift */,
-				97CAB878DB67A8A70F91468422D157A9 /* Query.swift */,
-				63DA3077FBC1821C44375190701A02D7 /* RTree.swift */,
-				1D259F773F3276E233005DB894516997 /* Schema.swift */,
-				0C07FF10E7F306F32BEA147F75114CAE /* Setter.swift */,
-				F98080946BC0BCBD77CB1132725CFEA8 /* SQLite.h */,
-				5F96AF1BFD7A327E89974323DD7D5A29 /* SQLite-Bridging.h */,
-				A8E9D816A670FAF67C3FEC0DDD057954 /* SQLite-Bridging.m */,
-				6C5F03C933EDDAAB8E464010B541E339 /* Statement.swift */,
-				50846CB3D9357AF365DCA1BC6F5E91B6 /* Value.swift */,
-			);
-			name = standard;
-			sourceTree = "<group>";
-		};
 		F18732492190E16D8C648D9158487652 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -711,9 +711,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BFA6642696FAB81AAC4CEEC9D625D357 /* fts3_tokenizer.h in Headers */,
-				0D30B7040CBFC8B6A744748FEB1ABFC7 /* SQLite-Bridging.h in Headers */,
-				586C14F31D6A5BD5AB45887B8D3D3F9F /* SQLite.h in Headers */,
+				E69EACFCC44DB6FBE2EC21ACCCB15087 /* fts3_tokenizer.h in Headers */,
+				6A3F7EA0D73431EC76C1A5DD92A8C196 /* SQLite-Bridging.h in Headers */,
+				6CDBC6A854B4B73BCF2EC007D87F9A70 /* SQLite.h in Headers */,
 				40D2808D41B26EA9759920F2EF14F091 /* SQLite.swift-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -938,26 +938,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51C9C6E702AE795A07A3A8AD80D0CD52 /* AggregateFunctions.swift in Sources */,
-				851342BE1B732DE4F30ECC4BEB623F4D /* Blob.swift in Sources */,
-				352D34473E06B2DCF28607E69F8E6F1E /* Collation.swift in Sources */,
-				BC381DBD18351023D620E78BFAEBB7A5 /* Connection.swift in Sources */,
-				8C53C069AD0B9BEB3AAA998E05C85680 /* CoreFunctions.swift in Sources */,
-				06950DBB81502CF959021299A7C6937D /* CustomFunctions.swift in Sources */,
-				CAE5F9D4EF115D0A8C73C37ADADFB26D /* Expression.swift in Sources */,
-				7B72BD75C426DD8FE7FDD4C8C67B1042 /* Foundation.swift in Sources */,
-				F42C234AE47144B24E1C0AFB48B98D9C /* FTS4.swift in Sources */,
-				3F6E5D994B314C69426E7A26AF7F7C46 /* FTS5.swift in Sources */,
-				A0122FA3DA0C398D2E56230C845FCC40 /* Helpers.swift in Sources */,
-				59BE3F796084B879515F6FD1C73A8378 /* Operators.swift in Sources */,
-				C43AEF6717AEC757749CB63331047C3F /* Query.swift in Sources */,
-				E2D0BF64C9B224C1B6C31FFC31FDDB52 /* RTree.swift in Sources */,
-				2843A43C2096B3AE8DB9778A662460FD /* Schema.swift in Sources */,
-				4C2DBDB481B52104263F95FBC8F5FF8C /* Setter.swift in Sources */,
-				AFD75A5E9786CE6CF4F4D5CBE311D3FF /* SQLite-Bridging.m in Sources */,
+				802BF76BE5FAE8784A5F32D359F9773E /* AggregateFunctions.swift in Sources */,
+				055B509D3373927F516EF21AE16BE135 /* Blob.swift in Sources */,
+				254D616D57374C0CB1AA9AA9ADE53E4E /* Collation.swift in Sources */,
+				E99179DD8F4942ED465091C0D0E2D3A8 /* Connection.swift in Sources */,
+				F86ECDBF5EF8C538E02085B9DA057D65 /* CoreFunctions.swift in Sources */,
+				D84556382F10734C5ED6813D60ED23DC /* CustomFunctions.swift in Sources */,
+				B936A5FF6CAF6DD855D26989C9AAC84A /* Expression.swift in Sources */,
+				48C9228C8F5FDB864B29723A27CEF477 /* Foundation.swift in Sources */,
+				3E131A914AE9DA9E0570D9CA6D194F95 /* FTS4.swift in Sources */,
+				69F6789CABBDF0E580E9002658D5332E /* FTS5.swift in Sources */,
+				695C5404AAE64FBE2809D54DB69CBE9C /* Helpers.swift in Sources */,
+				8F8F343257ABB6E252B7222535D52DCA /* Operators.swift in Sources */,
+				634852F8B309B67630CF23AEA5957E19 /* Query.swift in Sources */,
+				0871B3774D77D0C472351127B942B42C /* RTree.swift in Sources */,
+				3FDF0502BCFAE0906D976C9423C629B7 /* Schema.swift in Sources */,
+				524F6146F25682382F9BD9318603D31B /* Setter.swift in Sources */,
+				F4AE7988B83A3AC8038DC8E5DC913741 /* SQLite-Bridging.m in Sources */,
 				149AE7DF3E506A32DBF590A29F673C03 /* SQLite.swift-dummy.m in Sources */,
-				C5EF5C73EF0189EEDD04F0C4679AE868 /* Statement.swift in Sources */,
-				FB42204D834CE595EB6D0DD0F74DBFFC /* Value.swift in Sources */,
+				56916AF0E04B96E94388DE725F1692A2 /* Statement.swift in Sources */,
+				C5277D3F3ADDC71F5D4504BB13A8BA35 /* Value.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1165,9 +1165,41 @@
 			};
 			name = Debug;
 		};
-		227C325D152A68BDFC829D497EA778E8 /* Debug */ = {
+		14766285500F44E90C1F3F0A2B4435C7 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E9231618491FC7756CE003072373C5F8 /* Locksmith.xcconfig */;
+			baseConfigurationReference = DA839596BAF7F9A7220CD1A90E342D7B /* ProcedureKit.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/ProcedureKit/ProcedureKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/ProcedureKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/ProcedureKit/ProcedureKit.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = ProcedureKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		1BA32C23DA0514E9C59364D3CA6E81C6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4593AC8F26DCC977AF75DB61CF19D1FF /* Pods-LDSAnnotations.debug.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1180,23 +1212,91 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Locksmith/Locksmith-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Locksmith/Info.plist";
+				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/Locksmith/Locksmith.modulemap";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = Locksmith;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LDSAnnotations;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0.1;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
+		};
+		2F96924E0450A9202413A67DDD288D85 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D8E16BB2CDF35A59FAEC5BB0EF52E6C0 /* SQLite.swift.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/SQLite.swift/SQLite.swift-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/SQLite.swift/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/SQLite.swift/SQLite.swift.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = SQLite;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		3B857057593163E12E28CFF5D62146B8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = BA9C724278B4D302BB129C521808B3EF /* Swiftification.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Swiftification/Swiftification-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Swiftification/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Swiftification/Swiftification.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = Swiftification;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
 		};
 		44CDBB6D11DE06DB64D6268622BDC47E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -1238,45 +1338,9 @@
 			};
 			name = Release;
 		};
-		4C4BA826C38DFF7C0DCA663816D86AB2 /* Debug */ = {
+		7AB952C8C9AA41413FBB9DB6B5A27B4B /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4593AC8F26DCC977AF75DB61CF19D1FF /* Pods-LDSAnnotations.debug.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.modulemap";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = Pods_LDSAnnotations;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		59827CA331D81B07354ADE8529B24963 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = DA839596BAF7F9A7220CD1A90E342D7B /* ProcedureKit.xcconfig */;
+			baseConfigurationReference = E9231618491FC7756CE003072373C5F8 /* Locksmith.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1289,24 +1353,57 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/ProcedureKit/ProcedureKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/ProcedureKit/Info.plist";
+				GCC_PREFIX_HEADER = "Target Support Files/Locksmith/Locksmith-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Locksmith/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/ProcedureKit/ProcedureKit.modulemap";
+				MODULEMAP_FILE = "Target Support Files/Locksmith/Locksmith.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = ProcedureKit;
+				PRODUCT_NAME = Locksmith;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0.1;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
-		5F7622E65B28FBC0CF05471E5F6B8DCD /* Release */ = {
+		9077863B099C7B97EF413B34440FF9BF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = DA839596BAF7F9A7220CD1A90E342D7B /* ProcedureKit.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/ProcedureKit/ProcedureKit-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/ProcedureKit/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/ProcedureKit/ProcedureKit.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = ProcedureKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		9BF8942E03BD11C9FF05FF2993D32339 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 64D23AC0E41D47F3A0FDC7CA1A188E3E /* Pods-LDSAnnotations-LDSAnnotationsDemo.release.xcconfig */;
 			buildSettings = {
@@ -1335,82 +1432,14 @@
 				PRODUCT_NAME = Pods_LDSAnnotations_LDSAnnotationsDemo;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
-		65B6C6B3079869FF0415FCC8BEC08982 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = DA839596BAF7F9A7220CD1A90E342D7B /* ProcedureKit.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/ProcedureKit/ProcedureKit-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/ProcedureKit/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/ProcedureKit/ProcedureKit.modulemap";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = ProcedureKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0.1;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		678F4C5FC2FAEEB753661934AA4608D6 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = D89033D2B795BCF86607CEDA16426BAF /* Pods-LDSAnnotations-LDSAnnotationsDemo.debug.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsDemo/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsDemo/Pods-LDSAnnotations-LDSAnnotationsDemo.modulemap";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = Pods_LDSAnnotations_LDSAnnotationsDemo;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		72C7B67C7880BA424D4DB3565981A277 /* Release */ = {
+		B02A00B868052A7BD6D4AD430A098086 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BA9C724278B4D302BB129C521808B3EF /* Swiftification.xcconfig */;
 			buildSettings = {
@@ -1418,7 +1447,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -1431,20 +1460,21 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MODULEMAP_FILE = "Target Support Files/Swiftification/Swiftification.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = Swiftification;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0.1;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
-			name = Release;
+			name = Debug;
 		};
-		7555C263C9A17D2461CC5CBC3FE71307 /* Release */ = {
+		D58EB636458E4D5D4EF09597F0DF8EF5 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E9231618491FC7756CE003072373C5F8 /* Locksmith.xcconfig */;
+			baseConfigurationReference = 869CF809251625DF3FB0FB68325B0B7D /* Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1457,24 +1487,97 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Locksmith/Locksmith-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Locksmith/Info.plist";
+				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/Locksmith/Locksmith.modulemap";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Pods-LDSAnnotations-LDSAnnotationsTests.modulemap";
 				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = Locksmith;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LDSAnnotations_LDSAnnotationsTests;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0.1;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
-		788828E8587E43EBC144264D908E811B /* Debug */ = {
+		E6EFE3D2B316608841162EA3620B2441 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6995F49D48E58B0D9680B6AA877D0ED7 /* Pods-LDSAnnotations.release.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.modulemap";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LDSAnnotations;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		EAD51297C9B43B2BB5BF0C6E8E573464 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E9231618491FC7756CE003072373C5F8 /* Locksmith.xcconfig */;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREFIX_HEADER = "Target Support Files/Locksmith/Locksmith-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Locksmith/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Locksmith/Locksmith.modulemap";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_NAME = Locksmith;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		F1A3ADBBAD2EE68D2F925A31FBA1D2B8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D8E16BB2CDF35A59FAEC5BB0EF52E6C0 /* SQLite.swift.xcconfig */;
 			buildSettings = {
@@ -1500,14 +1603,14 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0.1;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
 		};
-		7D7EE3E6A50BC5339635E4EC65B80377 /* Debug */ = {
+		F6EDC01B54FE9B5F3559417E27380335 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9C9138ACFD416B85F0F4E3F3D6F9C7EB /* Pods-LDSAnnotations-LDSAnnotationsTests.debug.xcconfig */;
 			buildSettings = {
@@ -1537,15 +1640,16 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
 		};
-		9B9199320A033072270F1603338CA5F6 /* Debug */ = {
+		F998A00C844ECE7B432DA6A025BD459E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BA9C724278B4D302BB129C521808B3EF /* Swiftification.xcconfig */;
+			baseConfigurationReference = D89033D2B795BCF86607CEDA16426BAF /* Pods-LDSAnnotations-LDSAnnotationsDemo.debug.xcconfig */;
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1558,125 +1662,27 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/Swiftification/Swiftification-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Swiftification/Info.plist";
+				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsDemo/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/Swiftification/Swiftification.modulemap";
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsDemo/Pods-LDSAnnotations-LDSAnnotationsDemo.modulemap";
 				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = Swiftification;
+				OTHER_LDFLAGS = "";
+				OTHER_LIBTOOLFLAGS = "";
+				PODS_ROOT = "$(SRCROOT)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = Pods_LDSAnnotations_LDSAnnotationsDemo;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0.1;
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
-		};
-		E44DA1D197A5E4FC93C4F43A90F83938 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6995F49D48E58B0D9680B6AA877D0ED7 /* Pods-LDSAnnotations.release.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations/Pods-LDSAnnotations.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = Pods_LDSAnnotations;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		F71864D7E9839137D095F8AE91FD61C1 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 869CF809251625DF3FB0FB68325B0B7D /* Pods-LDSAnnotations-LDSAnnotationsTests.release.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MACH_O_TYPE = staticlib;
-				MODULEMAP_FILE = "Target Support Files/Pods-LDSAnnotations-LDSAnnotationsTests/Pods-LDSAnnotations-LDSAnnotationsTests.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_LDFLAGS = "";
-				OTHER_LIBTOOLFLAGS = "";
-				PODS_ROOT = "$(SRCROOT)";
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.${PRODUCT_NAME:rfc1034identifier}";
-				PRODUCT_NAME = Pods_LDSAnnotations_LDSAnnotationsTests;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
-		F936D77CB874473324DDAC9D213360B3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = D8E16BB2CDF35A59FAEC5BB0EF52E6C0 /* SQLite.swift.xcconfig */;
-			buildSettings = {
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREFIX_HEADER = "Target Support Files/SQLite.swift/SQLite.swift-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/SQLite.swift/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/SQLite.swift/SQLite.swift.modulemap";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = SQLite;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 3.0.1;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -1684,8 +1690,8 @@
 		063E8AA497EC982B7652E7F11230D944 /* Build configuration list for PBXNativeTarget "Pods-LDSAnnotations" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4C4BA826C38DFF7C0DCA663816D86AB2 /* Debug */,
-				E44DA1D197A5E4FC93C4F43A90F83938 /* Release */,
+				1BA32C23DA0514E9C59364D3CA6E81C6 /* Debug */,
+				E6EFE3D2B316608841162EA3620B2441 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1693,8 +1699,8 @@
 		081536B20119B61524E2EBA00F984045 /* Build configuration list for PBXNativeTarget "Pods-LDSAnnotations-LDSAnnotationsTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				7D7EE3E6A50BC5339635E4EC65B80377 /* Debug */,
-				F71864D7E9839137D095F8AE91FD61C1 /* Release */,
+				F6EDC01B54FE9B5F3559417E27380335 /* Debug */,
+				D58EB636458E4D5D4EF09597F0DF8EF5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1702,8 +1708,8 @@
 		294A9EF2E0B6D19A24BE6E3D9E5072E1 /* Build configuration list for PBXNativeTarget "Locksmith" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				227C325D152A68BDFC829D497EA778E8 /* Debug */,
-				7555C263C9A17D2461CC5CBC3FE71307 /* Release */,
+				EAD51297C9B43B2BB5BF0C6E8E573464 /* Debug */,
+				7AB952C8C9AA41413FBB9DB6B5A27B4B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1720,8 +1726,8 @@
 		3CBCB3C2887B51950535DBACBE91FBBB /* Build configuration list for PBXNativeTarget "ProcedureKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				65B6C6B3079869FF0415FCC8BEC08982 /* Debug */,
-				59827CA331D81B07354ADE8529B24963 /* Release */,
+				9077863B099C7B97EF413B34440FF9BF /* Debug */,
+				14766285500F44E90C1F3F0A2B4435C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1729,8 +1735,8 @@
 		7ACE23160EB5E387C26ED0DA46FC746D /* Build configuration list for PBXNativeTarget "SQLite.swift" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				788828E8587E43EBC144264D908E811B /* Debug */,
-				F936D77CB874473324DDAC9D213360B3 /* Release */,
+				F1A3ADBBAD2EE68D2F925A31FBA1D2B8 /* Debug */,
+				2F96924E0450A9202413A67DDD288D85 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1738,8 +1744,8 @@
 		853E91E33CB41995911CFE6079FAEE7D /* Build configuration list for PBXNativeTarget "Pods-LDSAnnotations-LDSAnnotationsDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				678F4C5FC2FAEEB753661934AA4608D6 /* Debug */,
-				5F7622E65B28FBC0CF05471E5F6B8DCD /* Release */,
+				F998A00C844ECE7B432DA6A025BD459E /* Debug */,
+				9BF8942E03BD11C9FF05FF2993D32339 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1747,8 +1753,8 @@
 		A92D2A0F1DE67B1A78D336D93976C406 /* Build configuration list for PBXNativeTarget "Swiftification" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9B9199320A033072270F1603338CA5F6 /* Debug */,
-				72C7B67C7880BA424D4DB3565981A277 /* Release */,
+				B02A00B868052A7BD6D4AD430A098086 /* Debug */,
+				3B857057593163E12E28CFF5D62146B8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

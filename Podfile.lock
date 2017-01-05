@@ -3,10 +3,10 @@ PODS:
   - ProcedureKit (4.0.0.beta.4):
     - ProcedureKit/Standard (= 4.0.0.beta.4)
   - ProcedureKit/Standard (4.0.0.beta.4)
-  - SQLite.swift (0.11.0):
-    - SQLite.swift/standard (= 0.11.0)
-  - SQLite.swift/standard (0.11.0)
-  - Swiftification (9.1.0)
+  - SQLite.swift (0.11.2):
+    - SQLite.swift/standard (= 0.11.2)
+  - SQLite.swift/standard (0.11.2)
+  - Swiftification (9.2.0)
 
 DEPENDENCIES:
   - Locksmith
@@ -17,9 +17,9 @@ DEPENDENCIES:
 SPEC CHECKSUMS:
   Locksmith: 310b4cc5031af5728bf4db5d4de547a5100c6a3b
   ProcedureKit: 554ca98c4d5a22ed134f12b5d929944b2abd62bf
-  SQLite.swift: 9a26273607d3077a2e5a8d33486e9989f8404c7d
-  Swiftification: 5ab668789606ff59e62f413e98c695029953e8b5
+  SQLite.swift: 670c3e9e0a806bbfd56a3de5d530768dc0e6fe7c
+  Swiftification: 20aa4e19571a41173c9e96c8b4170da429545945
 
-PODFILE CHECKSUM: d5ff36e50899c6193b692b2493da6c6f447a18d4
+PODFILE CHECKSUM: 681030ee093331d08644632273869a44b120492a
 
-COCOAPODS: 1.2.0.beta.1
+COCOAPODS: 1.2.0.beta.3

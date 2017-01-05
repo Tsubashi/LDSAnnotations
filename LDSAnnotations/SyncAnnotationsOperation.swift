@@ -441,7 +441,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                                     }
                                     
                                     let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
-                                    let style = (highlight["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .Highlight
+                                    let style = (highlight["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .highlight
                                     
                                     try self.annotationStore.addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID, source: self.source)
                                     self.downloadHighlightCount += 1

@@ -44,7 +44,7 @@ public struct Highlight: Equatable {
         self.id = id
         self.paragraphRange = paragraphRange
         self.colorName = colorName
-        self.style = style ?? .Highlight
+        self.style = style ?? .highlight
         self.annotationID = annotationID
     }
     
@@ -57,7 +57,7 @@ public struct Highlight: Equatable {
         result["@offset-start"] = paragraphRange.startWordOffset
         result["@offset-end"] = paragraphRange.endWordOffset ?? -1
         
-        if style == .Underline || style == .Clear {
+        if style == .underline || style == .clear {
             result["@style"] = style.rawValue
         }
         

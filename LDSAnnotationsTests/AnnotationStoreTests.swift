@@ -271,7 +271,7 @@ class AnnotationStoreTests: XCTestCase {
     func testCreateAndTrashNote() {
         let annotationStore = AnnotationStore()!
         
-        let note = try! annotationStore.addNote("Title", content: "content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "yellow", style: .Underline, appSource: "Test", device: "iphone")
+        let note = try! annotationStore.addNote("Title", content: "content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "yellow", style: .underline, appSource: "Test", device: "iphone")
         
         let annotation = annotationStore.annotationWithID(note.annotationID)!
         
@@ -326,7 +326,7 @@ class AnnotationStoreTests: XCTestCase {
     func testAnnotationWithNoteID() {
         let annotationStore = AnnotationStore()!
         
-        let note = try! annotationStore.addNote("Title", content: "Content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "ipad")
+        let note = try! annotationStore.addNote("Title", content: "Content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "yellow", style: .highlight, appSource: "Test", device: "ipad")
         
         XCTAssertEqual(note.annotationID, annotationStore.annotationWithNoteID(note.id)!.id, "Annotation did not load correctly from database")
     }
@@ -378,7 +378,7 @@ class AnnotationStoreTests: XCTestCase {
             ParagraphRange(paragraphAID: "4")
         ]
 
-        let highlights = try! annotationStore.addHighlights(docID: docID, docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let highlights = try! annotationStore.addHighlights(docID: docID, docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         let annotation = annotationStore.annotationWithID(highlights.first!.annotationID)
         
         XCTAssertEqual([annotation!], annotationStore.annotations(paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })))
@@ -481,7 +481,7 @@ class AnnotationStoreTests: XCTestCase {
         var links = [Link]()
         
         for letter in alphabet {
-            let link = try! annotationStore.addLink(name: letter, toDocID: linkedToDocID, toDocVersion: 1, toParagraphAIDs: ["1"], fromDocID: docID, fromDocVersion: 1, fromParagraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+            let link = try! annotationStore.addLink(name: letter, toDocID: linkedToDocID, toDocVersion: 1, toParagraphAIDs: ["1"], fromDocID: docID, fromDocVersion: 1, fromParagraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
             annotations.append(annotationStore.annotationWithID(link.annotationID)!)
             
             links.append(link)
@@ -604,7 +604,7 @@ class AnnotationStoreTests: XCTestCase {
             ParagraphRange(paragraphAID: "4")
         ]
         
-        let highlights = try! annotationStore.addHighlights(docID: docID, docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let highlights = try! annotationStore.addHighlights(docID: docID, docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         XCTAssertEqual(Set(paragraphRanges.map({ $0.paragraphAID })), Set(highlights.map({ $0.paragraphRange.paragraphAID })))
     }
 
@@ -679,7 +679,7 @@ class AnnotationStoreTests: XCTestCase {
             ParagraphRange(paragraphAID: "3")
         ]
         
-        let highlights = try! annotationStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let highlights = try! annotationStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         
         let annotation = annotationStore.annotationWithID(highlights.first!.annotationID)!
         
@@ -716,7 +716,7 @@ class AnnotationStoreTests: XCTestCase {
             ParagraphRange(paragraphAID: "3")
         ]
         
-        let highlights = try! annotationStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .Highlight, appSource: "Test", device: "iphone")
+        let highlights = try! annotationStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
         let annotation = annotationStore.annotationWithID(highlights.first!.annotationID)!
         let note = try! annotationStore.addNote(title: "TestTitle", content: "TestContent", annotationID: annotation.id)
         let link = try! annotationStore.addLink(name: "TestLink", toDocID: "2", toDocVersion: 1, toParagraphAIDs: ["4"], annotationID: annotation.id)
@@ -802,7 +802,7 @@ class AnnotationStoreTests: XCTestCase {
     func testRemovingNoteFromAnnotationWithClearHighlights() {
         let annotationStore = AnnotationStore()!
         
-        let note = try! annotationStore.addNote("Title", content: "content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "clear", style: .Clear, appSource: "Test", device: "iphone")
+        let note = try! annotationStore.addNote("Title", content: "content", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "12345")], colorName: "clear", style: .clear, appSource: "Test", device: "iphone")
         
         let annotation = annotationStore.annotationWithID(note.annotationID)!
         

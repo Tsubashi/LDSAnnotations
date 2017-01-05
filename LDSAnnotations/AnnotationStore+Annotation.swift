@@ -452,14 +452,12 @@ extension AnnotationStore {
     
     func trashAnnotationIfEmptyWithID(_ id: Int64, source: NotificationSource) throws {
         try inTransaction(notificationSource: source) {
-            let notEmpty = [
-                try self.db.scalar(HighlightTable.table.filter(HighlightTable.annotationID == id && HighlightTable.style != .Clear).count),
-                try self.db.scalar(LinkTable.table.filter(LinkTable.annotationID == id).count),
-                try self.db.scalar(AnnotationTagTable.table.filter(AnnotationTagTable.annotationID == id).count),
-                try self.db.scalar(BookmarkTable.table.filter(BookmarkTable.annotationID == id).count),
-                try self.db.scalar(NoteTable.table.filter(NoteTable.annotationID == id).count)
-            ].any { $0 > 0 }
-            
+            let statement = "SELECT COUNT(annotation_id) FROM highlight WHERE annotation_id = @annotationID AND style != @style UNION ALL SELECT COUNT(annotation_id) FROM link WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM annotation_tag WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM bookmark WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM note WHERE annotation_id = @annotationID;"
+            let bindings: [String: Binding?] = ["@annotationID": id, "@style": HighlightStyle.clear.rawValue]
+            let notEmpty = try self.db.prepare(statement, bindings).flatMap { row in
+                return row[0] as? Int64
+            }.any { $0 > 0 }
+
             try self.updateLastModifiedDate(annotationID: id, status: notEmpty ? nil : .trashed, source: source)
         }
     }
