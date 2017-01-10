@@ -92,7 +92,7 @@ public struct Annotation: Equatable {
         }
 
         // Derive the annotation type, this is a required field
-        var type: AnnotationType = .journal
+        var type: SyncAnnotationType = .journal
         
         if let bookmark = annotationStore.bookmarkWithAnnotationID(id) {
             // If the annotation has a bookmark, it should never have highlights, tags, links, etc
@@ -148,7 +148,7 @@ public func == (lhs: Annotation, rhs: Annotation) -> Bool {
         && lhs.device == rhs.device
 }
 
-private enum AnnotationType: String {
+private enum SyncAnnotationType: String {
 
     case bookmark = "bookmark"
     case highlight = "highlight"

@@ -20,6 +20,7 @@
 		D40F0A2C1C976A58002D61EA /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2B1C976A58002D61EA /* Tag.swift */; };
 		D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2D1C976B7E002D61EA /* Link.swift */; };
 		D40F0A301C977129002D61EA /* Bookmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40F0A2F1C977129002D61EA /* Bookmark.swift */; };
+		D44424381E2555FC0082B2EE /* AnnotationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44424371E2555FC0082B2EE /* AnnotationType.swift */; };
 		D466C6511D3B28F300F18A12 /* ParagraphRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = D466C6501D3B28F300F18A12 /* ParagraphRange.swift */; };
 		D48107561D50F99C00D70685 /* SessionNotificationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */; };
 		D48107581D51034A00D70685 /* XCTestCase+LDSAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D48107571D51034A00D70685 /* XCTestCase+LDSAnnotations.swift */; };
@@ -99,6 +100,7 @@
 		D40F0A2B1C976A58002D61EA /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		D40F0A2D1C976B7E002D61EA /* Link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Link.swift; sourceTree = "<group>"; };
 		D40F0A2F1C977129002D61EA /* Bookmark.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Bookmark.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		D44424371E2555FC0082B2EE /* AnnotationType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationType.swift; sourceTree = "<group>"; };
 		D466C6501D3B28F300F18A12 /* ParagraphRange.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParagraphRange.swift; sourceTree = "<group>"; };
 		D48107551D50F99C00D70685 /* SessionNotificationsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionNotificationsTests.swift; sourceTree = "<group>"; };
 		D48107571D51034A00D70685 /* XCTestCase+LDSAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "XCTestCase+LDSAnnotations.swift"; sourceTree = "<group>"; };
@@ -304,17 +306,18 @@
 				D48FD6A21C9B0C640089EA68 /* AnnotationNotebook.swift */,
 				D9C470E11C617A0400EDCD69 /* AnnotationStatus.swift */,
 				D9C470DF1C61773D00EDCD69 /* AnnotationStore.swift */,
-				110640D21DC906A200BD620C /* AnnotationStore+Merge.swift */,
 				D4A90CE51C9877B10010F8F2 /* AnnotationStore+Annotation.swift */,
 				D48FD6A41C9B0CC70089EA68 /* AnnotationStore+AnnotationNotebook.swift */,
 				D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */,
 				D4ACFD351C99DD57008CEF22 /* AnnotationStore+Bookmark.swift */,
 				D4ACFD371C99E1DC008CEF22 /* AnnotationStore+Highlight.swift */,
 				D4ACFD3F1C99F6A5008CEF22 /* AnnotationStore+Link.swift */,
+				110640D21DC906A200BD620C /* AnnotationStore+Merge.swift */,
 				D4A90CE71C988FBD0010F8F2 /* AnnotationStore+Note.swift */,
 				D4A90CE31C9876230010F8F2 /* AnnotationStore+Notebook.swift */,
 				D4ACFD391C99EB37008CEF22 /* AnnotationStore+Tag.swift */,
 				D4ACFD3B1C99ECF1008CEF22 /* AnnotationTag.swift */,
+				D44424371E2555FC0082B2EE /* AnnotationType.swift */,
 				D40F0A2F1C977129002D61EA /* Bookmark.swift */,
 				D40F0A251C976507002D61EA /* Highlight.swift */,
 				D40F0A271C976634002D61EA /* HighlightStyle.swift */,
@@ -589,6 +592,7 @@
 				D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */,
 				D9C470991C60317E00EDCD69 /* Error.swift in Sources */,
 				D94305791C5C237B00FA14B6 /* Session.swift in Sources */,
+				D44424381E2555FC0082B2EE /* AnnotationType.swift in Sources */,
 				D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */,
 				D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */,
 				D95F19D31CD8DD9C008618AA /* SyncAnnotationsChanges.swift in Sources */,

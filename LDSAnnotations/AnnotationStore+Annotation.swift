@@ -316,6 +316,63 @@ public extension AnnotationStore {
         }
     }
     
+    public func annotationsWithType(docID: String) -> [(annotation: Annotation, type: AnnotationType)] {
+        do {
+            let bindings: [String: Binding?] = ["@docID": docID]
+            let statement = [
+                "SELECT annotation.*, 'note' FROM annotation JOIN note ON annotation._id = note.annotation_id WHERE annotation.doc_id = @docID",
+                "UNION SELECT annotation.*, 'link' FROM annotation JOIN link ON annotation._id = link.annotation_id WHERE annotation.doc_id = @docID",
+                "UNION SELECT annotation.*, 'tag' FROM annotation JOIN annotation_tag ON annotation._id = annotation_tag.annotation_id WHERE annotation.doc_id = @docID",
+                "UNION SELECT annotation.*, 'notebook' FROM annotation JOIN annotation_notebook ON annotation._id = annotation_notebook.annotation_id WHERE annotation.doc_id = @docID",
+                "ORDER BY annotation._id"
+            ].joined(separator: " ")
+
+            let results = try db.prepare(statement, bindings).flatMap { bindings -> (annotation: Annotation, type: AnnotationType)? in
+                guard let id = bindings[0] as? Int64, let uniqueID = bindings[1] as? String, let status = (bindings[4] as? String).flatMap({ AnnotationStatus.fromDatatypeValue($0) }), let lastModified = (bindings[6] as? String).flatMap({ Date.fromDatatypeValue($0) }), let appSource = bindings[7] as? String, let device = bindings[8] as? String, let typeString = bindings[9] as? String else { return nil }
+                
+                let docID = bindings[2] as? String
+                let docVersion = (bindings[3] as? Int64).flatMap { Int($0) }
+                let created = (bindings[5] as? String).flatMap { Date.fromDatatypeValue($0) }
+                let annotation = Annotation(id: id, uniqueID: uniqueID, docID: docID, docVersion: docVersion, status: status, created: created, lastModified: lastModified, appSource: appSource, device: device)
+                let annotationType: AnnotationType? = {
+                    switch typeString {
+                    case "note":
+                        return .note
+                    case "link":
+                        return .link
+                    case "tag":
+                        return .tag
+                    case "notebook":
+                        return .notebook
+                    default:
+                        return nil
+                    }
+                }()
+                
+                return annotationType.flatMap { (annotation: annotation, type: $0) }
+            }
+            
+            let annotationsWithType = results.grouped(by: { annotation, _ in
+                return annotation.id
+            }).flatMap { (annotationID, annotations) -> (annotation: Annotation, type: AnnotationType)? in
+                guard let annotationWithType = annotations.first else { return nil }
+                
+                if annotations.count > 1 {
+                    return (annotation: annotationWithType.annotation, type: .multiple)
+                }
+                return (annotation: annotationWithType.annotation, type: annotationWithType.type)
+            }
+            
+            let linkDestinationAnnotationsWithType = try db.prepare(AnnotationTable.table.select(AnnotationTable.table[*]).join(LinkTable.table, on: AnnotationTable.table[AnnotationTable.id] == LinkTable.annotationID).filter(LinkTable.table[LinkTable.docID] == docID)).map { row -> (annotation: Annotation, type: AnnotationType) in
+                return (annotation: AnnotationTable.fromRow(row), type: .linkDestination)
+            }
+            
+            return annotationsWithType + linkDestinationAnnotationsWithType
+        } catch {
+            return []
+        }
+    }
+    
 }
 
 // MARK: Internal

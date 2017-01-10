@@ -28,6 +28,163 @@ import XCTest
 class AnnotationStoreTests: XCTestCase {
     private let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     
+    func testAnnotationsWithTypeNote() {
+        let annotationStore = AnnotationStore()!
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        
+        _ = try! annotationStore.addNote(title: "Note", content: "Content", annotationID: annotation.id)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 1)
+
+        let annotationWithType = results.first!
+        XCTAssertEqual(annotationWithType.annotation.id, annotation.id)
+        XCTAssertEqual(annotationWithType.type, AnnotationType.note)
+    }
+    
+    func testAnnotationsWithTypeLink() {
+        let annotationStore = AnnotationStore()!
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        
+        _ = try! annotationStore.addLink(name: "Link", toDocID: "54321", toDocVersion: 1, toParagraphAIDs: ["1"], annotationID: annotation.id)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 1)
+        
+        let annotationWithType = results.first!
+        XCTAssertEqual(annotationWithType.annotation.id, annotation.id)
+        XCTAssertEqual(annotationWithType.type, AnnotationType.link)
+    }
+    
+    func testAnnotationsWithTypeLinkDestination() {
+        let annotationStore = AnnotationStore()!
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: "54321", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        
+        _ = try! annotationStore.addLink(name: "Link Destination", docID: docID, docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation.id, source: .local)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 1)
+        
+        let annotationWithType = results.first!
+        XCTAssertEqual(annotationWithType.annotation.id, annotation.id)
+        XCTAssertEqual(annotationWithType.type, AnnotationType.linkDestination)
+    }
+    
+    func testAnnotationsWithTypeTag() {
+        let annotationStore = AnnotationStore()!
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        
+        _ = try! annotationStore.addTag(name: "Tag", annotationID: annotation.id)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 1)
+        
+        let annotationWithType = results.first!
+        XCTAssertEqual(annotationWithType.annotation.id, annotation.id)
+        XCTAssertEqual(annotationWithType.type, AnnotationType.tag)
+    }
+    
+    func testAnnotationsWithTypeNotebook() {
+        let annotationStore = AnnotationStore()!
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        
+        let notebook = try! annotationStore.addNotebook(name: "Notebook", source: .local)
+        _ = try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook.id , displayOrder: 1, source: .local)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 1)
+        
+        let annotationWithType = results.first!
+        XCTAssertEqual(annotationWithType.annotation.id, annotation.id)
+        XCTAssertEqual(annotationWithType.type, AnnotationType.notebook)
+    }
+    
+    func testAnnotationsWithTypeMultiple() {
+        let annotationStore = AnnotationStore()!
+        
+        let docID1 = "1"
+        let annotation1 = try! annotationStore.addAnnotation(docID: docID1, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addNote(title: "Note1", content: "Content", annotationID: annotation1.id)
+        _ = try! annotationStore.addTag(name: "Tag1", annotationID: annotation1.id)
+        
+        let results1 = annotationStore.annotationsWithType(docID: docID1)
+        XCTAssertTrue(results1.count == 1)
+        
+        let annotationWithType1 = results1.first!
+        XCTAssertEqual(annotationWithType1.annotation.id, annotation1.id)
+        XCTAssertEqual(annotationWithType1.type, AnnotationType.multiple)
+        
+        // Annotation 2
+        let docID2 = "2"
+        let annotation2 = try! annotationStore.addAnnotation(docID: docID2, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addNote(title: "Note1", content: "Content", annotationID: annotation2.id)
+        _ = try! annotationStore.addTag(name: "Tag1", annotationID: annotation2.id)
+        _ = try! annotationStore.addLink(name: "Link", toDocID: docID1, toDocVersion: 1, toParagraphAIDs: ["1"], annotationID: annotation2.id)
+        let notebook = try! annotationStore.addNotebook(name: "Notebook", source: .local)
+        _ = try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation2.id, notebookID: notebook.id , displayOrder: 1, source: .local)
+        
+        let results2 = annotationStore.annotationsWithType(docID: docID2)
+        XCTAssertTrue(results2.count == 1)
+        
+        let annotationWithType2 = results2.first!
+        XCTAssertEqual(annotationWithType2.annotation.id, annotation2.id)
+        XCTAssertEqual(annotationWithType2.type, AnnotationType.multiple)
+    }
+    
+    func testAnnotationsWithTypeFunkyLinkDestinations() {
+        let annotationStore = AnnotationStore()!
+     
+        let docID = "12345"
+        let annotation1 = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addNote(title: "Note", content: "Content", annotationID: annotation1.id)
+        _ = try! annotationStore.addLink(name: "Link", toDocID: docID, toDocVersion: 1, toParagraphAIDs: ["1"], annotationID: annotation1.id)
+        
+        let annotation2 = try! annotationStore.addAnnotation(docID: "54321", docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addLink(name: "Link Destination", docID: docID, docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation2.id, source: .local)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 3)
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == .linkDestination }).count == 2)
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == .multiple }).count == 1)
+        XCTAssertEqual(Set(results.map({ $0.type })), Set([.linkDestination, .multiple]))
+    }
+    
+    func testAnnotationsWithTypeFunkyLinkDestinations2() {
+        let annotationStore = AnnotationStore()!
+        
+        let docID = "12345"
+        let docID2 = "54321"
+        let annotation1 = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addNote(title: "Note", content: "Content", annotationID: annotation1.id)
+        _ = try! annotationStore.addLink(name: "Link", toDocID: docID2, toDocVersion: 1, toParagraphAIDs: ["1"], annotationID: annotation1.id)
+        
+        let annotation2 = try! annotationStore.addAnnotation(docID: docID2, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addLink(name: "Link Destination 1", docID: docID, docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation2.id, source: .local)
+        _ = try! annotationStore.addLink(name: "Link Destination 2", docID: docID, docVersion: 1, paragraphAIDs: ["1"], annotationID: annotation2.id, source: .local)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 3)
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == .linkDestination }).count == 2)
+        XCTAssertEqual(Set(results.map({ $0.type })), Set([.multiple, .linkDestination]))
+    }
+    
+    func testAnnotationsWithTypeFunkyLinkDestinations3() {
+        let annotationStore = AnnotationStore()!
+        
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        _ = try! annotationStore.addLink(name: "Link", toDocID: docID, toDocVersion: 1, toParagraphAIDs: ["1"], annotationID: annotation.id)
+        
+        let results = annotationStore.annotationsWithType(docID: docID)
+        XCTAssertTrue(results.count == 2)
+        XCTAssertEqual(Set(results.map({ $0.type })), Set([.link, .linkDestination]))
+    }
+    
     func testAddNote() {
         let annotationStore = AnnotationStore()!
         let expected = try! annotationStore.addNote(title: nil, content: "", annotationID: 1, source: .local)
