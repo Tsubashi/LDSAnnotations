@@ -61,6 +61,14 @@ extension AnnotationStore {
         return try updateHighlight(highlight, source: .local)
     }
     
+    public func highlightsWithDocID(_ docID: String) -> [Highlight] {
+        do {
+            return try db.prepare(HighlightTable.table.select(HighlightTable.table[*]).join(AnnotationTable.table, on: AnnotationTable.table[AnnotationTable.id] == HighlightTable.annotationID).filter(AnnotationTable.docID == docID).filter(AnnotationTable.status == .active)).map { HighlightTable.fromRow($0) }
+        } catch {
+            return []
+        }
+    }
+    
     /// Returns list of highlights with annotationID
     public func highlightsWithAnnotationID(_ annotationID: Int64) -> [Highlight] {
         do {

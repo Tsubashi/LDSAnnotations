@@ -28,6 +28,16 @@ import XCTest
 class AnnotationStoreTests: XCTestCase {
     private let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     
+    func testHighlightsWithDocID() {
+        let annotationStore = AnnotationStore()!
+
+        let highlights1 = try! annotationStore.addHighlights(docID: "1", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1"), ParagraphRange(paragraphAID: "2"), ParagraphRange(paragraphAID: "3")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
+        let highlights2 = try! annotationStore.addHighlights(docID: "2", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "4"), ParagraphRange(paragraphAID: "5")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
+        
+        XCTAssertEqual(Set(highlights1), Set(annotationStore.highlightsWithDocID("1")))
+        XCTAssertEqual(Set(highlights2), Set(annotationStore.highlightsWithDocID("2")))
+    }
+    
     func testAnnotationsWithTypeNote() {
         let annotationStore = AnnotationStore()!
         let docID = "12345"
