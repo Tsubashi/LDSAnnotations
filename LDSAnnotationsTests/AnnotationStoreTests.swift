@@ -80,7 +80,12 @@ class AnnotationStoreTests: XCTestCase {
         
         let annotationWithType = results.first!
         XCTAssertEqual(annotationWithType.annotation.id, annotation.id)
-        XCTAssertEqual(annotationWithType.type, AnnotationType.linkDestination)
+        if case let .linkDestination(link) = annotationWithType.type {
+            XCTAssertEqual(link.name, "Link Destination")
+        } else {
+            XCTFail()
+        }
+        
     }
     
     func testAnnotationsWithTypeTag() {
@@ -159,9 +164,17 @@ class AnnotationStoreTests: XCTestCase {
         
         let results = annotationStore.annotationsWithType(docID: docID)
         XCTAssertTrue(results.count == 3)
-        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == .linkDestination }).count == 2)
+        let destinations = results.map({ $0.type }).filter({ $0.isLinkDestination() })
+        let names: [String] = destinations.flatMap {
+            if case let .linkDestination(link) = $0 {
+                return link.name
+            } else {
+                return nil
+            }
+        }
+        XCTAssertEqual(Set(names), Set(["Link", "Link Destination"]))
+        XCTAssertTrue(destinations.count == 2)
         XCTAssertTrue(results.map({ $0.type }).filter({ $0 == .multiple }).count == 1)
-        XCTAssertEqual(Set(results.map({ $0.type })), Set([.linkDestination, .multiple]))
     }
     
     func testAnnotationsWithTypeFunkyLinkDestinations2() {
@@ -179,8 +192,8 @@ class AnnotationStoreTests: XCTestCase {
         
         let results = annotationStore.annotationsWithType(docID: docID)
         XCTAssertTrue(results.count == 3)
-        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == .linkDestination }).count == 2)
-        XCTAssertEqual(Set(results.map({ $0.type })), Set([.multiple, .linkDestination]))
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0.isLinkDestination() }).count == 2)
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == AnnotationType.multiple }).count == 1)
     }
     
     func testAnnotationsWithTypeFunkyLinkDestinations3() {
@@ -192,7 +205,8 @@ class AnnotationStoreTests: XCTestCase {
         
         let results = annotationStore.annotationsWithType(docID: docID)
         XCTAssertTrue(results.count == 2)
-        XCTAssertEqual(Set(results.map({ $0.type })), Set([.link, .linkDestination]))
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0.isLinkDestination() }).count == 1)
+        XCTAssertTrue(results.map({ $0.type }).filter({ $0 == AnnotationType.link }).count == 1)
     }
     
     func testAddNote() {

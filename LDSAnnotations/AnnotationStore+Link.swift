@@ -45,6 +45,17 @@ class LinkTable {
             annotationID: row[annotationID])
     }
     
+    static func fromNamespacedRow(_ row: Row) -> Link {
+        return Link(
+            id: row[LinkTable.table[id]],
+            name: row[LinkTable.table[name]],
+            docID: row[LinkTable.table[docID]],
+            docVersion: row[LinkTable.table[docVersion]],
+            paragraphAIDs: row[LinkTable.table[paragraphAIDs]].components(separatedBy: ",").map({ $0.trimmingCharacters(in: .whitespaces) }),
+            annotationID: row[LinkTable.table[annotationID]]
+        )
+    }
+    
 }
 
 // MARK: Public

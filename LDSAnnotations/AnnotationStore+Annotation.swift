@@ -50,6 +50,20 @@ class AnnotationTable {
         )
     }
     
+    static func fromNamespacedRow(_ row: Row) -> Annotation {
+        return Annotation(
+            id: row[AnnotationTable.table[id]],
+            uniqueID: row[AnnotationTable.table[uniqueID]],
+            docID: row[AnnotationTable.table[docID]],
+            docVersion: row[AnnotationTable.table[docVersion]],
+            status: row.get(status),
+            created: row[AnnotationTable.table[created]],
+            lastModified: row[AnnotationTable.table[lastModified]],
+            appSource: row[AnnotationTable.table[appSource]],
+            device: row[AnnotationTable.table[device]]
+        )
+    }
+    
 }
 
 
@@ -363,8 +377,8 @@ public extension AnnotationStore {
                 return (annotation: annotationWithType.annotation, type: annotationWithType.type)
             }
             
-            let linkDestinationAnnotationsWithType = try db.prepare(AnnotationTable.table.select(AnnotationTable.table[*]).join(LinkTable.table, on: AnnotationTable.table[AnnotationTable.id] == LinkTable.annotationID).filter(LinkTable.table[LinkTable.docID] == docID)).map { row -> (annotation: Annotation, type: AnnotationType) in
-                return (annotation: AnnotationTable.fromRow(row), type: .linkDestination)
+            let linkDestinationAnnotationsWithType = try db.prepare(AnnotationTable.table.join(LinkTable.table, on: AnnotationTable.table[AnnotationTable.id] == LinkTable.annotationID).filter(LinkTable.table[LinkTable.docID] == docID)).map { row -> (annotation: Annotation, type: AnnotationType) in
+                return (annotation: AnnotationTable.fromNamespacedRow(row), type: .linkDestination(LinkTable.fromNamespacedRow(row)))
             }
             
             return annotationsWithType + linkDestinationAnnotationsWithType

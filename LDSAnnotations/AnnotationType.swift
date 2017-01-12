@@ -21,11 +21,48 @@
 
 import Foundation
 
-public enum AnnotationType {
+public enum AnnotationType: Equatable {
     case link
-    case linkDestination
+    case linkDestination(Link)
     case multiple
     case note
     case notebook
     case tag
+    
+    public func isLinkDestination() -> Bool {
+        if case .linkDestination = self {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    public func accessibilityIdentifier() -> String {
+        switch self {
+        case .link:
+            return "link"
+        case .linkDestination:
+            return "link destination"
+        case .multiple:
+            return "multiple"
+        case .note:
+            return "note"
+        case .tag:
+            return "tag"
+        case .notebook:
+            return "notebook"
+        }
+    }
+    
+}
+
+public func ==(lhs: AnnotationType, rhs: AnnotationType) -> Bool {
+    switch (lhs, rhs) {
+    case (.link, .link), (.multiple, .multiple), (.note, .note), (.notebook, .notebook), (.tag, .tag):
+        return true
+    case let (.linkDestination(leftLink), .linkDestination(rightLink)):
+        return leftLink == rightLink
+    default:
+        return false
+    }
 }
