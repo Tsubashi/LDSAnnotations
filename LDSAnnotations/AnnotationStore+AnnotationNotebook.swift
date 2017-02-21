@@ -58,6 +58,14 @@ public extension AnnotationStore {
         try removeAnnotation(annotationID: annotationID, fromNotebook: notebookID, source: .local)
     }
     
+    public func isAnnotation(annotationID: Int64, inNotebook notebookID: Int64) -> Bool {
+        do {
+            return try db.scalar(AnnotationNotebookTable.table.filter(AnnotationNotebookTable.annotationID == annotationID).filter(AnnotationNotebookTable.notebookID == notebookID).count) > 0
+        } catch {
+            return false
+        }
+    }
+    
 }
 
 // MARK: Internal

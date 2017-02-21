@@ -28,6 +28,20 @@ import XCTest
 class AnnotationStoreTests: XCTestCase {
     private let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     
+    func testIsAnnotationInNotebook() {
+        let annotationStore = AnnotationStore()!
+        let docID = "12345"
+        let annotation = try! annotationStore.addAnnotation(docID: docID, docVersion: 1, appSource: "Test", device: "iphone", source: .local)
+        
+        let notebook1 = try! annotationStore.addNotebook(name: "Notebook1", source: .local)
+        _ = try! annotationStore.addOrUpdateAnnotationNotebook(annotationID: annotation.id, notebookID: notebook1.id , displayOrder: 1, source: .local)
+        
+        let notebook2 = try! annotationStore.addNotebook(name: "Notebook2", source: .local)
+        
+        XCTAssertTrue(annotationStore.isAnnotation(annotationID: annotation.id, inNotebook: notebook1.id))
+        XCTAssertFalse(annotationStore.isAnnotation(annotationID: annotation.id, inNotebook: notebook2.id))
+    }
+    
     func testHighlightsWithDocID() {
         let annotationStore = AnnotationStore()!
 
