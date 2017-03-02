@@ -72,8 +72,8 @@ class AnnotationStoreMergeTests: XCTestCase {
         let otherStore = AnnotationStore()!
         otherStore.addAll(from: annotationStore, appSource: "Test", device: "iphone")
         
-        XCTAssertEqual([annotation!], otherStore.annotations(paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })))
-        XCTAssertEqual([annotation!], otherStore.annotations(docID: docID, paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })))
+        verifyEqualBesidesLastModified(annotation1: annotation!, annotation2: otherStore.annotations(paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })).first!)
+        verifyEqualBesidesLastModified(annotation1: annotation!, annotation2: otherStore.annotations(docID: docID, paragraphAIDs: paragraphRanges.map({ $0.paragraphAID })).first!)
     }
     
     func testMergeNotebook() {
@@ -128,6 +128,17 @@ class AnnotationStoreMergeTests: XCTestCase {
             
             XCTAssertTrue(Set(annotationUniqueIDs) == Set(otherUniqueIDs), "Didn't load correct annotations for tagID")
         }
+    }
+    
+    fileprivate func verifyEqualBesidesLastModified(annotation1: Annotation, annotation2: Annotation) {
+        XCTAssertEqual(annotation1.id, annotation2.id)
+        XCTAssertEqual(annotation1.uniqueID, annotation2.uniqueID)
+        XCTAssertEqual(annotation1.docID, annotation2.docID)
+        XCTAssertEqual(annotation1.docVersion, annotation2.docVersion)
+        XCTAssertEqual(annotation1.status, annotation2.status)
+        XCTAssertEqual(annotation1.created, annotation2.created)
+        XCTAssertEqual(annotation1.appSource, annotation2.appSource)
+        XCTAssertEqual(annotation1.device, annotation2.device)
     }
     
 }

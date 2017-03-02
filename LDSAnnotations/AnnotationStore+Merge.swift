@@ -14,7 +14,7 @@ extension AnnotationStore {
         let notebooks = otherStore.notebooks()
         for notebook in notebooks {
             do {
-                try addNotebook(uniqueID: notebook.uniqueID, name: notebook.name, description: notebook.description, status: notebook.status, lastModified: notebook.lastModified, source: .sync)
+                try addNotebook(uniqueID: notebook.uniqueID, name: notebook.name, description: notebook.description, status: notebook.status, source: .local)
             } catch {
                 NSLog("Unable to add notebook: \(error)")
             }
@@ -22,12 +22,12 @@ extension AnnotationStore {
         
         for annotation in otherStore.annotations() {
             do {
-                let newAnnotation = try addAnnotation(uniqueID: annotation.uniqueID, docID: annotation.docID, docVersion: annotation.docVersion, status: annotation.status, created: annotation.created, lastModified: annotation.lastModified, appSource: appSource, device: device, source: .sync)
+                let newAnnotation = try addAnnotation(uniqueID: annotation.uniqueID, docID: annotation.docID, docVersion: annotation.docVersion, status: annotation.status, created: annotation.created, appSource: appSource, device: device, source: .local)
                 if let note = otherStore.noteWithAnnotationID(annotation.id) {
                     try addNote(title: note.title, content: note.content, annotationID: newAnnotation.id)
                 }
                 for highlight in otherStore.highlightsWithAnnotationID(annotation.id) {
-                    try addHighlight(paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: newAnnotation.id, source: .sync)
+                    try addHighlight(paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: newAnnotation.id, source: .local)
                 }
                 for tag in otherStore.tagsWithAnnotationID(annotation.id) {
                     try addTag(name: tag.name, annotationID: newAnnotation.id)
@@ -36,7 +36,7 @@ extension AnnotationStore {
                     try addLink(name: link.name, toDocID: link.docID, toDocVersion: link.docVersion, toParagraphAIDs: link.paragraphAIDs, annotationID: newAnnotation.id)
                 }
                 if let bookmark = otherStore.bookmarkWithAnnotationID(annotation.id) {
-                    try addBookmark(name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: newAnnotation.id, offset: bookmark.offset, source: .sync)
+                    try addBookmark(name: bookmark.name, paragraphAID: bookmark.paragraphAID, displayOrder: bookmark.displayOrder, annotationID: newAnnotation.id, offset: bookmark.offset, source: .local)
                 }
                 for notebook in otherStore.notebooksWithAnnotationID(annotation.id) {
                     if let newNotebook = notebookWithUniqueID(notebook.uniqueID) {

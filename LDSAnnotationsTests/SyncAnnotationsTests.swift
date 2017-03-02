@@ -422,6 +422,43 @@ class SyncAnnotationsTests: XCTestCase {
         // Verify the bookmark was removed
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
     }
+    
+    func testSyncAfterMerge() {
+        let annotationStore1 = AnnotationStore()!
+        let session1 = createSession()
+        var token1: SyncToken?
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
+        
+        let annotationStore2 = AnnotationStore()!
+        let session2 = createSession()
+        var token2: SyncToken?
+        token2 = resetAnnotations(annotationStore: annotationStore2, session: session2, token: token2)
+        
+        // Add an annotation of each type to a temp store (mimicking offline annotations)
+        let tempStore = AnnotationStore()!
+        try! tempStore.addNote("NoteTitle", content: "NoteContent", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
+        try! tempStore.addBookmark(name: "BookmarkName", paragraphAID: "1", displayOrder: 1, docID: "13859831", docVersion: 1, appSource: "Test", device: "iphone")
+        try! tempStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "2"), ParagraphRange(paragraphAID: "3")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
+        let link1 = try! tempStore.addLink(name: "Link1", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["2"], fromDocID: "13859831", fromDocVersion: 1, fromParagraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
+        try! tempStore.addLink(name: "Link2", toDocID: "23162487", toDocVersion: 1, toParagraphAIDs: ["3"], annotationID: link1.annotationID)
+        let annotationID = try! tempStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone").first!.annotationID
+        try! tempStore.addTag(name: "Tag1", annotationID: annotationID)
+        let notebook = try! tempStore.addNotebook(name: "Notebook1")
+        try! tempStore.addNote(title: "NoteTitle1", content: "NoteContent1", appSource: "Test", device: "iphone", notebookID: notebook.id)
+        try! tempStore.addNote(title: "NoteTitle2", content: "NoteContent2", appSource: "Test", device: "iphone", notebookID: notebook.id)
+        
+        // Merge into a different store (sync right before merge to simulate failing conditions)
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
+        annotationStore1.addAll(from: tempStore, appSource: "Test", device: "iphone")
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
+        
+        // Download to a new store
+        token2 = sync(annotationStore2, session: session2, token: token2, description: "Get sync changes")
+        
+        // Make sure everything came across correctly
+        verifyEqual(annotationStore1: tempStore, annotationStore2: annotationStore1)
+        verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
+    }
 
     func verifyEqual(annotationStore1: AnnotationStore, annotationStore2: AnnotationStore) {
         let annotations1 = annotationStore1.annotations().filter { $0.status == .active }
