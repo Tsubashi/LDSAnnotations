@@ -26,7 +26,7 @@ import Locksmith
 
 public class AccountController {
     
-    public static let sharedController = AccountController()
+    public static let shared = AccountController()
     
     public var addAccountObservers = ObserverSet<String>()
     public var deleteAccountObservers = ObserverSet<String>()

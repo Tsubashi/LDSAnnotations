@@ -141,7 +141,7 @@ class AccountViewController: UIViewController {
     }
     
     func performSync() {
-        let token = AccountController.sharedController.syncToken(forUsername: session.username)
+        let token = AccountController.shared.syncToken(forUsername: session.username)
         session.sync(annotationStore: annotationStore, token: token) { syncResult in
             DispatchQueue.main.sync {
                 switch syncResult {
@@ -169,7 +169,7 @@ class AccountViewController: UIViewController {
                     
                     deserializationErrors.forEach { NSLog("\($0)") }
                     
-                    AccountController.sharedController.setSyncToken(token, forUsername: self.session.username)
+                    AccountController.shared.setSyncToken(token, forUsername: self.session.username)
                 case let .error(errors: errors):
                     NSLog("Sync failed: \(errors)")
                 }

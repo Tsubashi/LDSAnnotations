@@ -68,8 +68,8 @@ class AccountsViewController: UIViewController {
         
         reloadData()
         
-        AccountController.sharedController.addAccountObservers.add(self, type(of: self).didAddAccount)
-        AccountController.sharedController.deleteAccountObservers.add(self, type(of: self).didDeleteAccount)
+        AccountController.shared.addAccountObservers.add(self, type(of: self).didAddAccount)
+        AccountController.shared.deleteAccountObservers.add(self, type(of: self).didDeleteAccount)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -89,7 +89,7 @@ class AccountsViewController: UIViewController {
     var usernames = [String]()
     
     func reloadData() {
-        usernames = AccountController.sharedController.usernames
+        usernames = AccountController.shared.usernames
     }
     
     func didAddAccount(_ username: String) {
@@ -158,7 +158,7 @@ extension AccountsViewController {
             } else {
                 DispatchQueue.main.async {
                     do {
-                        try AccountController.sharedController.addOrUpdateAccount(withUsername: username, password: password)
+                        try AccountController.shared.addOrUpdateAccount(withUsername: username, password: password)
                     } catch {
                         NSLog("Failed to add account: %@", "\(error)")
                     
@@ -200,7 +200,7 @@ extension AccountsViewController: UITableViewDataSource {
         if editingStyle == .delete {
             let username = usernames[indexPath.row]
             do {
-                try AccountController.sharedController.deleteAccount(username: username)
+                try AccountController.shared.deleteAccount(username: username)
             } catch {
                 NSLog("Failed to delete account: %@", "\(error)")
             }
@@ -215,7 +215,7 @@ extension AccountsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let username = usernames[indexPath.row]
-        if let password = AccountController.sharedController.password(forUsername: username), let annotationStore = AnnotationStore.annotationStoreForUsername(username) {
+        if let password = AccountController.shared.password(forUsername: username), let annotationStore = AnnotationStore.annotationStoreForUsername(username) {
             let viewController = AccountViewController(session: Session(username: username, password: password), annotationStore: annotationStore)
             
             navigationController?.pushViewController(viewController, animated: true)

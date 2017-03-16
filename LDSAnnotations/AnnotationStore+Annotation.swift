@@ -523,8 +523,8 @@ extension AnnotationStore {
     
     func trashAnnotationIfEmptyWithID(_ id: Int64, source: NotificationSource) throws {
         try inTransaction(notificationSource: source) {
-            let statement = "SELECT COUNT(annotation_id) FROM highlight WHERE annotation_id = @annotationID AND style != @style UNION ALL SELECT COUNT(annotation_id) FROM link WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM annotation_tag WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM bookmark WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM note WHERE annotation_id = @annotationID;"
-            let bindings: [String: Binding?] = ["@annotationID": id, "@style": HighlightStyle.highlight.rawValue]
+            let statement = "SELECT COUNT(annotation_id) FROM highlight WHERE annotation_id = @annotationID AND color != @color UNION ALL SELECT COUNT(annotation_id) FROM link WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM annotation_tag WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM bookmark WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM note WHERE annotation_id = @annotationID;"
+            let bindings: [String: Binding?] = ["@annotationID": id, "@color": HighlightColor.clear.rawValue]
             let notEmpty = try self.db.prepare(statement, bindings).flatMap { row in
                 return row[0] as? Int64
             }.any { $0 > 0 }

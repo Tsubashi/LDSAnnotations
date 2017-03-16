@@ -865,6 +865,26 @@ class AnnotationStoreTests: XCTestCase {
         XCTAssertNil(annotationStore.tagWithID(tag.id))
     }
     
+    func testTrashAnnotationsWithClearHighlight() {
+        let annotationStore = AnnotationStore()!
+
+        let paragraphRanges = [ParagraphRange(paragraphAID: "1")]
+        
+        let highlights1 = try! annotationStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: paragraphRanges, highlightColor: .yellow, style: .highlight, appSource: "Test", device: "iphone")
+        let annotation1 = annotationStore.annotationWithID(highlights1.first!.annotationID)!
+        let note1 = try! annotationStore.addNote(title: "TestTitle", content: "TestContent", annotationID: annotation1.id)
+        
+        let highlights2 = try! annotationStore.addHighlights(docID: "13859831", docVersion: 1, paragraphRanges: paragraphRanges, highlightColor: .clear, style: .highlight, appSource: "Test", device: "iphone")
+        let annotation2 = annotationStore.annotationWithID(highlights2.first!.annotationID)!
+        let note2 = try! annotationStore.addNote(title: "TestTitle", content: "TestContent", annotationID: annotation2.id)
+        
+        try! annotationStore.trashNoteWithID(note1.id)
+        XCTAssertTrue(annotationStore.annotationWithID(annotation1.id)!.status == .active)
+        
+        try! annotationStore.trashNoteWithID(note2.id)
+        XCTAssertTrue(annotationStore.annotationWithID(annotation2.id)!.status == .trashed, "Annotation should have been trashed because of clear highlight color")
+    }
+    
     func testTrashAnnotation() {
         let annotationStore = AnnotationStore()!
         
