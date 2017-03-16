@@ -433,7 +433,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                                     guard let offsetEndString = highlight["@offset-end"] as? String, let offsetEnd = Int(offsetEndString) else {
                                         throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-end")
                                     }
-                                    guard let colorName = highlight["@color"] as? String else {
+                                    guard let highlightColor = (highlight["@color"] as? String).flatMap({ HighlightColor.highlightColor(from: $0) }) else {
                                         throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing color")
                                     }
                                     guard let paragraphAID = highlight["@pid"] as? String else {
@@ -443,7 +443,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                                     let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
                                     let style = (highlight["@style"] as? String).flatMap { HighlightStyle(rawValue: $0) } ?? .highlight
                                     
-                                    try self.annotationStore.addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID, source: self.source)
+                                    try self.annotationStore.addHighlight(paragraphRange: paragraphRange, highlightColor: highlightColor, style: style, annotationID: annotationID, source: self.source)
                                     self.downloadHighlightCount += 1
                                 }
                             }

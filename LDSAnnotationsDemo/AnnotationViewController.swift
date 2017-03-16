@@ -106,7 +106,7 @@ extension AnnotationViewController {
         case .highlights:
             for (index, highlight) in annotationStore.highlightsWithAnnotationID(annotation.id).enumerated() where index == indexPath.row {
                 let style = highlight.style == .underline ? "Underline" : "Highlight"
-                cell.textLabel?.text = "paragraph AID: \(highlight.paragraphRange.paragraphAID)\noffset start: \(highlight.paragraphRange.startWordOffset)\noffset end: \(highlight.paragraphRange.endWordOffset)\ncolor: \(highlight.colorName)\nstyle: \(style)"
+                cell.textLabel?.text = "paragraph AID: \(highlight.paragraphRange.paragraphAID)\noffset start: \(highlight.paragraphRange.startWordOffset)\noffset end: \(highlight.paragraphRange.endWordOffset)\ncolor: \(highlight.highlightColor)\nstyle: \(style)"
             }
         case .tags:
             for (index, tag) in annotationStore.tagsWithAnnotationID(annotation.id).enumerated() where index == indexPath.row {

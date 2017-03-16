@@ -254,7 +254,7 @@ public extension AnnotationStore {
             let duplicateAnnotation = try self.addAnnotation(docID: annotation.docID, docVersion: annotation.docVersion, appSource: appSource, device: device, source: source)
             
             for highlight in self.highlightsWithAnnotationID(annotation.id) {
-                try self.addHighlight(paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: duplicateAnnotation.id, source: source)
+                try self.addHighlight(paragraphRange: highlight.paragraphRange, highlightColor: highlight.highlightColor, style: highlight.style, annotationID: duplicateAnnotation.id, source: source)
             }
             
             for link in self.linksWithAnnotationID(annotation.id) {
@@ -524,7 +524,7 @@ extension AnnotationStore {
     func trashAnnotationIfEmptyWithID(_ id: Int64, source: NotificationSource) throws {
         try inTransaction(notificationSource: source) {
             let statement = "SELECT COUNT(annotation_id) FROM highlight WHERE annotation_id = @annotationID AND style != @style UNION ALL SELECT COUNT(annotation_id) FROM link WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM annotation_tag WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM bookmark WHERE annotation_id = @annotationID UNION ALL SELECT COUNT(annotation_id) FROM note WHERE annotation_id = @annotationID;"
-            let bindings: [String: Binding?] = ["@annotationID": id, "@style": HighlightStyle.clear.rawValue]
+            let bindings: [String: Binding?] = ["@annotationID": id, "@style": HighlightStyle.highlight.rawValue]
             let notEmpty = try self.db.prepare(statement, bindings).flatMap { row in
                 return row[0] as? Int64
             }.any { $0 > 0 }

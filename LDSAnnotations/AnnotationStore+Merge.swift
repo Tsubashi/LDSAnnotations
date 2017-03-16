@@ -27,7 +27,7 @@ extension AnnotationStore {
                     try addNote(title: note.title, content: note.content, annotationID: newAnnotation.id)
                 }
                 for highlight in otherStore.highlightsWithAnnotationID(annotation.id) {
-                    try addHighlight(paragraphRange: highlight.paragraphRange, colorName: highlight.colorName, style: highlight.style, annotationID: newAnnotation.id, source: .local)
+                    try addHighlight(paragraphRange: highlight.paragraphRange, highlightColor: highlight.highlightColor, style: highlight.style, annotationID: newAnnotation.id, source: .local)
                 }
                 for tag in otherStore.tagsWithAnnotationID(annotation.id) {
                     try addTag(name: tag.name, annotationID: newAnnotation.id)

@@ -50,6 +50,9 @@ public class AccountController {
             // It's not catastrophic if the password cannot be deleted
         }
         
+        // Get rid of sync tokens when user signs out
+        deleteSyncToken(forUsername: username)
+        
         usernames = usernames.filter { $0 != username }
         
         deleteAccountObservers.notify(username)
@@ -81,6 +84,12 @@ public class AccountController {
     public func setSyncToken(_ token: SyncToken?, forUsername username: String) {
         var tokens = UserDefaults.standard.object(forKey: AccountController.tokensKey) as? [String: String] ?? [:]
         tokens[username] = token?.rawValue
+        UserDefaults.standard.set(tokens, forKey: AccountController.tokensKey)
+    }
+    
+    public func deleteSyncToken(forUsername username: String) {
+        var tokens = UserDefaults.standard.object(forKey: AccountController.tokensKey) as? [String: String] ?? [:]
+        tokens.removeValue(forKey: username)
         UserDefaults.standard.set(tokens, forKey: AccountController.tokensKey)
     }
     

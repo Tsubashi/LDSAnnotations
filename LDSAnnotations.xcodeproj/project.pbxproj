@@ -39,6 +39,7 @@
 		D4ACFD3C1C99ECF1008CEF22 /* AnnotationTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD3B1C99ECF1008CEF22 /* AnnotationTag.swift */; };
 		D4ACFD3E1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */; };
 		D4ACFD401C99F6A5008CEF22 /* AnnotationStore+Link.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4ACFD3F1C99F6A5008CEF22 /* AnnotationStore+Link.swift */; };
+		D4C8F67E1E65FCB2002B3111 /* HighlightColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4C8F67D1E65FCB2002B3111 /* HighlightColor.swift */; };
 		D90A3CE11C95C6FE0060094B /* LDSAnnotations.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D943055E1C5C184B00FA14B6 /* LDSAnnotations.framework */; };
 		D90A3CE91C95C7280060094B /* AuthenticationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3CE71C95C7280060094B /* AuthenticationTests.swift */; };
 		D90A3CEA1C95C7280060094B /* SyncNotebooksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90A3CE81C95C7280060094B /* SyncNotebooksTests.swift */; };
@@ -119,6 +120,7 @@
 		D4ACFD3B1C99ECF1008CEF22 /* AnnotationTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AnnotationTag.swift; sourceTree = "<group>"; };
 		D4ACFD3D1C99EDF0008CEF22 /* AnnotationStore+AnnotationTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+AnnotationTag.swift"; sourceTree = "<group>"; };
 		D4ACFD3F1C99F6A5008CEF22 /* AnnotationStore+Link.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AnnotationStore+Link.swift"; sourceTree = "<group>"; };
+		D4C8F67D1E65FCB2002B3111 /* HighlightColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HighlightColor.swift; sourceTree = "<group>"; };
 		D90A3CDC1C95C6FE0060094B /* LDSAnnotationsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LDSAnnotationsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D90A3CE01C95C6FE0060094B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D90A3CE71C95C7280060094B /* AuthenticationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthenticationTests.swift; sourceTree = "<group>"; };
@@ -320,6 +322,7 @@
 				D44424371E2555FC0082B2EE /* AnnotationType.swift */,
 				D40F0A2F1C977129002D61EA /* Bookmark.swift */,
 				D40F0A251C976507002D61EA /* Highlight.swift */,
+				D4C8F67D1E65FCB2002B3111 /* HighlightColor.swift */,
 				D40F0A271C976634002D61EA /* HighlightStyle.swift */,
 				D40F0A2D1C976B7E002D61EA /* Link.swift */,
 				D40F0A291C97693C002D61EA /* Note.swift */,
@@ -592,6 +595,7 @@
 				D4A90CE41C9876230010F8F2 /* AnnotationStore+Notebook.swift in Sources */,
 				D9C470991C60317E00EDCD69 /* Error.swift in Sources */,
 				D94305791C5C237B00FA14B6 /* Session.swift in Sources */,
+				D4C8F67E1E65FCB2002B3111 /* HighlightColor.swift in Sources */,
 				D44424381E2555FC0082B2EE /* AnnotationType.swift in Sources */,
 				D40F0A2E1C976B7E002D61EA /* Link.swift in Sources */,
 				D4A90CE01C986F5D0010F8F2 /* SyncAnnotationsOperation.swift in Sources */,

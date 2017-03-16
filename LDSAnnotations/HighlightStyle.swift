@@ -32,9 +32,6 @@ public enum HighlightStyle: String {
     /// Underline style
     case underline = "red-underline"
     
-    /// Clear style
-    case clear = "clear"
-    
 }
 
 extension HighlightStyle: Value {

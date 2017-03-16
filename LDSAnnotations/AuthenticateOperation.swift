@@ -114,7 +114,7 @@ class AuthenticateOperation: Procedure {
             case "pwdexpired":
                 self.finish(withError: AnnotationError.errorWithCode(.passwordExpired, failureReason: "Password is expired."))
             default:
-                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Authentication for an unknown reason."))
+                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Authentication failed for an unknown reason."))
             }
         }) 
         session.networkActivityObservers.notify(.start)

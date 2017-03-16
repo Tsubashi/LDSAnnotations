@@ -66,7 +66,7 @@ class AnnotationStoreMergeTests: XCTestCase {
             ParagraphRange(paragraphAID: "4")
         ]
         
-        let highlights = try! annotationStore.addHighlights(docID: docID, docVersion: 1, paragraphRanges: paragraphRanges, colorName: "yellow", style: .highlight, appSource: "Test", device: "iphone")
+        let highlights = try! annotationStore.addHighlights(docID: docID, docVersion: 1, paragraphRanges: paragraphRanges, highlightColor: .yellow, style: .highlight, appSource: "Test", device: "iphone")
         let annotation = annotationStore.annotationWithID(highlights.first!.annotationID)
         
         let otherStore = AnnotationStore()!

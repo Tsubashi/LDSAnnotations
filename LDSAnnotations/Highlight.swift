@@ -32,7 +32,7 @@ public struct Highlight: Equatable {
     public let paragraphRange: ParagraphRange
     
     /// Color of the highlight.
-    public var colorName: String
+    public var highlightColor: HighlightColor
     
     /// Highlight Style.
     public var style: HighlightStyle
@@ -40,24 +40,24 @@ public struct Highlight: Equatable {
     /// ID of annotation.
     public var annotationID: Int64
     
-    public init(id: Int64, paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle?, annotationID: Int64) {
+    public init(id: Int64, paragraphRange: ParagraphRange, highlightColor: HighlightColor, style: HighlightStyle?, annotationID: Int64) {
         self.id = id
         self.paragraphRange = paragraphRange
-        self.colorName = colorName
+        self.highlightColor = highlightColor
         self.style = style ?? .highlight
         self.annotationID = annotationID
     }
     
     func jsonObject() -> [String: Any] {
         var result: [String: Any] = [
-            "@color": colorName,
+            "@color": highlightColor.rawValue,
             "@pid": paragraphRange.paragraphAID,
         ]
         
         result["@offset-start"] = paragraphRange.startWordOffset
         result["@offset-end"] = paragraphRange.endWordOffset ?? -1
         
-        if style == .underline || style == .clear {
+        if style == .underline {
             result["@style"] = style.rawValue
         }
         
@@ -71,7 +71,7 @@ extension Highlight: Hashable {
     public var hashValue: Int {
         return id.hashValue
             ^ paragraphRange.hashValue
-            ^ colorName.hashValue
+            ^ highlightColor.rawValue.hashValue
             ^ style.rawValue.hashValue
             ^ annotationID.hashValue
     }
@@ -81,7 +81,7 @@ extension Highlight: Hashable {
 public func == (lhs: Highlight, rhs: Highlight) -> Bool {
     return lhs.id == rhs.id
         && lhs.paragraphRange == rhs.paragraphRange
-        && lhs.colorName == rhs.colorName
+        && lhs.highlightColor == rhs.highlightColor
         && lhs.style == rhs.style
         && lhs.annotationID == rhs.annotationID
 }

@@ -43,10 +43,13 @@ extension XCTestCase {
             fatalError()
         }
         
+        let authenticationURL = UserDefaults.standard.string(forKey: "AuthenticationURL").flatMap { URL(string: $0) }
+        let domain = UserDefaults.standard.string(forKey: "Domain") ?? "beta.lds.org"
+        
         let userAgent = "LDSAnnotations unit tests"
         let clientVersion = "1"
         
-        return Session(username: username, password: useIncorrectPassword ? "wrong-\(password)" : password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword)
+        return Session(username: username, password: useIncorrectPassword ? "wrong-\(password)" : password, userAgent: userAgent, clientVersion: clientVersion, clientUsername: clientUsername, clientPassword: clientPassword, authenticationURL: authenticationURL, domain: domain)
     }
     
     func sync(_ annotationStore: AnnotationStore, session: Session, token: SyncToken?, description: String, allowSyncFailure: Bool = false, completion: ((_ uploadCount: Int, _ downloadCount: Int) -> Void)? = nil) -> SyncToken? {

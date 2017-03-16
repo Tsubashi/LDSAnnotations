@@ -68,11 +68,11 @@ public extension AnnotationStore {
     }
 
     /// Creates a link and adds related annotation and highlights
-    @discardableResult public func addLink(name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> Link {
+    @discardableResult public func addLink(name: String, toDocID: String, toDocVersion: Int, toParagraphAIDs: [String], fromDocID: String, fromDocVersion: Int, fromParagraphRanges: [ParagraphRange], highlightColor: HighlightColor, style: HighlightStyle, appSource: String, device: String) throws -> Link {
         let source: NotificationSource = .local
         return try inTransaction(notificationSource: source) {
             // Create annotation and highlights for this link
-            let highlights = try self.addHighlights(docID: fromDocID, docVersion: fromDocVersion, paragraphRanges: fromParagraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: source)
+            let highlights = try self.addHighlights(docID: fromDocID, docVersion: fromDocVersion, paragraphRanges: fromParagraphRanges, highlightColor: highlightColor, style: style, appSource: appSource, device: device, source: source)
             
             guard let annotationID = highlights.first?.annotationID else { throw AnnotationError.errorWithCode(.saveHighlightFailed, failureReason: "Failed to create highlights") }
             

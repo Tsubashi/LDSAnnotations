@@ -97,7 +97,7 @@ class HighlightTests: XCTestCase {
         
         XCTAssertFalse(annotationStore.highlightsWithAnnotationID(1).isEmpty)
         
-        let expected = Highlight(id: 1, paragraphRange: ParagraphRange(paragraphAID: "20527924", startWordOffset: 2, endWordOffset: 6), colorName: "yellow", style: .highlight, annotationID: 1)
+        let expected = Highlight(id: 1, paragraphRange: ParagraphRange(paragraphAID: "20527924", startWordOffset: 2, endWordOffset: 6), highlightColor: .yellow, style: .highlight, annotationID: 1)
         let actual = annotationStore.highlightsWithAnnotationID(1).first
         
         XCTAssertEqual(actual, expected)
@@ -126,7 +126,7 @@ class HighlightTests: XCTestCase {
         
         XCTAssertFalse(annotationStore.highlightsWithAnnotationID(1).isEmpty)
         
-        let expected = Highlight(id: 1, paragraphRange: ParagraphRange(paragraphAID: "20527924"), colorName: "yellow", style: .highlight, annotationID: 1)
+        let expected = Highlight(id: 1, paragraphRange: ParagraphRange(paragraphAID: "20527924"), highlightColor: .yellow, style: .highlight, annotationID: 1)
         let actual = annotationStore.highlightsWithAnnotationID(1).first
         
         XCTAssertEqual(actual, expected)

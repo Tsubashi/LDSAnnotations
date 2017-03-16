@@ -33,14 +33,14 @@ class HighlightTable {
     static let paragraphAID = Expression<String>("paragraph_aid")
     static let offsetStart = Expression<Int>("offset_start")
     static let offsetEnd = Expression<Int?>("offset_end")
-    static let colorName = Expression<String>("color")
+    static let highlightColor = Expression<HighlightColor>("color")
     static let style = Expression<HighlightStyle?>("style")
     static let annotationID = Expression<Int64>("annotation_id")
     
     static func fromRow(_ row: Row) -> Highlight {
         return Highlight(id: row[id],
             paragraphRange: ParagraphRange(paragraphAID: row[paragraphAID], startWordOffset: row[offsetStart], endWordOffset: row[offsetEnd]),
-            colorName: row[colorName],
+            highlightColor: row.get(highlightColor),
             style: row.get(style),
             annotationID: row[annotationID])
     }
@@ -52,8 +52,8 @@ class HighlightTable {
 extension AnnotationStore {
     
     /// Returns list of highlights, and creates related annotation
-    @discardableResult public func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String) throws -> [Highlight] {
-        return try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: .local)
+    @discardableResult public func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], highlightColor: HighlightColor, style: HighlightStyle, appSource: String, device: String) throws -> [Highlight] {
+        return try addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, highlightColor: highlightColor, style: style, appSource: appSource, device: device, source: .local)
     }
     
     /// Update highlight
@@ -104,33 +104,33 @@ extension AnnotationStore {
             builder.column(HighlightTable.paragraphAID)
             builder.column(HighlightTable.offsetStart)
             builder.column(HighlightTable.offsetEnd)
-            builder.column(HighlightTable.colorName)
+            builder.column(HighlightTable.highlightColor)
             builder.column(HighlightTable.style)
             builder.column(HighlightTable.annotationID, references: AnnotationTable.table, AnnotationTable.id)
         })
     }
     
-    @discardableResult func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource: String, device: String, source: NotificationSource) throws -> [Highlight] {
+    @discardableResult func addHighlights(docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], highlightColor: HighlightColor, style: HighlightStyle, appSource: String, device: String, source: NotificationSource) throws -> [Highlight] {
         return try inTransaction(notificationSource: source) {
             // First create an annotation for these highlights
             let annotation = try self.addAnnotation(docID: docID, docVersion: docVersion, appSource: appSource, device: device, source: source)
             
             var highlights = [Highlight]()
             for paragraphRange in paragraphRanges {
-                let highlight = try self.addHighlight(paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotation.id, source: source)
+                let highlight = try self.addHighlight(paragraphRange: paragraphRange, highlightColor: highlightColor, style: style, annotationID: annotation.id, source: source)
                 highlights.append(highlight)
             }
             return highlights
         }
     }
     
-    @discardableResult func addHighlight(paragraphRange: ParagraphRange, colorName: String, style: HighlightStyle, annotationID: Int64, source: NotificationSource) throws -> Highlight {
+    @discardableResult func addHighlight(paragraphRange: ParagraphRange, highlightColor: HighlightColor, style: HighlightStyle, annotationID: Int64, source: NotificationSource) throws -> Highlight {
         return try inTransaction(notificationSource: source) {
             let id = try self.db.run(HighlightTable.table.insert(
                 HighlightTable.paragraphAID <- paragraphRange.paragraphAID,
                 HighlightTable.offsetStart <- paragraphRange.startWordOffset,
                 HighlightTable.offsetEnd <- paragraphRange.endWordOffset,
-                HighlightTable.colorName <- colorName,
+                HighlightTable.highlightColor <- highlightColor,
                 HighlightTable.style <- style,
                 HighlightTable.annotationID <- annotationID
             ))
@@ -138,7 +138,7 @@ extension AnnotationStore {
             // Mark associated annotation as having been updated
             try self.updateLastModifiedDate(annotationID: annotationID, source: source)
             
-            return Highlight(id: id, paragraphRange: paragraphRange, colorName: colorName, style: style, annotationID: annotationID)
+            return Highlight(id: id, paragraphRange: paragraphRange, highlightColor: highlightColor, style: style, annotationID: annotationID)
         }
     }
     
@@ -152,7 +152,7 @@ extension AnnotationStore {
                 HighlightTable.paragraphAID <- highlight.paragraphRange.paragraphAID,
                 HighlightTable.offsetStart <- highlight.paragraphRange.startWordOffset,
                 HighlightTable.offsetEnd <- highlight.paragraphRange.endWordOffset,
-                HighlightTable.colorName <- highlight.colorName,
+                HighlightTable.highlightColor <- highlight.highlightColor,
                 HighlightTable.style <- highlight.style,
                 HighlightTable.annotationID <- highlight.annotationID
             ))

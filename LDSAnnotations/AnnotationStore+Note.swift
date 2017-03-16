@@ -55,12 +55,12 @@ public extension AnnotationStore {
     }
     
     /// Adds note, related annotation & highlights
-    @discardableResult public func addNote(_ title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], colorName: String, style: HighlightStyle, appSource:
+    @discardableResult public func addNote(_ title: String?, content: String, docID: String, docVersion: Int, paragraphRanges: [ParagraphRange], highlightColor: HighlightColor, style: HighlightStyle, appSource:
         String, device: String) throws -> Note {
         
         let source: NotificationSource = .local
         return try inTransaction(notificationSource: source) {
-            let highlights = try self.addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, colorName: colorName, style: style, appSource: appSource, device: device, source: source)
+            let highlights = try self.addHighlights(docID: docID, docVersion: docVersion, paragraphRanges: paragraphRanges, highlightColor: highlightColor, style: style, appSource: appSource, device: device, source: source)
             
             guard let annotationID = highlights.first?.annotationID else { throw AnnotationError.errorWithCode(.saveHighlightFailed, failureReason: "Failed to create highlights") }
             
