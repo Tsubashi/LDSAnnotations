@@ -79,9 +79,11 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                     self.finish(withError: error)
                 }
             case .failure(let payload):
-                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Failure response: \(payload)"))
+                let syncError: Error = SyncError(id: nil, username: self.session.username, message: "Folder sync failed", json: payload, type: .unknown)
+                self.finish(withError: syncError)
             case .error(let error):
-                self.finish(withError: error)
+                let syncError: Error = SyncError(id: nil, username: self.session.username, message: "Folder sync failed: \(error)", json: payload, type: .unknown)
+                self.finish(withError: syncError)
             }
         }
     }
@@ -108,11 +110,11 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
     
     func applyServerChanges(_ payload: [String: Any], onOrBefore: Date) throws -> (Date, [String: [String]], [Notebook], [Error]) {
         guard let syncFolders = payload["syncFolders"] as? [String: Any] else {
-            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing syncFolders")
+            throw SyncError(id: nil, username: session.username, message: "Missing syncFolders", json: payload, type: .unknown)
         }
         
         guard let rawServerSyncDate = syncFolders["before"] as? String, let serverSyncDate = Date.parseFormattedISO8601(rawServerSyncDate) else {
-            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing before")
+            throw SyncError(id: nil, username: session.username, message: "Missing before", json: payload, type: .unknown)
         }
         
         var notebookAnnotationIDs = [String: [String]]()
@@ -124,13 +126,13 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                 do {
                     try annotationStore.db.savepoint {
                         guard let uniqueID = change["folderId"] as? String else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook is missing missing folderId")
+                            throw SyncError(id: nil, username: self.session.username, message: "Notebook is missing missing folderId", json: change, type: .deserialization)
                         }
                         guard let rawChangeType = change["changeType"] as? String, let changeType = ChangeType(rawValue: rawChangeType) else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing changeType")
+                            throw SyncError(id: uniqueID, username: self.session.username, message: "Missing change type", json: change, type: .deserialization)
                         }
                         guard let rawNotebook = change["folder"] as? [String: Any] else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing folder")
+                            throw SyncError(id: uniqueID, username: self.session.username, message: "Missing folder", json: change, type: .deserialization)
                         }
                         
                         let displayOrders = rawNotebook["order"] as? [String: [String]]
@@ -140,10 +142,10 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                         switch changeType {
                         case .new:
                             guard let rawLastModified = rawNotebook["timestamp"] as? String, let lastModified = Date.parseFormattedISO8601(rawLastModified) else {
-                                throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing last modified date")
+                                throw SyncError(id: uniqueID, username: self.session.username, message: "Missing last modified date", json: change, type: .deserialization)
                             }
                             guard let name = rawNotebook["label"] as? String else {
-                                throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook with uniqueID '\(uniqueID)' is missing name")
+                                throw SyncError(id: uniqueID, username: self.session.username, message: "Missing name (label)", json: change, type: .deserialization)
                             }
                             
                             let description = rawNotebook["desc"] as? String
@@ -177,7 +179,7 @@ class SyncNotebooksOperation: Procedure, ResultInjection {
                             }
                         }
                     }
-                } catch let error as NSError where AnnotationError.Code(rawValue: error.code) == .syncDeserializationFailed {
+                } catch {
                     deserializationErrors.append(error)
                 }
             }

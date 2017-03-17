@@ -22,6 +22,20 @@
 
 import Foundation
 
+public enum SyncErrorType {
+    case length
+    case deserialization
+    case unknown
+}
+
+public struct SyncError: Error {
+    let id: String?
+    let username: String?
+    let message: String
+    let json: Any?
+    let type: SyncErrorType
+}
+
 public struct AnnotationError {
     
     public static let Domain = "com.crosswaterbridge.LDSAnnotations"
@@ -35,7 +49,6 @@ public struct AnnotationError {
         case saveHighlightFailed = -3001
         case requiredFieldMissing = -3008
         case syncFailed = -4000
-        case syncDeserializationFailed = -4001
         case transactionError = -5000
     }
     

@@ -24,7 +24,6 @@ import Foundation
 
 /// Result of syncing notebooks and annotations.
 public enum SyncResult {
-    
     /// Result when sync is successful.
     ///
     /// The `token` should be used for the next sync.
@@ -32,5 +31,4 @@ public enum SyncResult {
     
     /// Result when a sync fails.
     case error(errors: [Error])
-    
 }

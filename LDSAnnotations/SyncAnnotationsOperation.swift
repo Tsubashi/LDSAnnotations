@@ -23,10 +23,6 @@
 import Foundation
 import ProcedureKit
 
-enum SyncAnnotationsOperationError: Error {
-    case notebookSyncFailed(String)
-}
-
 class SyncAnnotationsOperation: Procedure, ResultInjection {
     
     var result: PendingValue<Void> = .void
@@ -82,14 +78,21 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                     downloadLinkCount: self.downloadLinkCount)
                 completion(.success(notebooksResult: notebooksResult, localSyncAnnotationsDate: localSyncAnnotationsDate, serverSyncAnnotationsDate: serverSyncAnnotationsDate, changes: changes, deserializationErrors: self.deserializationErrors))
             } else {
-                completion(.error(errors: errors))
+                let syncErrors: [SyncError] = errors.map { error in
+                    if let syncError = error as? SyncError {
+                        return syncError
+                    } else {
+                        return SyncError(id: nil, username: session.username, message: "\(error)", json: nil, type: .unknown)
+                    }
+                }
+                completion(.error(errors: syncErrors))
             }
         }))
     }
     
     override func execute() {
         guard requirement.value != nil else {
-            finish(withError: SyncAnnotationsOperationError.notebookSyncFailed("Sync notebooks failed, cannot sync annotations."))
+            finish(withError: SyncError(id: nil, username: session.username, message: "Sync notebooks failed, cannot sync annotations.", json: nil, type: .unknown))
             return
         }
         
@@ -111,18 +114,17 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
             syncAnnotations["syncStatus"] = "notdeleted"
         }
         
-        let payload = ["syncAnnotations": syncAnnotations]
+        let requestJSON = ["syncAnnotations": syncAnnotations]
         
-        session.put("/ws/annotation/v1.4/Services/rest/sync/annotations-ids?xver=2", payload: payload) { response in
+        session.put("/ws/annotation/v1.4/Services/rest/sync/annotations-ids?xver=2", payload: requestJSON) { response in
             switch response {
-            case .success(let payload):
-                let syncAnnotationsIds = payload["syncAnnotationsIds"] as? [String: Any]
+            case .success(let responseJSON):
+                let syncAnnotationsIds = responseJSON["syncAnnotationsIds"] as? [String: Any]
                 if let errorsJSON = syncAnnotationsIds?["errors"] as? [[String: Any]], !errorsJSON.isEmpty {
                     // Server returned errors, fail
                     
-                    let errors = errorsJSON.map { AnnotationError.errorWithCode(.syncFailed, failureReason: String(format: "Failed to sync annotation with unique ID \"%@\": %@", $0["id"] as? String ?? "Unknown", $0["msg"] as? String ?? "Unknown")) }
+                    let errors = errorsJSON.map { SyncError(id: $0["id"] as? String, username: self.session.username, message: $0["msg"] as? String ?? "Unknown", json: requestJSON, type: .unknown) }
                     self.finish(withErrors: errors)
-                    
                 } else {
                     // No errors, sync is good
                     if (syncAnnotationsIds?["syncIds"] as? [[String: Any]])?.isEmpty == true, let rawServerSyncDate = syncAnnotationsIds?["before"] as? String, let serverSyncDate = Date.parseFormattedISO8601(rawServerSyncDate) {
@@ -130,24 +132,26 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                         do {
                             self.serverSyncAnnotationsDate = serverSyncDate
                             try self.annotationStore.inTransaction(notificationSource: self.source) {
-                                try self.applyServerChanges(payload, onOrBefore: localSyncDate)
+                                try self.applyServerChanges(responseJSON, onOrBefore: localSyncDate)
                             }
                             self.finish()
-                        } catch let error as NSError {
+                        } catch {
                             self.finish(withError: error)
                         }
                     } else {
                         do {
-                            try self.requestVersionedAnnotations(payload, onOrBefore: localSyncDate)
-                        } catch let error as NSError {
+                            try self.requestVersionedAnnotations(responseJSON, onOrBefore: localSyncDate)
+                        } catch {
                             self.finish(withError: error)
                         }
                     }
                 }
             case .failure(let payload):
-                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Failure response: \(payload)"))
+                let syncError: Error = SyncError(id: nil, username: self.session.username, message: "Annotation sync failed", json: payload, type: .unknown)
+                self.finish(withError: syncError)
             case .error(let error):
-                self.finish(withError: error)
+                let syncError: Error = SyncError(id: nil, username: self.session.username, message: "Annotation sync failed: \(error)", json: requestJSON, type: .unknown)
+                self.finish(withError: syncError)
             }
         }
     }
@@ -192,17 +196,17 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
     
     func requestVersionedAnnotations(_ payload: [String: Any], onOrBefore: Date) throws {
         guard let syncAnnotations = payload["syncAnnotationsIds"] as? [String: Any] else {
-            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing syncAnnotationsIds")
+            throw SyncError(id: nil, username: session.username, message: "Missing syncAnnotationsIds", json: payload, type: .unknown)
         }
         
         guard let rawServerSyncDate = syncAnnotations["before"] as? String, let serverSyncDate = Date.parseFormattedISO8601(rawServerSyncDate) else {
-            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing before")
+            throw SyncError(id: nil, username: session.username, message: "Missing before", json: payload, type: .unknown)
         }
         
         self.serverSyncAnnotationsDate = serverSyncDate
         
         guard let syncIDs = syncAnnotations["syncIds"] as? [[String: Any]] else {
-            throw AnnotationError.errorWithCode(.unknown, failureReason: "Missing syncIds")
+            throw SyncError(id: nil, username: session.username, message: "Missing syncIds", json: payload, type: .unknown)
         }
                 
         let docIDs = syncIDs.flatMap { $0["docId"] as? String }
@@ -237,13 +241,15 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                         try self.applyServerChanges(payload, onOrBefore: onOrBefore)
                     }
                     self.finish()
-                } catch let error as NSError {
+                } catch {
                     self.finish(withError: error)
                 }
             case .failure(let payload):
-                self.finish(withError: AnnotationError.errorWithCode(.unknown, failureReason: "Failure response: \(payload)"))
+                let syncError: Error = SyncError(id: nil, username: self.session.username, message: "Getting versioned annotations failed", json: payload, type: .unknown)
+                self.finish(withError: syncError)
             case .error(let error):
-                self.finish(withError: error)
+                let syncError: Error = SyncError(id: nil, username: self.session.username, message: "Getting versioned annotations failed: \(error)", json: payload, type: .unknown)
+                self.finish(withError: syncError)
             }
         }
     }
@@ -296,19 +302,19 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                 do {
                     try annotationStore.db.savepoint {
                         guard let uniqueID = change["annotationId"] as? String else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Missing annotationId")
+                            throw SyncError(id: nil, username: self.session.username, message: "Missing annotationId", json: change, type: .deserialization)
                         }
                         guard let rawChangeType = change["changeType"] as? String, let changeType = ChangeType(rawValue: rawChangeType) else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing changeType")
+                            throw SyncError(id: uniqueID, username: self.session.username, message: "Missing change type", json: change, type: .deserialization)
                         }
                         guard let rawAnnotation = change["annotation"] as? [String: Any] else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing annotation")
+                            throw SyncError(id: uniqueID, username: self.session.username, message: "Missing annotation", json: change, type: .deserialization)
                         }
                         guard let rawLastModified = rawAnnotation["timestamp"] as? String, let lastModified = Date.parseFormattedISO8601(rawLastModified) else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing last modified date")
+                            throw SyncError(id: uniqueID, username: self.session.username, message: "Missing last modified date", json: change, type: .deserialization)
                         }
                         guard let appSource = rawAnnotation["source"] as? String else {
-                            throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Annotation with uniqueID '\(uniqueID)' is missing source")
+                            throw SyncError(id: uniqueID, username: self.session.username, message: "Missing source", json: change, type: .deserialization)
                         }
                         
                         switch changeType {
@@ -358,7 +364,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                             if let bookmark = rawAnnotation["bookmark"] as? [String: Any] {
                                 if bookmark["@pid"] == nil && bookmark["uri"] != nil {
                                     // Bookmark has a URI, but no @pid so its invalid. If both are nil, its a valid chapter-level bookmark
-                                    throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Bookmark with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
+                                    throw SyncError(id: uniqueID, username: self.session.username, message: "Missing paragraphAID", json: change, type: .deserialization)
                                 }
                                 
                                 let name = bookmark["name"] as? String
@@ -391,11 +397,11 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                             if let folders = rawAnnotation["folders"] as? [String: [[String: Any]]] {
                                 for folder in folders["folder"] ?? [] {
                                     guard let notebookUniqueID = (folder["@uri"] as? NSString)?.lastPathComponent else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Notebook is missing uniqueID: \(folder)")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Missing uri in folder", json: change, type: .deserialization)
                                     }
                                     
                                     guard let notebookID = self.annotationStore.notebookWithUniqueID(notebookUniqueID)?.id else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Cannot associate annotation with uniqueID '\(uniqueID)' to notebook with uniqueID '\(notebookUniqueID)'")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Notebook with uniqueID '\(notebookUniqueID)' not found in database", json: change, type: .deserialization)
                                     }
                                     
                                     if let index = notebookIDsToDelete.index(of: notebookID) {
@@ -428,16 +434,16 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                             if let highlights = rawAnnotation["highlights"] as? [String: [[String: Any]]] {
                                 for highlight in highlights["highlight"] ?? [] {
                                     guard let offsetStartString = highlight["@offset-start"] as? String, let offsetStart = Int(offsetStartString) else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-start")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Highlight missing offset-start", json: change, type: .deserialization)
                                     }
                                     guard let offsetEndString = highlight["@offset-end"] as? String, let offsetEnd = Int(offsetEndString) else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing offset-end")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Highlight missing offset-end", json: change, type: .deserialization)
                                     }
                                     guard let highlightColor = (highlight["@color"] as? String).flatMap({ HighlightColor.highlightColor(from: $0) }) else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing color")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Highlight missing color", json: change, type: .deserialization)
                                     }
                                     guard let paragraphAID = highlight["@pid"] as? String else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Highlight with annotation uniqueID '\(uniqueID)' is missing paragraphAID")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Highlight missing paragraphAID", json: change, type: .deserialization)
                                     }
                                     
                                     let paragraphRange = ParagraphRange(paragraphAID: paragraphAID, startWordOffset: offsetStart, endWordOffset: offsetEnd)
@@ -462,16 +468,16 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                             if let links = rawAnnotation["refs"] as? [String: [[String: Any]]] {
                                 for link in links["ref"] ?? [] {
                                     guard let name = link["$"] as? String else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing name")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Link missing name", json: change, type: .deserialization)
                                     }
                                     guard let paragraphAIDs = link["@pid"] as? String else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing paragraphAIDs")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Link missing paragraphAIDs", json: change, type: .deserialization)
                                     }
                                     guard let docID = link["@docId"] as? String else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docId")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Link missing docID", json: change, type: .deserialization)
                                     }
                                     guard let docVersionString = link["@contentVersion"] as? String, let docVersion = Int(docVersionString) else {
-                                        throw AnnotationError.errorWithCode(.syncDeserializationFailed, failureReason: "Link with annotation uniqueID '\(uniqueID)' is missing docVersion")
+                                        throw SyncError(id: uniqueID, username: self.session.username, message: "Link missing docVersion", json: change, type: .deserialization)
                                     }
                                     
                                     try self.annotationStore.addLink(name: name, docID: docID, docVersion: docVersion, paragraphAIDs: paragraphAIDs.components(separatedBy: ",").map { $0.trimmed() }, annotationID: annotationID, source: self.source)
@@ -503,7 +509,7 @@ class SyncAnnotationsOperation: Procedure, ResultInjection {
                             }
                         }
                     }
-                } catch let error as NSError where AnnotationError.Code(rawValue: error.code) == .syncDeserializationFailed {
+                } catch {
                     deserializationErrors.append(error)
                 }
             }
