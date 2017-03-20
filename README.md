@@ -9,9 +9,9 @@ Swift client library for LDS annotation sync.
 
 ### Installation
 
-Install with Cocoapods by adding the following to your Podfile:
+Install with CocoaPods by adding the following to your Podfile:
 
-```
+```ruby
 use_frameworks!
 
 pod 'LDSAnnotations'
@@ -19,7 +19,7 @@ pod 'LDSAnnotations'
 
 Then run:
 
-```
+```bash
 pod install
 ```
 
@@ -39,16 +39,23 @@ isn’t accidentally committed.
 ### Travis CI
 
 The test credentials are encrypted in the `.travis.yml` for use when building on
-Travis CI. To update the credentials, use the following command (substituting the
-appropriate values; be sure to escape `bash` symbols):
+Travis CI. To update the credentials:
 
-```bash
-travis encrypt --add --override \
-    "CLIENT_USERNAME=<value>" \
-    "CLIENT_PASSWORD=<value>" \
-    "TEST_ACCOUNT_USERNAME=<value>" \
-    "TEST_ACCOUNT_PASSWORD=<value>"
-```
+1. Install the [Travis client](https://github.com/travis-ci/travis.rb):
+
+	```bash
+	sudo gem install travis
+	```
+
+2. Run the following command (substituting the appropriate values; be sure to escape any `bash` symbols):
+
+	```bash
+	travis encrypt --add --override \
+		"CLIENT_USERNAME=<value>" \
+		"CLIENT_PASSWORD=<value>" \
+		"TEST_ACCOUNT_USERNAME=<value>" \
+		"TEST_ACCOUNT_PASSWORD=<value>"
+	```
 
 ### License
 

@@ -78,7 +78,7 @@ public class Session: NSObject {
     public var docVersionsForDocIDs: ((_ docIDs: [String]) -> ([String: Int]))?
     
     /// Constructs a session.
-    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: URL? = URL(string: "https://beta.lds.org/login.html"), domain: String = "beta.lds.org", trustPolicy: TrustPolicy = .trust) {
+    public init(username: String, password: String, userAgent: String, clientVersion: String, clientUsername: String, clientPassword: String, authenticationURL: URL? = URL(string: "https://signin.lds.org/login.html"), domain: String = "lds.org", trustPolicy: TrustPolicy = .trust) {
         self.username = username
         self.password = password
         self.userAgent = userAgent

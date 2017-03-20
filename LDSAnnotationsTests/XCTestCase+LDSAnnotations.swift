@@ -43,8 +43,8 @@ extension XCTestCase {
             fatalError()
         }
         
-        let authenticationURL = UserDefaults.standard.string(forKey: "AuthenticationURL").flatMap { URL(string: $0) }
-        let domain = UserDefaults.standard.string(forKey: "Domain") ?? "beta.lds.org"
+        let authenticationURL = URL(string: UserDefaults.standard.string(forKey: "AuthenticationURL") ?? "https://signin.lds.org/login.html")
+        let domain = UserDefaults.standard.string(forKey: "Domain") ?? "lds.org"
         
         let userAgent = "LDSAnnotations unit tests"
         let clientVersion = "1"
