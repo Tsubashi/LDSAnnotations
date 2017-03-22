@@ -62,6 +62,21 @@ class SyncAnnotationsTests: XCTestCase {
         verifyEqual(annotationStore1: annotationStore1, annotationStore2: annotationStore2)
     }
     
+    func testNotesThatCausedSecurityException() {
+        let annotationStore1 = AnnotationStore()!
+        let session1 = createSession()
+        var token1: SyncToken?
+        token1 = resetAnnotations(annotationStore: annotationStore1, session: session1, token: token1)
+        
+        // These next two notes caused an ASM security exception to happen for a user so the payload never got to the sync service. They aren't supposed to intercept service calls like that. This test should hopefully help us catch if they break this again.
+        _ = try! annotationStore1.addNote("", content: "Or this \\(newer link format\\):\ngospellibrary://content/scriptures/dc\\-testament/dc/20?verse=17&lang=eng\\#p17\n", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], highlightColor: .yellow, style: .highlight, appSource: "Test", device: "iphone")
+        
+        _ = try! annotationStore1.addNote("Elder L Tom Perry on Religious Freedom - Video", content: "https://www\\.lds\\.org/media\\-library/video/2013\\-11\\-1010\\-mormon\\-apostle\\-promotes\\-religious\\-freedom?category=topics/religious\\-freedom&lang=eng", docID: "13859831", docVersion: 1, paragraphRanges: [ParagraphRange(paragraphAID: "1")], highlightColor: .yellow, style: .highlight, appSource: "Test", device: "iphone")
+        
+        // Upload the changes
+        token1 = sync(annotationStore1, session: session1, token: token1, description: "Sync annotations")
+    }
+    
     func testSyncBookmarkReorder() {
         let annotationStore1 = AnnotationStore()!
         let session1 = createSession()
